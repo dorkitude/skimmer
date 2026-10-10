@@ -32,15 +32,31 @@ type line struct {
 	text string
 }
 
+// DefaultOverlap is the default fraction of a chunk repeated from the end
+// of the chunk before it.
+const DefaultOverlap = 0.10
+
 // Split divides text into chunks of at most maxChars runes. Paragraphs
 // (blank-line separated blocks) are packed together up to the limit; a
 // paragraph too long on its own is packed line by line, and a line too long
 // on its own is cut on word boundaries (then hard-cut). Blank lines between
 // paragraphs inside a chunk are kept as a single blank line. maxChars ≤ 0
 // uses DefaultMaxChars.
-func Split(text string, maxChars int) []Chunk {
+//
+// With overlap > 0, each chunk after the first begins with up to overlap
+// runes of whole trailing lines from the chunk before it (or the tail of
+// its last line, from a word boundary, when that line alone is too long),
+// so something that straddles a boundary is seen whole at least once. The
+// packing budget shrinks to match, so chunks still fit in maxChars. Overlap
+// is capped at half of maxChars.
+func Split(text string, maxChars, overlap int) []Chunk {
 	if maxChars <= 0 {
 		maxChars = DefaultMaxChars
+	}
+	overlap = max(0, min(overlap, maxChars/2))
+	budget := maxChars
+	if overlap > 0 {
+		budget = maxChars - overlap - 2 // 2: the separator joining overlap and chunk
 	}
 	text = strings.ReplaceAll(text, "\r\n", "\n")
 
@@ -62,15 +78,19 @@ func Split(text string, maxChars int) []Chunk {
 		paras = append(paras, cur)
 	}
 
-	p := packer{max: maxChars}
+	p := packer{max: budget}
 	for _, para := range paras {
-		if size(para) > maxChars {
+		if size(para) > budget {
 			p.flush()
 			for _, l := range para {
-				if runes(l.text) > maxChars {
+				if runes(l.text) > budget {
 					p.flush()
-					for _, piece := range cutLine(l.text, maxChars) {
-						p.out = append(p.out, Chunk{Text: piece, StartLine: l.n, EndLine: l.n})
+					for k, piece := range cutLine(l.text, budget) {
+						sep := " " // later pieces continue the same line
+						if k == 0 {
+							sep = "\n"
+						}
+						p.out = append(p.out, []seg{{n: l.n, text: piece, sep: sep}})
 					}
 					continue
 				}
@@ -82,43 +102,98 @@ func Split(text string, maxChars int) []Chunk {
 		p.add(para, "\n\n")
 	}
 	p.flush()
-	return p.out
+
+	out := make([]Chunk, len(p.out))
+	for i, g := range p.out {
+		if i > 0 && overlap > 0 {
+			g = append(tail(p.out[i-1], overlap), g...)
+		}
+		out[i] = render(g)
+	}
+	return out
+}
+
+// seg is one line (or piece of a line) inside a chunk, with the separator
+// that joins it to the seg before it.
+type seg struct {
+	n    int
+	text string
+	sep  string
 }
 
 type packer struct {
-	max   int
-	out   []Chunk
-	buf   strings.Builder
-	n     int // runes in buf
-	start int
-	end   int
+	max  int
+	segs []seg
+	size int // runes in the chunk being built
+	out  [][]seg
 }
 
 // add appends a block of lines, joined to what came before by sep, flushing
 // first if it would not fit.
 func (p *packer) add(block []line, sep string) {
-	text := join(block)
-	n := runes(text)
-	if p.n > 0 && p.n+runes(sep)+n > p.max {
+	n := size(block)
+	if p.size > 0 && p.size+runes(sep)+n > p.max {
 		p.flush()
 	}
-	if p.n > 0 {
-		p.buf.WriteString(sep)
-		p.n += runes(sep)
-	} else {
-		p.start = block[0].n
+	if p.size > 0 {
+		p.size += runes(sep)
 	}
-	p.buf.WriteString(text)
-	p.n += n
-	p.end = block[len(block)-1].n
+	for i, l := range block {
+		s := "\n"
+		if i == 0 {
+			s = sep
+		}
+		p.segs = append(p.segs, seg{n: l.n, text: l.text, sep: s})
+	}
+	p.size += n
 }
 
 func (p *packer) flush() {
-	if p.n > 0 {
-		p.out = append(p.out, Chunk{Text: p.buf.String(), StartLine: p.start, EndLine: p.end})
+	if len(p.segs) > 0 {
+		p.out = append(p.out, p.segs)
 	}
-	p.buf.Reset()
-	p.n = 0
+	p.segs = nil
+	p.size = 0
+}
+
+// tail returns the trailing segs of g that fit in max runes, separators
+// included. If even the last seg is too long, it returns that seg's last
+// max runes, starting after a space when there is one.
+func tail(g []seg, max int) []seg {
+	total, i := 0, len(g)
+	for i > 0 {
+		cost := runes(g[i-1].text)
+		if i < len(g) {
+			cost += runes(g[i].sep)
+		}
+		if total+cost > max {
+			break
+		}
+		total += cost
+		i--
+	}
+	if i < len(g) {
+		return g[i:]
+	}
+	last := g[len(g)-1]
+	r := []rune(last.text)
+	t := string(r[len(r)-max:])
+	if j := strings.IndexByte(t, ' '); j >= 0 && j < len(t)-1 {
+		t = t[j+1:]
+	}
+	return []seg{{n: last.n, text: t, sep: last.sep}}
+}
+
+// render joins segs into a chunk; the first seg's separator is dropped.
+func render(g []seg) Chunk {
+	var b strings.Builder
+	for i, s := range g {
+		if i > 0 {
+			b.WriteString(s.sep)
+		}
+		b.WriteString(s.text)
+	}
+	return Chunk{Text: b.String(), StartLine: g[0].n, EndLine: g[len(g)-1].n}
 }
 
 func join(ls []line) string {

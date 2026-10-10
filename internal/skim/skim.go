@@ -75,7 +75,9 @@ type Skimmer struct {
 	Goal       string
 	Threshold  float64 // keep chunks with P(yes) ≥ Threshold
 	ChunkChars int
-	MaxChars   int // per source, in runes
+	// Overlap is the fraction of each chunk repeated from the one before.
+	Overlap  float64
+	MaxChars int // per source, in runes
 	// MaxKept, when > 0, keeps at most this many chunks per source (the
 	// highest scoring), still emitted in document order.
 	MaxKept int
@@ -126,7 +128,7 @@ func (s *Skimmer) one(ctx context.Context, src Source) (Result, jev.Usage) {
 		r.Truncated = true
 	}
 	r.Chars = utf8.RuneCountInString(text)
-	chunks := chunk.Split(text, s.ChunkChars)
+	chunks := chunk.Split(text, s.ChunkChars, int(s.Overlap*float64(s.ChunkChars)))
 	r.Chunks = len(chunks)
 	if len(chunks) == 0 {
 		return r, jev.Usage{}

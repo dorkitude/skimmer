@@ -19,8 +19,8 @@ It's the chunk filter from [webctl](https://github.com/dorkitude/webctl), pulled
           │                                            │
           ▼                                            │
   ┌───────────────┐                                    │
-  │  ~2,000-char  │  line ranges remembered            │
-  │    chunks     │                                    │
+  │  ~2,000-char  │  10% overlap,                      │
+  │    chunks     │  line ranges remembered            │
   └───────┬───────┘                                    │
           │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │
           ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
@@ -102,6 +102,7 @@ func (c *Cooldown) Note(name string, err error) {
 | `-t, --threshold` | keep chunks with P(relevant) ≥ this (default 0.5) |
 | `-n, --max-chunks` | keep at most N chunks per source, best first |
 | `--chunk-chars` | chunk size (default 2000) |
+| `--overlap` | fraction of each chunk repeated from the previous one, so text straddling a boundary is seen whole (default 0.1; `--overlap 0.2` for more, `--overlap 0` to disable; max 0.5) |
 | `--max-chars` | read at most this many characters per source (default 400k) |
 | `--json` / `--raw` | structured output / just the kept text |
 | `--paths` / `--text` | force stdin to be read as a path list / as the document |

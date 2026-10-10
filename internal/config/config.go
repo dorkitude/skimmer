@@ -28,6 +28,7 @@ const (
 	DefaultModel       = "jev-latest"
 	DefaultThreshold   = 0.5
 	DefaultChunkChars  = 2000
+	DefaultOverlap     = 0.10
 	DefaultMaxChars    = 400000
 	DefaultConcurrency = 8
 	EnvPrefix          = "SKIMMER"
@@ -48,10 +49,12 @@ type Config struct {
 	// "config", or "" when unset.
 	KeySource string
 
-	BaseURL     string
-	Model       string
-	Threshold   float64
-	ChunkChars  int
+	BaseURL    string
+	Model      string
+	Threshold  float64
+	ChunkChars int
+	// Overlap is the fraction of each chunk repeated from the one before.
+	Overlap     float64
 	MaxChars    int
 	Concurrency int
 }
@@ -79,6 +82,7 @@ func New() *viper.Viper {
 	v.SetDefault("model", DefaultModel)
 	v.SetDefault("threshold", DefaultThreshold)
 	v.SetDefault("chunk_chars", DefaultChunkChars)
+	v.SetDefault("overlap", DefaultOverlap)
 	v.SetDefault("max_chars", DefaultMaxChars)
 	v.SetDefault("concurrency", DefaultConcurrency)
 	v.SetEnvPrefix(EnvPrefix)
@@ -117,6 +121,7 @@ func Load(v *viper.Viper) (*Config, error) {
 		Model:       strings.TrimSpace(v.GetString("model")),
 		Threshold:   v.GetFloat64("threshold"),
 		ChunkChars:  v.GetInt("chunk_chars"),
+		Overlap:     v.GetFloat64("overlap"),
 		MaxChars:    v.GetInt("max_chars"),
 		Concurrency: v.GetInt("concurrency"),
 	}
@@ -130,6 +135,9 @@ func Load(v *viper.Viper) (*Config, error) {
 	}
 	if cfg.ChunkChars < 200 {
 		return nil, fmt.Errorf("chunk_chars must be at least 200, got %d", cfg.ChunkChars)
+	}
+	if cfg.Overlap < 0 || cfg.Overlap > 0.5 {
+		return nil, fmt.Errorf("overlap must be between 0 and 0.5, got %g", cfg.Overlap)
 	}
 	if cfg.Concurrency <= 0 {
 		cfg.Concurrency = DefaultConcurrency

@@ -59,6 +59,7 @@ func init() {
 	f.StringVarP(&skimOpts.prompt, "prompt", "p", "", "prompt name or .md path (default skim_document/DEFAULT)")
 	f.Float64P("threshold", "t", config.DefaultThreshold, "keep chunks with P(relevant) ≥ this")
 	f.Int("chunk-chars", config.DefaultChunkChars, "target chunk size in characters")
+	f.Float64("overlap", config.DefaultOverlap, "fraction of each chunk repeated from the previous one (0 to disable, max 0.5)")
 	f.Int("max-chars", config.DefaultMaxChars, "read at most this many characters per source")
 	f.IntVarP(&skimOpts.maxKept, "max-chunks", "n", 0, "keep at most N chunks per source, best first (0 = no cap)")
 	f.IntVar(&skimOpts.maxFiles, "max-files", 500, "cap on files read from directories and stdin path lists")
@@ -80,6 +81,7 @@ func runSkim(cmd *cobra.Command, args []string) error {
 	}
 	cfg, err := loadConfigFor(cmd, map[string]string{
 		"threshold": "threshold", "chunk-chars": "chunk_chars", "max-chars": "max_chars",
+		"overlap": "overlap",
 	})
 	if err != nil {
 		return err
@@ -113,6 +115,7 @@ func runSkim(cmd *cobra.Command, args []string) error {
 		Goal:       skimOpts.goal,
 		Threshold:  cfg.Threshold,
 		ChunkChars: cfg.ChunkChars,
+		Overlap:    cfg.Overlap,
 		MaxChars:   cfg.MaxChars,
 		MaxKept:    skimOpts.maxKept,
 	}
