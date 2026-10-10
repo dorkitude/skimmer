@@ -1,0 +1,24 @@
+/skimmer
+/dist/
+*.local
+/probe/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.swp
+
+# Node (npm wrapper)
+node_modules/
+
+# Go test artifacts
+coverage.out
