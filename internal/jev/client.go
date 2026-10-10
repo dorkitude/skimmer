@@ -21,6 +21,9 @@ const (
 	maxAttempts    = 3
 )
 
+// UserAgent is sent with every request; the CLI sets the real version.
+var UserAgent = "skimmer (+https://github.com/dorkitude/skimmer)"
+
 // Client talks to the Jev System One API.
 type Client struct {
 	// APIKey is sent as a bearer token. It may be empty when BaseURL is a
@@ -180,7 +183,7 @@ func (c *Client) once(ctx context.Context, payload []byte) (*SystemOneResponse, 
 	if c.APIKey != "" {
 		httpReq.Header.Set("Authorization", "Bearer "+c.APIKey)
 	}
-	httpReq.Header.Set("User-Agent", "skimmer/1.0 (+https://github.com/dorkitude/skimmer)")
+	httpReq.Header.Set("User-Agent", UserAgent)
 
 	resp, err := c.httpClient().Do(httpReq)
 	if err != nil {

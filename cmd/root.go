@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"runtime/debug"
+	"strings"
 	"syscall"
 
 	"github.com/spf13/cobra"
@@ -15,8 +17,20 @@ import (
 	"github.com/dorkitude/skimmer/internal/jev"
 )
 
-// Version is set at build time with -ldflags "-X github.com/dorkitude/skimmer/cmd.Version=...".
-var Version = "dev"
+// Version is set at build time with -ldflags "-X github.com/dorkitude/skimmer/cmd.Version=..."
+// (GoReleaser and the Homebrew formula do). `go install ...@vX.Y.Z` builds
+// fall back to the module version; anything else reports "dev".
+var Version = ""
+
+func version() string {
+	if Version != "" {
+		return Version
+	}
+	if bi, ok := debug.ReadBuildInfo(); ok && bi.Main.Version != "" && bi.Main.Version != "(devel)" {
+		return strings.TrimPrefix(bi.Main.Version, "v")
+	}
+	return "dev"
+}
 
 // v carries flag bindings into config.Load.
 var v = config.New()
@@ -42,10 +56,11 @@ less distracted model.
 Run ` + "`skimmer auth`" + ` once to store your Jev key.`,
 	SilenceUsage:  true,
 	SilenceErrors: true,
-	Version:       Version,
 }
 
 func init() {
+	rootCmd.Version = version()
+	jev.UserAgent = "skimmer/" + rootCmd.Version + " (+https://github.com/dorkitude/skimmer)"
 	pf := rootCmd.PersistentFlags()
 	pf.String("api-key", "", "Jev API key (default: $SKIMMER_API_KEY, .env, or `skimmer auth`)")
 	pf.String("base-url", "", "Jev API base URL (default "+config.DefaultBaseURL+")")

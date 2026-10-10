@@ -1,0 +1,58 @@
+version: 2
+
+project_name: skimmer
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: skimmer
+    binary: skimmer
+    main: .
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X github.com/dorkitude/skimmer/cmd.Version={{.Version}}
+    goos: [darwin, linux, windows]
+    goarch: [amd64, arm64]
+
+archives:
+  - id: default
+    ids: [skimmer]
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files: [LICENSE, README.md]
+
+# .deb and .rpm packages, attached to the release. The .debs are also
+# published to the signed apt repository (scripts/publish-apt.sh).
+nfpms:
+  - id: packages
+    package_name: skimmer
+    ids: [skimmer]
+    formats: [deb, rpm]
+    file_name_template: "{{ .PackageName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    vendor: Kyle Wild
+    maintainer: Kyle Wild <kyle@kylewild.com>
+    homepage: https://github.com/dorkitude/skimmer
+    description: |-
+      Skim pages, files, and lists with Jev, keeping only what helps with
+      your goal. Saves agent tokens.
+    license: MIT
+    bindir: /usr/bin
+    section: utils
+    priority: optional
+    contents:
+      - src: LICENSE
+        dst: /usr/share/doc/skimmer/LICENSE
+
+checksum:
+  name_template: checksums.txt
+
+release:
+  name_template: "skimmer {{ .Tag }}"
+
+changelog:
+  disable: true

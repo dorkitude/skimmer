@@ -39,9 +39,36 @@ When Jev can't judge a chunk (a failed batch, say), skimmer keeps it rather than
 
 ## Install
 
+### Homebrew (macOS and Linux)
+
+```bash
+brew install dorkitude/tap/skimmer
+```
+
+### apt (Debian and Ubuntu)
+
+```bash
+curl -fsSL https://dorkitude.github.io/skimmer-apt/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/skimmer.gpg
+echo "deb [signed-by=/usr/share/keyrings/skimmer.gpg] https://dorkitude.github.io/skimmer-apt stable main" | sudo tee /etc/apt/sources.list.d/skimmer.list
+sudo apt update && sudo apt install skimmer
+```
+
+### Scoop (Windows)
+
+```powershell
+scoop bucket add dorkitude https://github.com/dorkitude/scoop-bucket
+scoop install dorkitude/skimmer
+```
+
+### go install
+
 ```bash
 go install github.com/dorkitude/skimmer@latest
 ```
+
+### Binaries and packages
+
+Every [release](https://github.com/dorkitude/skimmer/releases) has macOS, Linux, and Windows builds (amd64 and arm64), plus `.deb` and `.rpm` packages and `checksums.txt`.
 
 ## Auth
 
@@ -151,6 +178,10 @@ run it through `skimmer` with a specific goal, and read only what comes back:
 Kept file chunks are cited as path:start-end; open the file there if you need more context.
 If skimmer reports nothing relevant, rephrase the goal or lower `-t` before reading raw.
 ```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). The release process is in [AGENTS.md](AGENTS.md#release-strategy), and changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
