@@ -98,7 +98,9 @@ release.
    tests, then GoReleaser, then the apt publish.
 4. Add the notes: `gh release edit vX.Y.Z -R dorkitude/skimmer --notes "<from CHANGELOG>"`.
 5. Publish Homebrew and Scoop: `scripts/publish-packages.sh vX.Y.Z`
-   (`DRY_RUN=1` to preview). It's idempotent.
+   (`DRY_RUN=1` to preview). It's idempotent. **Don't skip this.** The tag
+   push updates only GitHub and apt. Without this step, `brew` and `scoop`
+   users stay on the previous version and nothing fails to warn you.
 6. Verify each channel reports `X.Y.Z`:
    ```bash
    go install github.com/dorkitude/skimmer@vX.Y.Z && skimmer --version
