@@ -24,9 +24,9 @@ It's the chunk filter from [webctl](https://github.com/dorkitude/webctl), pulled
   └───────┬───────┘                                    │
           │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │
           ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-  ┌───────────────────────────────────────────────────────┐
-  │                          Jev                          │  one yes/no question per chunk or item,
-  │       "does this help with the goal?" → P(yes)        │  batched to fit context, run in parallel
+  ┌───────────────────────────────────────────────────────┐  one yes/no question per
+  │                          Jev                          │  chunk or item, batched to 
+  │       "does this help with the goal?" → P(yes)        │  fit context, run in parallel
   └───────┬───────────┬───────────┬───────────────────────┘
           ▼           ▼           ▼        ✂️  the rest dropped
   ┌───────────────────────────────────────────┐
