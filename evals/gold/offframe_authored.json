@@ -1,0 +1,55 @@
+[
+{"doc":"arxiv-2608.16621","kind":"single","question":"What incremental maintenance cost do the authors report per document update versus full re-ingestion?"},
+{"doc":"arxiv-2608.16621","kind":"single","question":"Which corpus and how many documents were used in the main incremental-update experiment?"},
+{"doc":"arxiv-2608.16621","kind":"collect","question":"List every dataset used anywhere in this paper and the size reported for each."},
+{"doc":"arxiv-2608.16621","kind":"comparison","question":"How does update cost under the proposed substrate differ from the full-rebuild baseline in the reported results?"},
+
+{"doc":"arxiv-2608.20845","kind":"single","question":"What speedup or cost reduction does ingest-time compilation show over query-time interpretation?"},
+{"doc":"arxiv-2608.20845","kind":"single","question":"What LLM was used for ingest-time compilation in the experiments?"},
+{"doc":"arxiv-2608.20845","kind":"collect","question":"Gather every baseline RAG system this paper compares against."},
+{"doc":"arxiv-2608.20845","kind":"collect","question":"List all token-cost or dollar figures reported anywhere in the paper."},
+{"doc":"arxiv-2608.20845","kind":"comparison","question":"How do ingest-time and query-time approaches differ in reported latency versus accuracy?"},
+
+{"doc":"arxiv-2609.29661","kind":"single","question":"How is a 'revised corpus' defined, and how many revisions were injected in the benchmark?"},
+{"doc":"arxiv-2609.29661","kind":"single","question":"What accuracy did the fact-compilation method achieve on stale-answer questions?"},
+{"doc":"arxiv-2609.29661","kind":"collect","question":"List every evaluation metric reported in this paper."},
+{"doc":"arxiv-2609.29661","kind":"single","question":"Which limitation do the authors name first in the limitations section?"},
+
+{"doc":"arxiv-2610.18579","kind":"single","question":"How do the authors define a 'System One model' failure in an agent loop?"},
+{"doc":"arxiv-2610.18579","kind":"single","question":"What fraction of failures were reading errors versus decision errors?"},
+{"doc":"arxiv-2610.18579","kind":"collect","question":"Collect every agent benchmark or environment evaluated in this paper."},
+{"doc":"arxiv-2610.18579","kind":"comparison","question":"How does the strongest model's comprehension score differ from its action-selection score?"},
+
+{"doc":"cdc-sleep","kind":"single","question":"How many hours of sleep does CDC recommend for adults aged 18-60?"},
+{"doc":"cdc-sleep","kind":"collect","question":"List every age group on this page with its recommended sleep duration."},
+{"doc":"cdc-sleep","kind":"collect","question":"Gather every health condition the page links to insufficient sleep."},
+
+{"doc":"gutenberg-alice","kind":"single","question":"What does the bottle Alice drinks in chapter 1 taste like, according to her?"},
+{"doc":"gutenberg-alice","kind":"single","question":"What riddle does the Hatter ask at the tea party, and is it answered?"},
+{"doc":"gutenberg-alice","kind":"collect","question":"List every substance or object that changes Alice's size and the resulting change."},
+{"doc":"gutenberg-alice","kind":"collect","question":"Name every animal present at the Caucus-Race and in the pool of tears."},
+{"doc":"gutenberg-alice","kind":"comparison","question":"How does Alice's first meeting with the Duchess differ from her encounter at the croquet ground?"},
+
+{"doc":"gutenberg-timemachine","kind":"single","question":"What year does the Time Traveller say the dials showed when he stopped in the Eloi era?"},
+{"doc":"gutenberg-timemachine","kind":"single","question":"What is the name of the Eloi woman the Time Traveller rescues from the river?"},
+{"doc":"gutenberg-timemachine","kind":"collect","question":"List every item the Time Traveller carries or acquires during his journey."},
+{"doc":"gutenberg-timemachine","kind":"comparison","question":"How does the Time Traveller's first theory of the Eloi society differ from his final explanation?"},
+
+{"doc":"nist-sp-800-63b","kind":"single","question":"What minimum memorized secret length does this publication require for user-chosen passwords?"},
+{"doc":"nist-sp-800-63b","kind":"single","question":"On what date was SP 800-63B withdrawn and what superseded it?"},
+{"doc":"nist-sp-800-63b","kind":"collect","question":"List every authenticator type defined and the AAL at which each is permitted."},
+{"doc":"nist-sp-800-63b","kind":"comparison","question":"How do the reauthentication requirements for AAL2 and AAL3 differ?"},
+
+{"doc":"rfc9110","kind":"single","question":"What status code does RFC 9110 define for 'Misdirected Request'?"},
+{"doc":"rfc9110","kind":"single","question":"Which RFCs does this document list as obsoleted in section 1.4?"},
+{"doc":"rfc9110","kind":"collect","question":"List every HTTP method defined in RFC 9110 with whether it is safe and idempotent."},
+
+{"doc":"wiki-ada-lovelace","kind":"single","question":"Which Menabrea paper did Lovelace translate, and in what year were her notes published?"},
+{"doc":"wiki-ada-lovelace","kind":"collect","question":"Gather every honor, award, or commemoration named after Ada Lovelace mentioned here."},
+
+{"doc":"wiki-garbage-patch","kind":"single","question":"What mass of plastic is estimated to be in the patch, and by which study?"},
+{"doc":"wiki-garbage-patch","kind":"collect","question":"List every cleanup effort or organization mentioned and what it attempted."},
+
+{"doc":"wiki-kalman-filter","kind":"single","question":"In which year and journal did Rudolf Kálmán publish the original filter paper?"},
+{"doc":"wiki-kalman-filter","kind":"collect","question":"List every named variant or extension of the Kalman filter described in the article."}
+]

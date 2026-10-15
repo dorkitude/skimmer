@@ -1,0 +1,225 @@
+[
+  {
+    "id": "13",
+    "type": "single",
+    "question": "How do the authors define a 'System One model' failure in an agent loop?",
+    "answer": "A System One model failure is when the model picks the wrong next action among supplied options with no chain of thought to inspect. Authors diagnose two explanations: misreading the agent's known state (e.g., missing that the last action failed or losing track of what it holds) versus reading the state correctly and still choosing badly (a decision/composition failure). They measure this by pairing each next-action decision with independent factual probes on the same state, yielding U1D0 outcomes (facts right, action wrong).",
+    "confidence": 85,
+    "source_chunks": [
+      "arxiv-2610.18579-01",
+      "arxiv-2610.18579-03",
+      "arxiv-2610.18579-05",
+      "arxiv-2610.18579-08"
+    ]
+  },
+  {
+    "id": "14",
+    "type": "single",
+    "question": "What fraction of failures were reading errors versus decision errors?",
+    "answer": "Most failures are decision errors after correct reading, not reading errors. For the six most accurate systems, 73–85% of decision errors occur on states where every measured fact is answered correctly (U1D0); that share grows with accuracy (e.g., 73% for JEV, 70% for OpenAI Decisions, up to ~85% for the reasoning reference). Conditional on all facts correct, action is still wrong in 10–21% of states. Conversely, when at least one fact is wrong, the action is nevertheless correct in 62–70% of states.",
+    "confidence": 90,
+    "source_chunks": [
+      "arxiv-2610.18579-06",
+      "arxiv-2610.18579-12",
+      "arxiv-2610.18579-16",
+      "arxiv-2610.18579-18"
+    ]
+  },
+  {
+    "id": "15",
+    "type": "collect",
+    "question": "Collect every agent benchmark or environment evaluated in this paper.",
+    "answer": [
+      "ALFWorld",
+      "BabyAI-Text",
+      "TextWorld (cooking games)",
+      "τ²-bench (airline and retail customer-service policies)",
+      "tool use traces",
+      "web navigation traces",
+      "coding traces",
+      "freshly generated states with probes sufficient by construction (follow-up studies)"
+    ],
+    "confidence": 90,
+    "source_chunks": [
+      "arxiv-2610.18579-02",
+      "arxiv-2610.18579-03",
+      "arxiv-2610.18579-09",
+      "arxiv-2610.18579-10"
+    ]
+  },
+  {
+    "id": "16",
+    "type": "comparison",
+    "question": "How does the strongest model's comprehension score differ from its action-selection score?",
+    "answer": "Among fast System One models, Eikos-27B is the strongest on action accuracy (D = 0.795) with comprehension/reading U = 0.850 (gap of 0.055). Torchcast-27B shows the largest reading–acting gap among competent systems: very high comprehension U = 0.858 but much lower action D = 0.678 (gap ~0.18). JEV has D = 0.763 and U = 0.833. Overall, comprehension (U) consistently exceeds action-selection (D); most residual errors are decision/composition failures after correct reading.",
+    "confidence": 80,
+    "source_chunks": [
+      "arxiv-2610.18579-16",
+      "arxiv-2610.18579-18",
+      "arxiv-2610.18579-19"
+    ]
+  },
+  {
+    "id": "17",
+    "type": "single",
+    "question": "How many hours of sleep does CDC recommend for adults aged 18-60?",
+    "answer": "The provided CDC page chunks do not state a specific hour recommendation for adults 18–60 (they discuss benefits of enough sleep and cite National Sleep Foundation sources, but the actual duration figures are not in the excerpted text).",
+    "confidence": 40,
+    "source_chunks": [
+      "cdc-sleep-00",
+      "cdc-sleep-01",
+      "cdc-sleep-02"
+    ]
+  },
+  {
+    "id": "18",
+    "type": "collect",
+    "question": "List every age group on this page with its recommended sleep duration.",
+    "answer": [],
+    "confidence": 30,
+    "source_chunks": [
+      "cdc-sleep-00",
+      "cdc-sleep-01",
+      "cdc-sleep-02",
+      "cdc-sleep-03"
+    ]
+  },
+  {
+    "id": "19",
+    "type": "collect",
+    "question": "Gather every health condition the page links to insufficient sleep.",
+    "answer": [
+      "Type 2 diabetes",
+      "Heart disease",
+      "High blood pressure",
+      "Stroke",
+      "Getting sick more often (impaired immunity)",
+      "Unhealthy weight / weight problems",
+      "Stress and worse mood",
+      "Poorer heart health and metabolism",
+      "Motor vehicle crashes and related injury or death",
+      "Worse attention and memory / daily performance"
+    ],
+    "confidence": 85,
+    "source_chunks": [
+      "cdc-sleep-01"
+    ]
+  },
+  {
+    "id": "20",
+    "type": "single",
+    "question": "What does the bottle Alice drinks in chapter 1 taste like, according to her?",
+    "answer": "The provided chunks introduce the “DRINK ME” bottle and note it is not marked poison, but they cut off before Alice’s full taste description (the classic mixed-flavours passage is not fully present in the excerpt).",
+    "confidence": 40,
+    "source_chunks": [
+      "gutenberg-alice-05",
+      "gutenberg-alice-06"
+    ]
+  },
+  {
+    "id": "21",
+    "type": "single",
+    "question": "What riddle does the Hatter ask at the tea party, and is it answered?",
+    "answer": "The provided chunks include the table of contents listing Chapter VII A Mad Tea-Party but do not contain the tea-party text itself, so the riddle (“Why is a raven like a writing-desk?”) and the fact that it is not answered are not evidenced in the excerpt.",
+    "confidence": 25,
+    "source_chunks": [
+      "gutenberg-alice-00"
+    ]
+  },
+  {
+    "id": "22",
+    "type": "collect",
+    "question": "List every substance or object that changes Alice's size and the resulting change.",
+    "answer": [
+      "DRINK ME bottle (Chapter I): shrinks Alice (small enough that she later cannot reach the key on the table)",
+      "Small cake marked EAT ME (Chapter I): makes Alice grow to more than nine feet high",
+      "White Rabbit’s fan (Chapter II): causes her to shrink rapidly (she drops it to avoid shrinking away altogether)",
+      "Another bottle in the White Rabbit’s house (Chapter IV): makes her grow until she fills and is trapped in the room (arm out the window, foot up the chimney)"
+    ],
+    "confidence": 80,
+    "source_chunks": [
+      "gutenberg-alice-05",
+      "gutenberg-alice-06",
+      "gutenberg-alice-07",
+      "gutenberg-alice-08",
+      "gutenberg-alice-11",
+      "gutenberg-alice-22"
+    ]
+  },
+  {
+    "id": "23",
+    "type": "collect",
+    "question": "Name every animal present at the Caucus-Race and in the pool of tears.",
+    "answer": [
+      "Alice (human, but present)",
+      "Mouse",
+      "Duck",
+      "Dodo",
+      "Lory",
+      "Eaglet",
+      "several other curious creatures",
+      "old Crab and young Crab (on shore / after the race)",
+      "mentioned in talk: Dinah the cat (not present in the pool)"
+    ],
+    "confidence": 85,
+    "source_chunks": [
+      "gutenberg-alice-14",
+      "gutenberg-alice-15",
+      "gutenberg-alice-16",
+      "gutenberg-alice-17",
+      "gutenberg-alice-19"
+    ]
+  },
+  {
+    "id": "24",
+    "type": "comparison",
+    "question": "How does Alice's first meeting with the Duchess differ from her encounter at the croquet ground?",
+    "answer": "The provided chunks only reach early chapters (through the Rabbit’s house / Bill) and the contents list; they do not contain Chapter VI (Pig and Pepper) or Chapter VIII (croquet ground) narrative, so the comparison cannot be grounded in the excerpt.",
+    "confidence": 20,
+    "source_chunks": [
+      "gutenberg-alice-00"
+    ]
+  },
+  {
+    "id": "25",
+    "type": "single",
+    "question": "What year does the Time Traveller say the dials showed when he stopped in the Eloi era?",
+    "answer": "The provided chunks describe arrival among the Eloi and the White Sphinx but do not include the line stating the dial reading (commonly AD 802,701 in the full novel).",
+    "confidence": 30,
+    "source_chunks": [
+      "gutenberg-timemachine-24",
+      "gutenberg-timemachine-25",
+      "gutenberg-timemachine-27",
+      "gutenberg-timemachine-28"
+    ]
+  },
+  {
+    "id": "26",
+    "type": "single",
+    "question": "What is the name of the Eloi woman the Time Traveller rescues from the river?",
+    "answer": "Not stated in the provided chunks (Weena appears later than the excerpt, which ends near the first meeting with the Eloi).",
+    "confidence": 25,
+    "source_chunks": [
+      "gutenberg-timemachine-27",
+      "gutenberg-timemachine-28"
+    ]
+  },
+  {
+    "id": "27",
+    "type": "collect",
+    "question": "List every item the Time Traveller carries or acquires during his journey.",
+    "answer": [
+      "The Time Machine itself (nickel, ivory, rock crystal / quartz components; levers)",
+      "Tattered blood-stained socks (on return; boots lost)",
+      "Dusty dirty coat smeared with green",
+      "(Excerpt does not yet cover later acquisitions such as matches, camphor, or club from the Palace of Green Porcelain)"
+    ],
+    "confidence": 50,
+    "source_chunks": [
+      "gutenberg-timemachine-10",
+      "gutenberg-timemachine-13",
+      "gutenberg-timemachine-14",
+      "gutenberg-timemachine-18"
+    ]
+  }
+]

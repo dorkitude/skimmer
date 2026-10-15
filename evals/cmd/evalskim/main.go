@@ -96,6 +96,7 @@ func run(args []string) error {
 	threshold := f.Float64("threshold", 0.5, "keep threshold")
 	singleDoc := f.Bool("single-doc", true, "judge each goal over only its own document (skimmer's primary single-source mode)")
 	factMatch := f.Bool("fact-match", false, "score gold goals by decisive-fact content match in kept chunks (required when chunk size differs from the catalog)")
+	ranked := f.Bool("ranked", false, "v2 goal set: rank-based metrics, recall@k and all-modes coverage")
 	chunkChars := f.Int("chunk-chars", 0, "chunk size override (0 = skimmer default)")
 	overlap := f.Float64("overlap", -1, "chunk overlap fraction override (-1 = skimmer default)")
 	if err := f.Parse(args); err != nil {
@@ -270,6 +271,9 @@ func run(args []string) error {
 
 	// Metrics.
 	report := compute(grs, goals, fingerprint, *model, *skV, *threshold, runID, names, catalog, *factMatch)
+	if *ranked {
+		report["ranked"] = rankedMetrics(grs)
+	}
 	out, _ := json.MarshalIndent(report, "", " ")
 	fmt.Println(string(out))
 	return nil
@@ -391,3 +395,114 @@ func compute(grs []gres, goals []Goal, fingerprint, model, skV string, threshold
 }
 
 var _ = strconv.Itoa
+
+// rankedMetrics computes recall@k and all-modes coverage from the archived
+// per-chunk probabilities. For each goal, chunks of its own document are
+// ranked by kept probability (ties broken by chunk id); recall@k is the share
+// of gold chunks within the top k; coverage is the fraction of goals whose
+// top-10 contains every gold chunk (mode drop: any gold region missing).
+func rankedMetrics(grs []gres) map[string]any {
+	type rk struct {
+		Draw    int     `json:"draw"`
+		Goals   int     `json:"goals"`
+		RAt1    float64 `json:"recall_at_1"`
+		RAt3    float64 `json:"recall_at_3"`
+		RAt5    float64 `json:"recall_at_5"`
+		RAt10   float64 `json:"recall_at_10"`
+		Cover10 float64 `json:"all_modes_in_top10"`
+		MRR     float64 `json:"mrr"`
+	}
+	stats := map[int]*rk{}
+	for _, gr := range grs {
+		gold := map[string]bool{}
+		switch v := gr.goal.GoldRaw.(type) {
+		case string:
+			gold[v] = true
+		case []string:
+			for _, x := range v {
+				gold[x] = true
+			}
+		case []any:
+			for _, x := range v {
+				if s, ok := x.(string); ok {
+					gold[s] = true
+				}
+			}
+		}
+		if len(gold) == 0 {
+			continue
+		}
+		st := stats[gr.draw]
+		if st == nil {
+			st = &rk{Draw: gr.draw}
+			stats[gr.draw] = st
+		}
+		type pc struct {
+			id string
+			p  float64
+		}
+		var ps []pc
+		for id, p := range gr.keptP {
+			ps = append(ps, pc{id, p})
+		}
+		sort.Slice(ps, func(a, b int) bool {
+			if ps[a].p != ps[b].p {
+				return ps[a].p > ps[b].p
+			}
+			return ps[a].id < ps[b].id
+		})
+		var ranks []int
+		for k, c := range ps {
+			if gold[c.id] {
+				ranks = append(ranks, k+1)
+			}
+		}
+		st.Goals++
+		in := func(k int) bool {
+			for _, r := range ranks {
+				if r <= k {
+					return true
+				}
+			}
+			return false
+		}
+		if in(1) {
+			st.RAt1++
+		}
+		if in(3) {
+			st.RAt3++
+		}
+		if in(5) {
+			st.RAt5++
+		}
+		if in(10) {
+			st.RAt10++
+		}
+		if r := ranks[0]; r > 0 {
+			st.MRR += 1 / float64(r)
+		}
+		all := true
+		for _, r := range ranks {
+			if r > 10 {
+				all = false
+			}
+		}
+		if all {
+			st.Cover10++
+		}
+	}
+	var out []rk
+	for d := 1; d <= 10; d++ {
+		if st, ok := stats[d]; ok && st.Goals > 0 {
+			n := float64(st.Goals)
+			st.RAt1 /= n
+			st.RAt3 /= n
+			st.RAt5 /= n
+			st.RAt10 /= n
+			st.Cover10 /= n
+			st.MRR /= n
+			out = append(out, *st)
+		}
+	}
+	return map[string]any{"draws": out}
+}

@@ -1,0 +1,15 @@
+[
+  {"q": 0, "kind": "single", "gold": ["arxiv-2608.16621-02", "arxiv-2608.16621-09"]},
+  {"q": 1, "kind": "single", "gold": ["arxiv-2608.16621-02", "arxiv-2608.16621-12"]},
+  {"q": 2, "kind": "collect", "gold": ["arxiv-2608.16621-02", "arxiv-2608.16621-11", "arxiv-2608.16621-12"]},
+  {"q": 3, "kind": "comparison", "gold": ["arxiv-2608.16621-02", "arxiv-2608.16621-09", "arxiv-2608.16621-14"]},
+  {"q": 4, "kind": "single", "gold": ["arxiv-2608.20845-03", "arxiv-2608.20845-09"]},
+  {"q": 5, "kind": "single", "gold": ["arxiv-2608.20845-15"]},
+  {"q": 6, "kind": "collect", "gold": ["arxiv-2608.20845-03", "arxiv-2608.20845-11", "arxiv-2608.20845-12", "arxiv-2608.20845-13"]},
+  {"q": 7, "kind": "collect", "gold": ["arxiv-2608.20845-03", "arxiv-2608.20845-09", "arxiv-2608.20845-13", "arxiv-2608.20845-15", "arxiv-2608.20845-16", "arxiv-2608.20845-19", "arxiv-2608.20845-22"]},
+  {"q": 8, "kind": "comparison", "gold": ["arxiv-2608.20845-03", "arxiv-2608.20845-09", "arxiv-2608.20845-13"]},
+  {"q": 9, "kind": "single", "gold": ["arxiv-2609.29661-01", "arxiv-2609.29661-11"]},
+  {"q": 10, "kind": "single", "gold": ["arxiv-2609.29661-02", "arxiv-2609.29661-15"]},
+  {"q": 11, "kind": "collect", "gold": ["arxiv-2609.29661-02", "arxiv-2609.29661-06", "arxiv-2609.29661-10", "arxiv-2609.29661-12", "arxiv-2609.29661-13", "arxiv-2609.29661-15", "arxiv-2609.29661-16"]},
+  {"q": 12, "kind": "single", "gold": ["arxiv-2609.29661-16"]}
+]

@@ -1,0 +1,431 @@
+[
+ {
+  "id": "h001",
+  "kind": "single",
+  "goal": "What incremental maintenance cost do the authors report per document update versus full re-ingestion?",
+  "doc": "arxiv-2608.16621",
+  "gold": [
+   "arxiv-2608.16621-02",
+   "arxiv-2608.16621-09"
+  ]
+ },
+ {
+  "id": "h002",
+  "kind": "single",
+  "goal": "Which corpus and how many documents were used in the main incremental-update experiment?",
+  "doc": "arxiv-2608.16621",
+  "gold": [
+   "arxiv-2608.16621-02",
+   "arxiv-2608.16621-12"
+  ]
+ },
+ {
+  "id": "h003",
+  "kind": "collect",
+  "goal": "List every dataset used anywhere in this paper and the size reported for each.",
+  "doc": "arxiv-2608.16621",
+  "gold": [
+   "arxiv-2608.16621-02",
+   "arxiv-2608.16621-11",
+   "arxiv-2608.16621-12"
+  ]
+ },
+ {
+  "id": "h004",
+  "kind": "comparison",
+  "goal": "How does update cost under the proposed substrate differ from the full-rebuild baseline in the reported results?",
+  "doc": "arxiv-2608.16621",
+  "gold": [
+   "arxiv-2608.16621-02",
+   "arxiv-2608.16621-09",
+   "arxiv-2608.16621-14"
+  ]
+ },
+ {
+  "id": "h005",
+  "kind": "single",
+  "goal": "What speedup or cost reduction does ingest-time compilation show over query-time interpretation?",
+  "doc": "arxiv-2608.20845",
+  "gold": [
+   "arxiv-2608.20845-03",
+   "arxiv-2608.20845-09"
+  ]
+ },
+ {
+  "id": "h006",
+  "kind": "single",
+  "goal": "What LLM was used for ingest-time compilation in the experiments?",
+  "doc": "arxiv-2608.20845",
+  "gold": [
+   "arxiv-2608.20845-15"
+  ]
+ },
+ {
+  "id": "h007",
+  "kind": "collect",
+  "goal": "Gather every baseline RAG system this paper compares against.",
+  "doc": "arxiv-2608.20845",
+  "gold": [
+   "arxiv-2608.20845-03",
+   "arxiv-2608.20845-11",
+   "arxiv-2608.20845-12",
+   "arxiv-2608.20845-13"
+  ]
+ },
+ {
+  "id": "h008",
+  "kind": "collect",
+  "goal": "List all token-cost or dollar figures reported anywhere in the paper.",
+  "doc": "arxiv-2608.20845",
+  "gold": [
+   "arxiv-2608.20845-03",
+   "arxiv-2608.20845-09",
+   "arxiv-2608.20845-13",
+   "arxiv-2608.20845-15",
+   "arxiv-2608.20845-16",
+   "arxiv-2608.20845-19",
+   "arxiv-2608.20845-22"
+  ]
+ },
+ {
+  "id": "h009",
+  "kind": "comparison",
+  "goal": "How do ingest-time and query-time approaches differ in reported latency versus accuracy?",
+  "doc": "arxiv-2608.20845",
+  "gold": [
+   "arxiv-2608.20845-03",
+   "arxiv-2608.20845-09",
+   "arxiv-2608.20845-13"
+  ]
+ },
+ {
+  "id": "h010",
+  "kind": "single",
+  "goal": "How is a 'revised corpus' defined, and how many revisions were injected in the benchmark?",
+  "doc": "arxiv-2609.29661",
+  "gold": [
+   "arxiv-2609.29661-01",
+   "arxiv-2609.29661-11"
+  ]
+ },
+ {
+  "id": "h011",
+  "kind": "single",
+  "goal": "What accuracy did the fact-compilation method achieve on stale-answer questions?",
+  "doc": "arxiv-2609.29661",
+  "gold": [
+   "arxiv-2609.29661-02",
+   "arxiv-2609.29661-15"
+  ]
+ },
+ {
+  "id": "h012",
+  "kind": "collect",
+  "goal": "List every evaluation metric reported in this paper.",
+  "doc": "arxiv-2609.29661",
+  "gold": [
+   "arxiv-2609.29661-02",
+   "arxiv-2609.29661-06",
+   "arxiv-2609.29661-10",
+   "arxiv-2609.29661-12",
+   "arxiv-2609.29661-13",
+   "arxiv-2609.29661-15",
+   "arxiv-2609.29661-16"
+  ]
+ },
+ {
+  "id": "h013",
+  "kind": "single",
+  "goal": "Which limitation do the authors name first in the limitations section?",
+  "doc": "arxiv-2609.29661",
+  "gold": [
+   "arxiv-2609.29661-16"
+  ]
+ },
+ {
+  "id": "h014",
+  "kind": "single",
+  "goal": "How do the authors define a 'System One model' failure in an agent loop?",
+  "doc": "arxiv-2610.18579",
+  "gold": [
+   "arxiv-2610.18579-01",
+   "arxiv-2610.18579-03",
+   "arxiv-2610.18579-05",
+   "arxiv-2610.18579-08"
+  ]
+ },
+ {
+  "id": "h015",
+  "kind": "single",
+  "goal": "What fraction of failures were reading errors versus decision errors?",
+  "doc": "arxiv-2610.18579",
+  "gold": [
+   "arxiv-2610.18579-06",
+   "arxiv-2610.18579-12",
+   "arxiv-2610.18579-16",
+   "arxiv-2610.18579-18"
+  ]
+ },
+ {
+  "id": "h016",
+  "kind": "collect",
+  "goal": "Collect every agent benchmark or environment evaluated in this paper.",
+  "doc": "arxiv-2610.18579",
+  "gold": [
+   "arxiv-2610.18579-02",
+   "arxiv-2610.18579-03",
+   "arxiv-2610.18579-09",
+   "arxiv-2610.18579-10"
+  ]
+ },
+ {
+  "id": "h017",
+  "kind": "comparison",
+  "goal": "How does the strongest model's comprehension score differ from its action-selection score?",
+  "doc": "arxiv-2610.18579",
+  "gold": [
+   "arxiv-2610.18579-16",
+   "arxiv-2610.18579-18",
+   "arxiv-2610.18579-19"
+  ]
+ },
+ {
+  "id": "h018",
+  "kind": "single",
+  "goal": "How many hours of sleep does CDC recommend for adults aged 18-60?",
+  "doc": "cdc-sleep",
+  "gold": [
+   "cdc-sleep-00",
+   "cdc-sleep-01",
+   "cdc-sleep-02"
+  ]
+ },
+ {
+  "id": "h019",
+  "kind": "collect",
+  "goal": "List every age group on this page with its recommended sleep duration.",
+  "doc": "cdc-sleep",
+  "gold": [
+   "cdc-sleep-00",
+   "cdc-sleep-01",
+   "cdc-sleep-02",
+   "cdc-sleep-03"
+  ]
+ },
+ {
+  "id": "h020",
+  "kind": "collect",
+  "goal": "Gather every health condition the page links to insufficient sleep.",
+  "doc": "cdc-sleep",
+  "gold": [
+   "cdc-sleep-01"
+  ]
+ },
+ {
+  "id": "h021",
+  "kind": "single",
+  "goal": "What does the bottle Alice drinks in chapter 1 taste like, according to her?",
+  "doc": "gutenberg-alice",
+  "gold": [
+   "gutenberg-alice-05",
+   "gutenberg-alice-06"
+  ]
+ },
+ {
+  "id": "h022",
+  "kind": "single",
+  "goal": "What riddle does the Hatter ask at the tea party, and is it answered?",
+  "doc": "gutenberg-alice",
+  "gold": [
+   "gutenberg-alice-00"
+  ]
+ },
+ {
+  "id": "h023",
+  "kind": "collect",
+  "goal": "List every substance or object that changes Alice's size and the resulting change.",
+  "doc": "gutenberg-alice",
+  "gold": [
+   "gutenberg-alice-05",
+   "gutenberg-alice-06",
+   "gutenberg-alice-07",
+   "gutenberg-alice-08",
+   "gutenberg-alice-11",
+   "gutenberg-alice-22"
+  ]
+ },
+ {
+  "id": "h024",
+  "kind": "collect",
+  "goal": "Name every animal present at the Caucus-Race and in the pool of tears.",
+  "doc": "gutenberg-alice",
+  "gold": [
+   "gutenberg-alice-14",
+   "gutenberg-alice-15",
+   "gutenberg-alice-16",
+   "gutenberg-alice-17",
+   "gutenberg-alice-19"
+  ]
+ },
+ {
+  "id": "h025",
+  "kind": "comparison",
+  "goal": "How does Alice's first meeting with the Duchess differ from her encounter at the croquet ground?",
+  "doc": "gutenberg-alice",
+  "gold": [
+   "gutenberg-alice-00"
+  ]
+ },
+ {
+  "id": "h026",
+  "kind": "single",
+  "goal": "What year does the Time Traveller say the dials showed when he stopped in the Eloi era?",
+  "doc": "gutenberg-timemachine",
+  "gold": [
+   "gutenberg-timemachine-24",
+   "gutenberg-timemachine-25",
+   "gutenberg-timemachine-27",
+   "gutenberg-timemachine-28"
+  ]
+ },
+ {
+  "id": "h027",
+  "kind": "single",
+  "goal": "What is the name of the Eloi woman the Time Traveller rescues from the river?",
+  "doc": "gutenberg-timemachine",
+  "gold": [
+   "gutenberg-timemachine-27",
+   "gutenberg-timemachine-28"
+  ]
+ },
+ {
+  "id": "h028",
+  "kind": "collect",
+  "goal": "List every item the Time Traveller carries or acquires during his journey.",
+  "doc": "gutenberg-timemachine",
+  "gold": [
+   "gutenberg-timemachine-10",
+   "gutenberg-timemachine-13",
+   "gutenberg-timemachine-14",
+   "gutenberg-timemachine-18"
+  ]
+ },
+ {
+  "id": "h029",
+  "kind": "single",
+  "goal": "What minimum memorized secret length does this publication require for user-chosen passwords?",
+  "doc": "nist-sp-800-63b",
+  "gold": [
+   "nist-sp-800-63b-21"
+  ]
+ },
+ {
+  "id": "h030",
+  "kind": "single",
+  "goal": "On what date was SP 800-63B withdrawn and what superseded it?",
+  "doc": "nist-sp-800-63b",
+  "gold": [
+   "nist-sp-800-63b-00"
+  ]
+ },
+ {
+  "id": "h031",
+  "kind": "collect",
+  "goal": "List every authenticator type defined and the AAL at which each is permitted.",
+  "doc": "nist-sp-800-63b",
+  "gold": [
+   "nist-sp-800-63b-11",
+   "nist-sp-800-63b-12",
+   "nist-sp-800-63b-25",
+   "nist-sp-800-63b-27"
+  ]
+ },
+ {
+  "id": "h032",
+  "kind": "comparison",
+  "goal": "How do the reauthentication requirements for AAL2 and AAL3 differ?",
+  "doc": "nist-sp-800-63b",
+  "gold": [
+   "nist-sp-800-63b-10",
+   "nist-sp-800-63b-25"
+  ]
+ },
+ {
+  "id": "h033",
+  "kind": "single",
+  "goal": "What status code does RFC 9110 define for 'Misdirected Request'?",
+  "doc": "rfc9110",
+  "gold": [
+   "rfc9110-04"
+  ]
+ },
+ {
+  "id": "h034",
+  "kind": "single",
+  "goal": "Which RFCs does this document list as obsoleted in section 1.4?",
+  "doc": "rfc9110",
+  "gold": [
+   "rfc9110-10"
+  ]
+ },
+ {
+  "id": "h035",
+  "kind": "single",
+  "goal": "Which Menabrea paper did Lovelace translate, and in what year were her notes published?",
+  "doc": "wiki-ada-lovelace",
+  "gold": [
+   "wiki-ada-lovelace-01"
+  ]
+ },
+ {
+  "id": "h036",
+  "kind": "collect",
+  "goal": "Gather every honor, award, or commemoration named after Ada Lovelace mentioned here.",
+  "doc": "wiki-ada-lovelace",
+  "gold": [
+   "wiki-ada-lovelace-03"
+  ]
+ },
+ {
+  "id": "h037",
+  "kind": "single",
+  "goal": "What mass of plastic is estimated to be in the patch, and by which study?",
+  "doc": "wiki-garbage-patch",
+  "gold": [
+   "wiki-garbage-patch-10",
+   "wiki-garbage-patch-15"
+  ]
+ },
+ {
+  "id": "h038",
+  "kind": "collect",
+  "goal": "List every cleanup effort or organization mentioned and what it attempted.",
+  "doc": "wiki-garbage-patch",
+  "gold": [
+   "wiki-garbage-patch-04",
+   "wiki-garbage-patch-05",
+   "wiki-garbage-patch-08",
+   "wiki-garbage-patch-14"
+  ]
+ },
+ {
+  "id": "h039",
+  "kind": "single",
+  "goal": "In which year and journal did Rudolf K\u00e1lm\u00e1n publish the original filter paper?",
+  "doc": "wiki-kalman-filter",
+  "gold": [
+   "wiki-kalman-filter-03"
+  ]
+ },
+ {
+  "id": "h040",
+  "kind": "collect",
+  "goal": "List every named variant or extension of the Kalman filter described in the article.",
+  "doc": "wiki-kalman-filter",
+  "gold": [
+   "wiki-kalman-filter-02",
+   "wiki-kalman-filter-03",
+   "wiki-kalman-filter-10"
+  ]
+ }
+]
