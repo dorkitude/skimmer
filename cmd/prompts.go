@@ -28,7 +28,13 @@ description, model) and a Go text/template body with these fields:
   {{.ID}}      its id in the request state, e.g. item_3
   {{.Index}}   its zero-based position
   {{.Source}}  the URL or file path (skim only)
-  {{.Lines}}   the chunk's line range, e.g. 40-58 (skim only)`,
+  {{.Lines}}   the chunk's line range, e.g. 40-58 (skim only)
+
+Note: the built-in defaults no longer paste the goal or the chunk text into
+the question; each chunk is sent once, in the request state, and the question
+just points at it ({{.ID}}). That measured 19% cheaper with equal-or-better
+accuracy (see evals/variants/README.md). Templates may still use {{.Text}}
+for backwards compatibility, but doing so sends the text twice.`,
 }
 
 var promptsListCmd = &cobra.Command{

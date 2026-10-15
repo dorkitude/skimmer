@@ -162,7 +162,7 @@ skimmer skim ./src -g "..." --prompt strict
 skimmer skim ./src -g "..." --prompt ./my-prompt.md
 ```
 
-A prompt is optional YAML frontmatter (`name`, `description`, `model`) followed by a Go `text/template` body. The body can use `{{.Goal}}`, `{{.Text}}`, `{{.ID}}`, `{{.Index}}`, and, for skim, `{{.Source}}` and `{{.Lines}}`. A user prompt named `DEFAULT.md` replaces the built-in default.
+A prompt is optional YAML frontmatter (`name`, `description`, `model`) followed by a Go `text/template` body. The body can use `{{.Goal}}`, `{{.Text}}`, `{{.ID}}`, `{{.Index}}`, and, for skim, `{{.Source}}` and `{{.Lines}}`. A user prompt named `DEFAULT.md` replaces the built-in default. The built-in defaults send each chunk once in the request state and point the question at it (`{{.ID}}`) rather than pasting the text into the question; that measured 19% cheaper with equal-or-better accuracy (see [evals/variants/](evals/variants/README.md)).
 
 ## For agents
 

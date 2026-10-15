@@ -5,6 +5,16 @@ Versions are semver with large patch numbers (`0.1.100`, `0.1.101`, ...).
 
 ## [Unreleased]
 
+### Changed
+
+- Built-in `skim` and `filter` prompts no longer paste the goal or the chunk
+  or item text into each question. Every chunk is sent once, in the request
+  state, and each question points at it by id. Measured on the frozen
+  goals-v2 eval (pinned `jev-1.14.0`, 2 draws): 19% fewer input tokens per
+  goal, equal-or-better recall at every rank and better all-modes coverage
+  (0.750 vs 0.722). See `evals/variants/README.md`. Custom prompts using
+  `{{.Text}}` still work, but send the text twice.
+
 ### Added
 
 - Evals for the skim filter itself (`evals/`): a 12-document public corpus with
