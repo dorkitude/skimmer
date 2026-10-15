@@ -311,15 +311,6 @@
   ]
  },
  {
-  "id": "h029",
-  "kind": "single",
-  "goal": "What minimum memorized secret length does this publication require for user-chosen passwords?",
-  "doc": "nist-sp-800-63b",
-  "gold": [
-   "nist-sp-800-63b-21"
-  ]
- },
- {
   "id": "h030",
   "kind": "single",
   "goal": "On what date was SP 800-63B withdrawn and what superseded it?",
@@ -334,20 +325,8 @@
   "goal": "List every authenticator type defined and the AAL at which each is permitted.",
   "doc": "nist-sp-800-63b",
   "gold": [
-   "nist-sp-800-63b-11",
-   "nist-sp-800-63b-12",
    "nist-sp-800-63b-25",
    "nist-sp-800-63b-27"
-  ]
- },
- {
-  "id": "h032",
-  "kind": "comparison",
-  "goal": "How do the reauthentication requirements for AAL2 and AAL3 differ?",
-  "doc": "nist-sp-800-63b",
-  "gold": [
-   "nist-sp-800-63b-10",
-   "nist-sp-800-63b-25"
   ]
  },
  {
@@ -366,15 +345,6 @@
   "doc": "rfc9110",
   "gold": [
    "rfc9110-10"
-  ]
- },
- {
-  "id": "h035",
-  "kind": "single",
-  "goal": "Which Menabrea paper did Lovelace translate, and in what year were her notes published?",
-  "doc": "wiki-ada-lovelace",
-  "gold": [
-   "wiki-ada-lovelace-01"
   ]
  },
  {
@@ -406,15 +376,6 @@
    "wiki-garbage-patch-05",
    "wiki-garbage-patch-08",
    "wiki-garbage-patch-14"
-  ]
- },
- {
-  "id": "h039",
-  "kind": "single",
-  "goal": "In which year and journal did Rudolf K\u00e1lm\u00e1n publish the original filter paper?",
-  "doc": "wiki-kalman-filter",
-  "gold": [
-   "wiki-kalman-filter-03"
   ]
  },
  {
