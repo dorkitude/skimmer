@@ -1,0 +1,314 @@
+Ingest-Time Fact Compilation for Cost-Efficient and
+Reliable Question Answering over Revised Corpora
+Kyle Wild                                    Yusuke Takahashi                                      Asako Uraki
+Endgame Labs, Inc.                                 Asia AI Institute,                                Asia AI Institute,
+San Francisco, USA                              Faculty of Data Science                           Faculty of Data Science
+Asia AI Institute                              Musashino University                              Musashino University
+Tokyo, Japan                                      Tokyo, Japan                                      Tokyo, Japan
+ORCID: 0009-0001-6918-3197                        ORCID: 0009-0006-8351-2280                        ORCID: 0009-0006-8412-1804
+
+
+
+Abstract—Most agentic question answering (“QA”) systems                       problem: the dominant cost is not retrieval itself but the
+do an important part of their semantic work at the worst                         semantic labor of reconstructing governed state at query time.
+arXiv:2609.29661v1 [cs.AI] 29 Aug 2026
+
+
+
+
+possible time: every time someone asks a question. When a corpus                    The default architecture is retrieval-augmented generation
+contains revisions, drafts, revocations, deletions, and sources with
+different levels of authority, the model must reconstruct the                    (RAG) [1], [2]: retrieve raw passages, place them in the context
+governed current state on every read—then throw that work                        window, and let the model derive the answer. We refer to the
+away and repeat it on the next query. This is a bit like a database              general pattern as query-time semantic reconstruction (QSR),
+that rebuilds a materialized view every time someone reads                       because every read re-pays the same semantic labor — decid-
+from it. We present ingest-time fact compilation, an alternative                 ing which of several retrieved revisions is current, which rows
+architecture that performs this work when corpus data is ingested
+or changed. Raw passages are rephrased into self-contained facts;                are drafts or sandbox artifacts, which values have been revoked
+rules governing revisions, deletions, effective dates, and source                or deleted, and which source should be trusted. Corpora that
+trust are resolved once; and the resulting current state is stored as            are revised over time make this reconstruction a governance
+typed records carrying source and revision provenance. At query                  problem, not merely a retrieval problem. Performing it inside
+time, an inexpensive model reads the compiled record instead of                  the context window at query time is expensive in tokens
+reconstructing it from a noisy set of candidates. In a controlled
+synthetic experiment across five seeds, the same low-cost model                  and latency, degrades with context length [3], and — as we
+produced the correct value, source, and revision in only one of 30               show — exceeds the reliable capability of inexpensive models.
+trials under query-time reconstruction, but in all 30 trials from                Prior work formalized the economics of the alternative, ingest-
+the compiled substrate, at 12.89 times lower mean read cost per                  time semantic compilation (ISC), deriving a break-even read
+question. On simpler revision questions, both architectures were                 frequency R∗ above which compiling once and maintaining
+exact, but the compiled path used 21.6 times fewer tokens. A
+separate test on Federal Reserve dialogue and Wikipedia prose                    wins over reconstructing on every read, and showing that
+found that fact rephrasing roughly halved verbose dialogue while                 maintenance cost scales with the amount of corpus change
+preserving high source entailment, but left the already-concise                  rather than corpus size [4]. What that work did not provide
+Wikipedia prose essentially unchanged. These results support a                   is (i) a concrete fact-level compilation technique and (ii)
+narrow but practical claim: resolving a corpus state once can                    measured evidence of the failure and cost asymmetry between
+make subsequent QA cheaper and more reliable for inexpensive
+models. We release the open source, MIT-licensed implementation                  the two architectures on governed, revised corpora.
+and experimental artifacts so other researchers can reproduce,                      In this paper, we present ingest-time fact compilation, a
+adapt, and extend this work.                                                     pipeline in which a lightweight LLM rephrases raw passages
+Index Terms—ingest-time semantic compilation, fact extrac-                    into self-contained, pronoun-free atomic facts at ingest time,
+tion, retrieval-augmented generation, knowledge governance,                      governance rules are resolved once, and the results are per-
+provenance, cost model, large language models, LLM serving
+systems                                                                          sisted as typed, provenance-carrying substrate rows that a
+cheap model can read at query time. We evaluate the pipeline
+against QSR with a reproducible, publicly rerunnable harness
+I. I NTRODUCTION
+over a synthetic revision corpus with explicit governance rules.
+Organizations of every size — companies, universities,                           Our contributions are: (1) a fact-level compilation method
+local governments — now maintain bodies of knowledge that                        that separates semantic labor (paid once, at ingest) from
+change continuously: project records are corrected, policies                     answering (paid on every read); (2) an open, reproducible
+are superseded, entries are deleted for legal reasons, and drafts                experiment harness — five-seed reruns of every condition
+coexist with approved values. Question answering (QA) over                       plus a measured evaluation of the rephrasing step on two
+such corpora is rapidly being delegated to large language                        real source styles — with frozen result snapshots, pinned
+models, and whether that delegation is affordable, auditable,                    model identifiers, and priced token accounting; (3) a failure-
+and fast determines where it can be deployed. Correct answers                    asymmetry finding: a low-cost model that is unreliable at
+over changing institutional knowledge are an infrastructure                      governance reconstruction under QSR (mean exact rate 3.3%
+
+
+
+
+Accepted for presentation at the 2026 International Conference on Applied Science and Technology (iCAST-ES 2026). © 2026 IEEE. Personal use of this
+material is permitted. Permission from IEEE must be obtained for all other uses, in any current or future media, including reprinting/republishing this material
+for advertising or promotional purposes, creating new collective works, for resale or redistribution to servers or lists, or reuse of any copyrighted component
+of this work in other works.
+across five seeds) answers perfectly from the compiled sub-          the anisotropic geometry of neural embedding spaces [14],
+strate in every seed; and (4) a cost-asymmetry quantification of     which further motivates a typed, symbol-addressable substrate.
+12.89–185.10 times mean per-question cost, with a 21.6 times
+reduction in tokens per question, which sets the marginal cost            III. M ETHOD : I NGEST-T IME FACT C OMPILATION
+of governance-correct QA.                                            A. Pipeline Overview
+Section II positions the work. Section III defines the pipeline       The pipeline has five steps, summarized in Fig. 1. S1
+and its data structures. Section IV reports the experiments.         Segmentation: raw sources are split into passage-level units
+Section V discusses interpretation and limitations, and Section      carrying their origin (path, revision identifier, environment).
+VI concludes.                                                        S2 Fact rephrasing: a lightweight LLM rewrites each unit into
+self-contained, pronoun-free atomic facts, so that each fact is
+II. R ELATED W ORK                              interpretable without its surrounding document; in measured
+runs (Section IV-B), rephrasing compressed verbose dialogue
+Query-time reconstruction. RAG [1] and its descendants            transcripts to 0.49 times the original tokens while keeping
+[2] retrieve raw evidence and reconstruct meaning in the             97.6% of generated facts source-entailed, and left already-
+context window. Long-context models extend how much can              concise encyclopedic prose essentially unchanged (1.03 times)
+be reconstructed at once, but position effects degrade reliability   — compression is source-style dependent, strongest where
+as context grows [3], and every read still pays the full             prose is verbose and pronoun-heavy. S3 Governance reso-
+token cost. Approximate nearest-neighbor infrastructure [5]          lution: revision ordering, cross-row revocations, environment
+amortizes retrieval, not the per-query semantic reconstruction       filtering, source-trust preferences, and deletion tombstones are
+itself. Semantic caches [6] amortize repeated or similar queries     applied once, at ingest, under the rules of Section III-C. S4
+by storing answers, but cached answers go stale under revision       Substrate persistence: the resolved facts are stored as typed
+and carry no governance resolution.                                  rows carrying value, source, revision, state, and effective date.
+Ingest-time structure. Databases long ago moved labor to          S5 Query-time read: a query is answered by row lookup plus
+write time: the inverted index and the materialized view             a small-model completion that cites the stored source and
+are ingest-time compilations, with view maintenance studied          revision verbatim.
+extensively [7]. In the LLM era, GraphRAG [8] compiles a
+graph and community summaries at ingest. Proposition-level           B. Data Structures
+indexing rewrites passages into self-contained propositions to          The unit of the substrate is a fact row: a tuple (entity, slot,
+improve retrieval granularity [9], and atomic-fact decomposi-        value, revision, state, environment, source, effective_on). The
+tion is used to evaluate factual precision [10]; both share the      state field distinguishes production values, drafts, proposals,
+rewriting move of our step S2 but stop at retrieval or eval-         rejected rows, sandbox artifacts, revocations, and tombstones.
+uation, without governance resolution or typed provenance.           Under QSR, the model instead receives a shuffled set of
+Structurally, our fact row is a Slowly Changing Dimension            retrieved raw rows — current and stale revisions, distractors
+Type 2 record [15], rules R1–R6 mirror temporal-database             from other entities, drafts and sandbox rows — and must
+concerns standardized in SQL:2011 [16], and the stored source        reconstruct the same tuple in the context window. The two
+and revision fields relate to W3C PROV provenance modeling           architectures therefore answer from the same underlying in-
+[17]; the read path S5 likewise relates to natural-language          formation; they differ only in when the governance labor is
+interfaces over typed stores. In the semantic-space lineage,         performed and in what form it persists.
+vector-space retrieval [11], latent semantic indexing [12], and
+the Mathematical Model of Meaning [13] compute a semantic            C. Governance Resolution Rules
+space once, ahead of queries — a related precedent for paying           The reference rule set, applied once at ingest (ISC) or
+semantic labor before read time. The ISC maintenance study           demanded of the model at query time (QSR), is: R1 only
+[4] frames the architectural choice economically, derives the        production rows are eligible; R2 among eligible rows, the
+break-even read frequency R∗ , and shows that a compiled             highest revision wins; R3 drafts, proposals, rejected, sandbox,
+substrate can be kept current under corpus change at a main-         and future-dated rows are ignored; R4 a revocation row that
+tenance cost that scales with the amount of change, not corpus       names a document identifier removes that candidate; R5 owner
+size.                                                                and regulatory sources are preferred over imported ones; R6 if
+Positioning. Two properties separate this paper from prior        the winning row is a deletion tombstone whose effective date
+work: (a) compilation at the level of governance-resolved            has passed, the answer is UNKNOWN; R7 the cited source
+facts — current value, revision, deletion state, and trusted         and revision must come from the chosen row itself, not from
+source resolved once and stored with provenance — rather             a nearby draft or sandbox row.
+than of embeddings, graphs, or summaries alone; and (b)
+measured failure and cost asymmetry between architectures on         D. Cost Model
+the same governed corpus and the same models. Prior ingest-             Following the ISC framing [4], total semantic-processing
+time systems provide (a) only partially and, to our knowledge,       cost scales with corpus change and maintenance rather than
+none provide (b). In addition, similarity-only retrieval inherits    read load once compilation is adopted: the compiled path pays
+a per-change ingest cost and a small maintenance term, while                                     TABLE I
+QSR pays a reconstruction cost on every read. The break-            M ODELS AND PUBLISHED PRICES USED FOR COST ACCOUNTING (J ULY 8,
+2026). P RICES IN $ PER MILLION TOKENS .
+even read frequency R∗ falls as the per-read gap widens;
+the experiments below measure that gap directly on hosted
+Model             Input Output
+models. The comparison in this paper is deliberately scoped                         DeepSeek V4 Flash  0.14   0.28
+to the marginal per-read gap; ingest-time compilation cost                          DeepSeek V4 Pro    1.74   3.48
+is characterized by the rephrasing measurements of Section                          GLM 5.2            1.40   4.40
+IV (measured per-fact S2 ingest cost: $0.00003 per fact on                          Kimi K2.7 Code     0.95   4.00
+dialogue and $0.00001 per fact on dense prose — transparently
+reconstructed from the saved prompts and completions with                                     TABLE II
+the frozen tokenizer and the Table I prices, as the frozen runner   S2 REPHRASING ON TWO REAL SOURCE STYLES (D EEP S EEK V4 F LASH ;
+did not retain the provider usage object), and a full empirical                  TOKENS VIA TIKTOKEN CL 100 K _ BASE ).
+
+break-even including maintenance is follow-up work.
+Token              QA
+IV. E XPERIMENTS                                  Source style            Passages ratio Entailed fidelity
+Dialogue (Fed Q&A)            25 0.49×   97.6% 92.0%
+A. Setup                                                                Dense prose (Wikipedia)       30 1.03× 100.0% 96.7%
+Purpose. The evaluation isolates two questions matched to
+this paper’s phase: does query-time governance reconstruction
+exceed the reliable capability of an inexpensive model while        and QA-fidelity are judged automatically by a hosted LLM
+the compiled substrate does not (failure asymmetry), and            judge under binary criteria recorded in the harness configura-
+what per-question cost premium does QSR pay when both               tion — a fact counts as source-entailed only if fully supported
+architectures succeed (cost asymmetry)? External validity on        by its source passage, and a passage passes QA-fidelity only
+real corpora is explicitly out of scope and is planned follow-      if questions answered from the facts match answers from
+up work; the results below are controlled proof-of-concept          the raw passage; malformed completions are excluded from
+evidence. All measurements in this paper stand independently        these denominators and reported (5 of 30 on the dialogue
+of the maintenance results reported in [4].                         set, 16.7%). No human agreement study accompanies these
+Harness. All runs use a Python harness against a commercial      automatic judgments yet; a double-annotated validation with
+hosted API, with pinned model identifiers, JSON run con-            chance-corrected agreement is planned follow-up work. The
+figurations, and frozen result snapshots (CSV, JSONL, and           harness, run configurations, and frozen result snapshots are
+manifests) dated July 8, 2026. Per-question cost is computed        available at https://github.com/aix-sc/isc (tag data-freeze-2026-
+from logged prompt and completion tokens multiplied by              07-16).
+the provider’s published per-million-token prices as of that
+date (Table I); prices are recorded in the harness source           B. Rephrasing Compression and Fidelity (S2)
+for reproducibility. Corpus: a deterministic synthetic revision        Table II reports the S2 measurement. On verbose dialogue,
+corpus (seed 20260708) of 80 entities, each with three slots        rephrasing halved the token count (0.49 times) while 97.6%
+(capital_plan, risk_owner, launch_region) and three to five         of generated facts were judged source-entailed and 92.0% of
+revisions per slot, augmented for the adversarial set with          passages passed the QA-fidelity check, with one missing major
+drafts, proposals, rejected rows, sandbox artifacts, future-dated   claim. On already-concise encyclopedic prose, rephrasing pre-
+rows, cross-row revocations, and deletion tombstones with           served fidelity (100.0% entailed, 96.7% QA fidelity, no miss-
+effective dates. QSR conditions receive 64 (adversarial) or         ing claims) but did not compress (1.03 times). Compression
+up to 128 (cost sweep) retrieved context rows containing            is therefore a property of the source style, not of the pipeline
+the correct information plus stale revisions and distractors;       alone: S2 buys its token savings where institutional text is
+ISC conditions receive the single compiled substrate row.           verbose — transcripts, meeting notes, correspondence — and
+Metric: an answer counts as exact only if the value, the cited      acts as a fidelity-preserving normalizer elsewhere.
+source, and the cited revision all match. Every condition is
+rerun over five corpus seeds (20260709–20260713); tables            C. Adversarial Governance Reconstruction (Failure Asymme-
+report min/mean/max across seeds, and latency is the mean           try)
+across seeds (latency is serving-dependent and reported for            Six questions per seed require applying rules R1–R7 to
+orientation only). S2 measurement: the rephrasing step is           noisy context. Table III reports exact answer+source+revision
+evaluated on two real passage sets — 30 public Wikipedia            accuracy, mean per-question cost, and mean latency for
+passages (dense prose) and 25 valid Federal Reserve press-          DeepSeek V4 Flash under both architectures across the five
+conference Q&A excerpts (verbose dialogue; 5 of 30 mal-             seeds. QSR answered at most one of six questions correctly
+formed model completions excluded) — with DeepSeek V4               in any seed (1/30 overall; mean exact rate 3.3%), while the
+Flash as the rephrasing model, tokens counted by tiktoken           same low-cost model answered every question exactly from the
+cl100k_base, and three metrics: token ratio, source-entailed        compiled substrate in every seed (30/30), at 12.89 times lower
+fact rate, and passage-level QA-fidelity pass rate. Entailment      mean cost and 2.9 times lower mean latency per question.
+Fig. 1. Ingest-time fact compilation (S1–S4, paid once) and the two query-time read paths (S5 vs. QSR baseline), annotated with the measured results of
+Section IV.
+
+
+TABLE III                                                                    TABLE V
+A DVERSARIAL GOVERNANCE RECONSTRUCTION WITH D EEP S EEK V4                 C OST SWEEP ON SIMPLE REVISION TASKS (9 QUESTIONS × 5 SEEDS ; P RO
+F LASH (6 QUESTIONS × 5 SEEDS ; 64 CONTEXT ROWS FOR QSR). E XACT              IS A 2- QUESTION SAMPLE PER SEED ). QSR USES 128 CONTEXT ROWS .
+AS MIN – MAX ACROSS SEEDS ; COST AND LATENCY AS MEANS .                             C OSTS AND TOKENS AS MEANS ACROSS SEEDS .
+
+
+Exact Mean cost/q   Mean                                                           Mean cost/q Mean    Mean
+Condition    (min–max)           ($) latency                               Condition      Acc.                ($) tok/q latency
+Flash + QSR      0/6–1/6    0.00131 8.87 s                                 Flash + ISC    all exact      0.00010    453 3.30 s
+Flash + ISC 6/6 all seeds   0.00010 3.06 s                                 Flash + QSR    all exact      0.00142 9,777 3.40 s
+Pro + QSR      all exact      0.01851 10,018 10.67 s
+
+
+TABLE IV
+H EAVIER - MODEL QSR SPOT CHECK ON THE ADVERSARIAL SAMPLE (3
+QUESTIONS × 5 SEEDS ).                                 E. Cost Sweep on Simple Revision Tasks (Cost Asymmetry)
+On simple revision questions — corrected facts, deletion
+Exact Mean cost/q   Mean                         tombstones, and ordinary current facts, without the adversarial
+Condition        (min–max)         ($) latency                        rows — both architectures are exact in every seed, so the
+Kimi K2.7 Code +    0/3–1/3   0.01086 7.45 s
+QSR                                                                   comparison isolates cost (Table V). Relative to Flash + ISC,
+GLM 5.2 + QSR       2/3–3/3   0.01389 7.48 s                          Flash + QSR at 128 context rows costs 14.21 times more
+and uses 21.6 times more tokens per question on average;
+DeepSeek V4 Pro + QSR costs 185.10 times more.
+D. Heavier-Model QSR Spot Check                                                                         V. D ISCUSSION
+To test whether a stronger model can absorb the reconstruc-                 Claims and evidence. Contribution (3) is supported by
+tion burden at query time, we ran a three-question sample                    Table III: on governance-heavy reconstruction, the inexpensive
+of the same adversarial set over the five seeds (Table IV):                  model succeeds only when the governance labor has already
+Kimi K2.7 Code answered 0/3 to 1/3 exactly under QSR                         been compiled — in every seed. Contribution (4) is supported
+(mean 6.7%), while GLM 5.2 partially to fully solved the                     by Tables III–V: when both paths succeed, QSR pays a
+sample, ranging from 2/3 to 3/3 across seeds (mean 73.3%)                    14.21–185.10 times mean per-question cost premium and a
+— at $0.01389 mean per question, roughly 137 times the per-                  21.6 times token premium. Contribution (1) is qualified by
+question cost of Flash reading the compiled substrate.                       Table II: the rephrasing stage compresses where the source is
+verbose and preserves fidelity elsewhere. Together they sug-           16.7% for QSR and 88.6–100% for ISC); results should still be
+gest a capability-threshold reading: query-time reconstruction         read as a controlled demonstration, not a population estimate.
+demands a model above some capability level on every read,             Third, prices are one provider’s published rates on one date;
+whereas compilation pays that level once at ingest and lets            ratios will vary with providers and time even though the
+every subsequent read run on a cheap model. Decomposing the            token asymmetry is architectural. Fourth, the S2 rephrasing
+29 failed QSR answers sharpens this reading: none produced             measurements of Section IV cover two source styles, a single
+the correct value with a misattributed citation — all 29 failed        rephrasing model, and a single tokenizer, and their entailment
+to recover the correct value at all — so reconstruction fails at       and QA-fidelity judgments are automatic, with no human
+value recovery, not merely at citation discipline (per-question        agreement study yet; broader styles, domains, and human
+logs in the released artifact). A heavier model (GLM 5.2) can          validation remain future work. Fifth, substrate maintenance
+partially substitute capability for compilation — 2/3 to 3/3           under corpus change is treated by the companion maintenance
+across seeds — but at two orders of magnitude higher marginal          work [4] and is not re-measured here.
+cost and still without seed-robust exactness.
+Cost and token footprint. Tokens processed per question                        VI. C ONCLUSION AND F UTURE W ORK
+fall by a factor of 21.6 on average under the compiled path               We presented ingest-time fact compilation, a pipeline that
+with identical accuracy in the cost sweep. Because inference           pays governance-resolving semantic labor once, at ingest,
+cost, latency, and energy all scale with tokens processed,             instead of upon every query. The system persists provenance-
+the compiled path lowers the recurring marginal cost of                carrying fact rows, and we measured its failure and cost asym-
+governance-correct QA by one to two orders of magnitude,               metry against query-time semantic reconstruction on hosted
+moving routine deployment within reach of commodity models             models over five seeds: a 3.3% mean exact rate versus 100%
+and modest serving budgets in this controlled setup.                   in every seed on adversarial governance questions for the same
+A deterministic query-time filtering baseline. Since R1–            inexpensive model, a 12.89–185.10 times mean per-question
+R7 are declarative predicates over typed fields, a practitioner        cost premium for reconstruction, and a rephrasing stage that
+might filter on state and effective_on and take the high-              halves tokens on verbose dialogue while preserving fidelity on
+est revision in ordinary code — the non-materialized-view              concise prose. The next steps are concrete: (i) reproduce the
+counterpart of [7] — rather than hand 64 unfiltered rows               protocol on a real revision stream — e.g., customer support
+to a model. Such a filter, however, presupposes exactly the            transcripts, sales call transcripts, or biographical interviews
+typed, governance-relevant fields that ingest-time compilation         over time — with equivalent governance rules; (ii) harden
+produces: on raw revised sources, state, revision, revocation          the adversarial set with multi-hop updates, conflicting cur-
+targets, and effective dates are latent in prose, and extracting       rency flags, and access-control policies; (iii) extend the S2
+them is the semantic labor S1–S4 pays once. Once rows are              measurement across further source styles and domains and
+typed, deterministic evaluation is indeed the right reader —           reduce the malformed-completion rate; and (iv) integrate the
+the ISC read path approximates it with a near-deterministic            incremental maintenance mechanism of [4] so that compiled
+lookup plus a small completion — so the two designs are                substrates remain current under continuous change.
+complements rather than competitors. A measured determin-
+istic arm over the compiled substrate is added to the follow-up                                ACKNOWLEDGMENT
+comparison plan.                                                          The authors used an AI assistant (Anthropic Claude) for
+Error persistence. At 97.6% entailment, roughly one stored          language editing and figure preparation. All technical content,
+fact in forty is not supported by its source yet is served             experimental design, measurements, and claims are the au-
+with provenance on every read — a failure mode query-                  thors’ own, and the authors take full responsibility for the
+time reconstruction avoids by re-reading sources. Planned              content of this paper. Part of this work used computational
+countermeasures are audit sampling of stored rows against              infrastructure provided by Endgame Labs, Inc.
+sources, read-time entailment spot checks on low-confidence
+rows, and provenance-preserving re-verification within the                                         R EFERENCES
+maintenance cycle of [4]; until these are validated, “reliable”
+[1] P. Lewis et al., “Retrieval-augmented generation for knowledge-intensive
+in our title should be read as governance-rule reliability rather          NLP tasks,” in Adv. Neural Inf. Process. Syst., vol. 33, 2020, pp. 9459–
+than source-fidelity certainty.                                            9474.
+Limitations. First, the harness is synthetic: it isolates failure   [2] Y. Gao et al., “Retrieval-augmented generation for large language
+models: A survey,” arXiv preprint arXiv:2312.10997, 2023.
+modes and cost mechanics under controlled governance rules,            [3] N. F. Liu et al., “Lost in the middle: How language models use long
+and it supports no claim of external validity on real corpora.             contexts,” Trans. Assoc. Comput. Linguist., vol. 12, pp. 157–173, 2024.
+Second, the question sets are small (6, 3, and 9 questions             [4] Y. Takahashi, K. Wild, and A. Uraki, “Cost scales with change, not
+corpus size: Incrementally maintaining an evolving semantic substrate,”
+per seed). Pooling runs across the five seeds — the questions              in Proc. Int. Electron. Symp. (IES-KCIC), Aug. 1–3, 2026, to appear.
+repeat per seed, so pooling tests run-level consistency rather             arXiv:2608.16621, doi: 10.48550/arXiv.2608.16621.
+than question-population generality — the adversarial exact-           [5] J. Johnson, M. Douze, and H. Jégou, “Billion-scale similarity search
+with GPUs,” IEEE Trans. Big Data, vol. 7, no. 3, pp. 535–547, 2021.
+rate difference is nevertheless decisive (Fisher’s exact test,         [6] F. Bang, “GPTCache: An open-source semantic cache for LLM appli-
+1/30 vs 30/30, p ≈ 2.3 × 10−13 ; Wilson 95% intervals 0.6–                 cations,” in Proc. NLP-OSS Workshop, 2023, pp. 212–218.
+ [7] A. Gupta and I. S. Mumick, “Maintenance of materialized views:
+Problems, techniques, and applications,” IEEE Data Eng. Bull., vol. 18,
+no. 2, pp. 3–18, 1995.
+[8] D. Edge et al., “From local to global: A graph RAG approach to query-
+focused summarization,” arXiv preprint arXiv:2404.16130, 2024.
+[9] T. Chen et al., “Dense X retrieval: What retrieval granularity should we
+use?” in Proc. EMNLP, 2024, pp. 15159–15177.
+[10] S. Min et al., “FActScore: Fine-grained atomic evaluation of factual
+precision in long form text generation,” in Proc. EMNLP, 2023, pp.
+12076–12100.
+[11] G. Salton and M. J. McGill, Introduction to Modern Information
+Retrieval. New York, NY, USA: McGraw-Hill, 1983.
+[12] S. Deerwester, S. T. Dumais, G. W. Furnas, T. K. Landauer, and R.
+Harshman, “Indexing by latent semantic analysis,” J. Am. Soc. Inf. Sci.,
+vol. 41, no. 6, pp. 391–407, 1990.
+[13] Y. Kiyoki, T. Kitagawa, and T. Hayama, “A metadatabase system for
+semantic image search by a mathematical model of meaning,” ACM
+SIGMOD Record, vol. 23, no. 4, pp. 34–41, 1994.
+[14] K. Ethayarajh, “How contextual are contextualized word representa-
+tions? Comparing the geometry of BERT, ELMo, and GPT-2 embed-
+dings,” in Proc. EMNLP-IJCNLP, 2019, pp. 55–65.
+[15] R. Kimball and M. Ross, The Data Warehouse Toolkit: The Definitive
+Guide to Dimensional Modeling, 3rd ed. Indianapolis, IN, USA: Wiley,
+2013.
+[16] K. Kulkarni and J.-E. Michels, “Temporal features in SQL:2011,” ACM
+SIGMOD Rec., vol. 41, no. 3, pp. 34–43, 2012.
+[17] L. Moreau and P. Missier, Eds., “PROV-DM: The PROV data model,”
+W3C Recommendation, Apr. 2013.
+

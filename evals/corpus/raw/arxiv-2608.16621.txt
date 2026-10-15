@@ -1,0 +1,315 @@
+Cost Scales with Change, Not Corpus Size:
+Incrementally Maintaining an Evolving Semantic
+Substrate
+Yusuke Takahashi                                               Kyle Wild                                              Asako Uraki
+Asia AI Institute,                                      Endgame Labs, Inc.                                        Asia AI Institute,
+Faculty of Data Science                                    San Francisco, USA                                     Faculty of Data Science
+Musashino University                                        Asia AI Institute                                     Musashino University
+Tokyo, Japan                                         Musashino University                                         Tokyo, Japan
+ORCID: 0009-0006-8351-2280                                      Tokyo, Japan                                      ORCID: 0009-0006-8412-1804
+ORCID: 0009-0001-6918-3197
+
+
+Abstract—Retrieval-augmented             and        agentic                                 implementation, QSR is an interpreter that re-translates on
+question-answering systems increasingly re-derive the meaning                                   every run, while ISC is a compiler that translates once and
+of a corpus at query time. Put plainly, instead of re-deriving                                  reuses the result (Fig. 1).
+what a corpus means on every question, the work is done once
+when a document arrives and is thereafter merely consulted—a                                        Applying this idea to learned semantic representations,
+compiler, not an interpreter, of meaning. An alternative is to                                  however, raises a practical objection: as the corpus changes,
+compile that meaning once, at ingest time, into a compact,                                      keeping the substrate current seems expensive, and
+queryable semantic substrate and maintain it as the corpus                                      upgrading the underlying embedding model appears to
+evolves. The central objection is maintenance cost: rebuilding a                                require re-embedding everything. We show the objection is
+truncated singular value decomposition (SVD) on every change                                    largely misplaced.
+appears prohibitive, and a change of embedding model seems
+to force a full re-embedding. We argue and show empirically                                     Contributions. (i) We frame substrate maintenance as the
+that maintenance cost scales with the amount of change, not                                     key cost question and argue that, with incremental low-rank
+corpus size. On a controlled synthetic pilot (dimension 256,                                    updates, cost scales with change rather than corpus size. (ii)
+rank 32, a corpus grown from 3,000 to 9,000 documents over 50                                   On a controlled synthetic pilot we show incremental updates
+update events), incremental low-rank updates were 33.7 times                                    are an order of magnitude cheaper than full reconstruction
+cheaper per update than full re-SVD and 23.8 times cheaper                                      while tracking it to floating-point precision. (iii) We show an
+cumulatively, while the incremental subspace tracked the full                                   orthogonal Procrustes virtual axis update can absorb an
+recomputation to within floating-point precision (maximum
+principal-angle drift below 10⁻¹¹ degrees; recall@10 = 1.0). An
+embedding-model generation change by re-embedding only
+orthogonal Procrustes virtual axis update recovered 0.95 mean                                   a small anchor fraction. The novelty is thus not a new
+cosine to truly re-embedded vectors by re-embedding only                                        factorization algorithm but the maintenance discipline itself:
+about 10% of the corpus. The results support maintaining,                                       framing substrate upkeep as the central cost question,
+rather than repeatedly reconstructing, a semantic substrate.                                    unifying incremental SVD updates and Procrustes migration
+into a single change-driven procedure, and measuring that
+Index Terms—semantic substrate; incremental SVD;                                            the resulting cost scales with change rather than corpus size.
+retrieval-augmented generation; embedding drift; orthogonal
+Procrustes; latent semantic indexing; knowledge bases                                              The remainder of this paper is organized as follows:
+Section II reviews related work; Section III defines the
+I. INTRODUCTION                                                semantic substrate and its maintenance and migration
+Modern question-answering over documents commonly                                           procedures; Sections IV–VI present results, discussion, and
+follows a query-time pattern: when a question arrives, the                                      conclusions.
+system retrieves passages and a language model reconstructs
+the relevant meaning from raw text on the spot.                                                 II. LITERATURE REVIEW
+Retrieval-augmented       generation     popularized      this
+retrieve-then-generate paradigm [1], and recent systems                                         A. Semantic spaces and orthogonality
+even let a model translate natural-language questions into                                      Vector space models represent documents and queries as
+executable plans over heterogeneous data [2]. We call this                                      high-dimensional vectors ranked by cosine similarity [5].
+query-time semantic reconstruction (QSR). Increasingly, the                                     Latent semantic indexing applies a truncated SVD so related
+same role is played by retrieval-oriented Model Context                                         terms map to nearby directions in a low-rank space whose
+Protocol (MCP) servers [3]—the emerging open standard by                                        singular vectors are orthogonal [6]. A mathematical model
+which assistants reach external data sources at run time.                                       of meaning built an explicitly orthogonalized semantic space
+QSR is flexible, but it repeats semantic work on every                                      on a basic-vocabulary basis, treating orthogonality as the
+query and offers limited control over consistency,                                              property that lets cosine behave as a semantic distance [7].
+provenance, and cost as query volume grows; it is also                                          We treat them as related precedent, not a prerequisite.
+sensitive to how much context a model can effectively use
+[4]. An alternative is to perform the semantic work once, at
+ingest time, compiling the corpus into a compact, queryable
+semantic substrate that later queries consult—ingest-time
+semantic compilation. By analogy to language
+© 2026 IEEE. Personal use of this material is permitted. Permission from IEEE must be obtained for all other uses, in any current or future media, including reprinting/republishing this
+material for advertising or promotional purposes, creating new collective works, for resale or redistribution to servers or lists, or reuse of any copyrighted component of this work in
+other works.
+
+Accepted for publication in the 2026 International Electronics Symposium (IES), Yogyakarta, Indonesia, August 1–3, 2026. This is the authors' accepted version; the final published
+version will appear in IEEE Xplore.
+   Fig. 1. QSR reconstructs meaning on every query; ISC compiles meaning once at ingest and maintains it incrementally, so a query becomes a cheap
+lookup.
+
+B. Embedding geometry and anisotropy                                                                       III. METHODS
+Contextualized embeddings are anisotropic: vectors                        A. Preliminaries
+occupy a narrow cone, inflating cosine similarities between
+unrelated items [8]. Post-hoc corrections—flow-based                              We summarize the minimal intuition needed for this
+normalization [9], contrastive training [10], and                             section. An embedding represents a document's meaning as
+cluster-based isotropy enhancement [11]—can be read as                        a list of a few hundred numbers (a vector); documents with
+partial, retrofitted re-orthogonalization, and benchmark                      similar meanings point in similar directions. A corpus is
+studies show embedding quality varies sharply across tasks                    then one large table (a matrix) whose rows are these vectors.
+and models [12]. This motivates compiling and, where                          The singular value decomposition (SVD) is the standard tool
+useful, re-orthogonalizing a substrate rather than relying on                 that reorganizes this table into a small number of principal
+raw embeddings; their limitation is that the corrections are                  semantic axes; keeping only the top k axes yields a much
+global and static, not maintained as a corpus evolves.                        smaller representation (a low-rank approximation) that
+C. Dense retrieval and retrieval-augmented generation                         preserves the gist. The semantic substrate in this paper is
+exactly this small set of axes. When the axes are mutually
+Dense retrieval learns query and passage encoders for                     orthogonal (non-overlapping), the angle between vectors
+nearest-neighbor search [13], with late-interaction [14] and
+(cosine similarity) behaves as an honest measure of semantic
+fusion-in-decoder [15] variants, and self-reflective retrieval
+that decides when to retrieve [16]. These define the QSR                      closeness. Finally, Procrustes alignment finds the single
+baseline: meaning is reconstructed per query; production                      rotation that best overlays the same point set expressed in
+file-search features and retrieval-oriented MCP servers [3]                   two coordinate systems without distorting shapes—like
+instantiate it¹. Their limitation, for our purposes, is that none             turning a whole room while keeping the furniture's relative
+persists a compiled, maintainable semantic structure; each                    arrangement. The subsections below restate this intuition
+query re-pays the semantic cost, and an embedding-model                       precisely.
+upgrade invalidates the index.                                                B. Semantic substrate
+D. Indexing, maintenance, and migration                                           We embed each document into a D-dimensional vector
+On the read side, approximate nearest-neighbor indexes                    and stack the corpus as X ∈ ℝ^{N×D}. The substrate is a
+make substrate lookups practical [17], [18], [19]. On the                     rank-k factorization from a truncated SVD,
+write side, incremental and online SVD update a                                           X ≈ U_k Σ_k V_kᵀ, V_kᵀ V_k = I_k ,
+factorization as rows are added without recomputing from
+scratch [20], [21], and nested representations show a learned                     whose top-k right singular vectors V_k form an
+space can be safely truncated for rank control [22].                          orthonormal basis of a low-rank semantic subspace. A query
+Migration between spaces is standard: the orthogonal                          q is projected as q̃ = q V_k and scored by cosine similarity,
+Procrustes problem has a closed-form solution [23], and                       at O(Dk) per item.
+backward-compatible representation learning targets model                     C. Incremental maintenance vs. full re-SVD
+upgrades directly [24]. A complementary symbolic line
+stores compiled meaning as reusable knowledge objects                         When a batch of m documents is added or revised, the naive
+[25]; the substrate maintained here is its continuous                         option recomputes the truncated SVD over the whole corpus
+counterpart. The gap this paper fills is that these write-side                (full re-SVD) at roughly O(NDk) per iteration—growing
+tools have not been combined and measured for the specific                    with N. Incremental low-rank updates [20] instead modify
+goal of keeping a compiled semantic substrate current—at a                    (U_k, Σ_k, V_k) directly using only the change, at roughly
+cost set by change—across both content edits and model                        O(Dk·m + Dk²) per update—independent of N to first order.
+upgrades.                                                                     We periodically re-orthogonalize to bound departure from
+V_kᵀ V_k = I_k. Intuitively, full re-SVD re-reads the entire
+library every time a new shipment of books arrives, whereas       TABLE I. SYNTHETIC-PILOT RESULTS (D=256, K=32). INCREMENTAL
+the incremental update merely shelves the new arrivals and       MAINTENANCE IS 23.8–33.7× CHEAPER THAN FULL RE-SVD YET MATCHES
+IT (DRIFT BELOW 10⁻¹¹ DEG; RECALL@10 = 1.0): CHEAPER AND NOT
+adjusts the catalogue.
+LOSSY.
+D. Virtual axis update for model changes
+On an embedding-model upgrade, old and new vectors            Metric                     Full re-SVD      Incremental
+are not comparable. We embed a small anchor set under both        Per-update cost            283 ms           8.4 ms (33.7×)
+models, giving M and M̃, and solve the orthogonal                 (N=9,000)
+Procrustes problem [23],
+Cumulative cost (50        10.0 s           0.42 s (23.8×)
+R* = argmin_R ∥MR−M̃ ∥_F s.t. RᵀR=I, R*=WZᵀ,
+events)
+MᵀM̃ =WΣZᵀ,
+so that applying R* virtually updates the axes and only        Max principal-angle        — (ref.)         <10⁻¹¹ deg
+the small anchor fraction is re-embedded—trading a full           drift
+rebuild for an alignment problem, complementary to
+backward-compatible training [24].                                recall@10 vs. full         1.0              1.0
+
+E. Rank control and break-even
+The rank k trades fidelity for size; nested-representation   incremental maintainer accumulates only the new batch into
+training [22] suggests k can be adapted to a target precision.   a running D×D second-moment matrix and re-extracts the
+Maintaining a substrate is worthwhile only if its amortized      top-k eigenvectors (cost ∼O(m D² + D³), independent of N).
+cost beats per-query reconstruction. Precomputation is a         For migration we learn the orthogonal Procrustes map from
+spectrum, not a binary: a vector index already amortizes         k ∈ {50, 100, 200, 400, 800} anchor pairs and apply it to
+retrieval (embedding and nearest-neighbor search), but not       the whole corpus without re-embedding. The pilot runs on a
+the per-query semantic reconstruction a model performs           single CPU core with standard dense linear algebra;
+over raw passages—so c_q reflects that reconstruction,           embedding time, shared by both methods, is excluded from
+which is precisely what ISC persists and maintains. With         timings.
+ingest cost c_c per document, maintenance cost c_m per                                    IV. RESULTS
+change, QSR query cost c_q and lookup cost c_r, the
+break-even read count is                                         Cost asymmetry. At N = 9,000, incremental maintenance
+cost 8.4 ms per update versus 283 ms for full
+R* = (N·c_c + W·c_m) / (c_q − c_r) .                   re-SVD—33.7× cheaper—and 23.8× cheaper cumulatively
+Because incremental maintenance keeps c_m small and           over the 50 events (Table I). Incremental per-update cost
+independent of N, R* stays low in high-query regimes.            stayed flat as the corpus grew, whereas full re-SVD rose
+F. Experimental design                                           with N (Fig. 2).
+We use a controlled synthetic pilot that isolates            Subspace tracking. Across all events the maximum
+maintenance cost and tracking quality from confounds; it is      principal-angle drift between the incremental and full
+a harness, and a real-corpus study is future work. Each          subspaces stayed below 10⁻¹¹ degrees and recall@10 was 1.0
+document is a vector x = B_t c + ε ∈ ℝ^D with D = 256.           (Fig. 4); the incremental reconstruction error matched the
+Here B_t ∈ ℝ^{D×R0} (R0 = 40) is a latent semantic basis,        full baseline to working precision.
+orthonormalized by QR, that drifts slowly across events via
+a small random rotation (perturbation scale 0.03), modeling      Virtual axis update. An orthogonal Procrustes map from a
+a corpus whose topics shift gradually; the coefficients c_i ∼    small anchor set recovered 0.95 mean cosine to truly
+N(0,1) are scaled by 1/√(1+i), giving a decaying per-factor      re-embedded vectors while re-embedding only about 10% of
+spectrum so a few factors dominate; and ε ∼ N(0, 0.15² I) is     the corpus (Fig. 5).
+off-subspace noise. The substrate rank k = 32 is deliberately
+Scaling. The full re-SVD curve rises with N, whereas the
+below the latent rank R0 = 40, so the substrate is a genuine
+low-rank approximation, not an exact fit. The corpus starts      incremental curve is flat, set by the batch size m rather than
+at N0 = 3,000 documents and grows over 50 events, each           N; the cumulative gap therefore widens as the corpus grows
+appending a batch of m = 120 freshly generated documents,        (Fig. 3).
+reaching N = 9,000. For the model-migration test we build a                              V. DISCUSSION
+separate corpus of 4,000 documents and simulate an
+embedding-model change as a random orthogonal rotation              The results reframe the usual objection. Maintenance is
+of that space plus Gaussian noise (scale 0.05). All              dominated by change, not corpus size: a large but stable
+randomness is seeded (global seed 7; each event's drift          corpus is cheap to keep current; only churn incurs cost. A
+seeded deterministically) for exact reproducibility.             maintained substrate is therefore attractive precisely in the
+high-volume, slowly-changing regimes where QSR [1], [13]
+G. Metrics and implementation                                    repeats the most work, and the break-even count R* stays
+We measure per-update and cumulative wall-clock cost;        low.
+the maximum principal angle between the incremental and
+The virtual axis update softens the most feared
+full top-k right-singular subspaces; recall@10 of
+maintenance event—an embedding-model upgrade—by
+nearest-neighbor retrieval over a fixed set of 200 random
+converting a full re-embedding into a small alignment
+queries, relative to full recomputation; and reconstruction
+problem, complementing backward-compatible training
+error. Full re-SVD recomputes the top-k right singular
+[24]. The substrate also complements
+vectors of the whole corpus (cost ∼O(N D²)); the
+Fig. 2. Per-update maintenance cost vs. corpus size. Incremental updates
+stay flat (set by the batch size m) while full re-SVD rises with N:        Fig. 4. Maximum principal-angle drift between the incremental and full
+maintenance cost scales with the amount of change, not corpus size         subspaces over update events (log scale). Below 10⁻¹¹ degrees throughout,
+(Contribution i).                                                          with recall@10 = 1.0: the cheap incremental substrate is not a lossy
+shortcut—it matches full re-SVD to floating-point precision (Contribution
+ii).
+
+
+
+
+Fig. 3. Cumulative maintenance cost over the 50 update events; the gap
+widens as the corpus grows (23.8× cumulatively).
+
+Fig. 5. Procrustes virtual axis update: re-embedding only ~10% of the
+language-model-driven query systems [2] and is the                         corpus recovers 0.95 mean cosine to truly re-embedded vectors, so an
+geometric counterpart to symbolic knowledge-object                         embedding-model upgrade need not force a full re-embed (Contribution iii).
+memory [25], offering cheap nearest-neighbor recall
+alongside explicit, inspectable facts.
+For end-user assistants the practical implications are                     R*, and per-query reconstruction remains preferable. The
+concrete. Repeated questions over the same corpus become                   claim is not that compiling always wins, but that its
+faster and cheaper, because the ingest-time work is reused                 dominant maintenance cost is change.
+rather than re-paid on every query. Answers can be made                    Limitations. The pilot is synthetic and uses an idealized
+more auditable, and persisting compiled facts can reduce                   incremental update, so the absolute speedups and the
+drift over long interactions. We therefore see ISC not as a                exact-tracking result are best-case bounds; rank-one
+replacement for QSR but as a complementary mode that                       streaming variants and noisy real corpora will introduce
+assistants such as those above could adopt for heavy,                      bounded drift, and Procrustes recovery depends on anchor
+repetitive corpus processing. Because MCP is a delivery                    representativeness. Real embedding APIs and a live revision
+interface rather than a retrieval strategy, a maintained                   stream are needed for external validity.
+substrate can itself be served behind an MCP server, letting
+agents reach a compiled, always-current semantic layer                                                VI. CONCLUSION
+through the same open standard they already use for                        An evolving semantic substrate can be maintained, rather
+query-time retrieval. Evaluating answer quality is, moreover,              than repeatedly reconstructed, because maintenance cost
+more than a matter of truth alone; a multi-dimensional                     scales with change, not corpus size; and an
+framework for AI-output evaluation [26] complements this                   embedding-model change can be absorbed by a virtual axis
+auditability argument.                                                     update instead of a full rebuild. A synthetic pilot supports
+When is compiling not worth it? If a corpus is small, highly               both claims. Future work will measure on real corpora with
+volatile, or queried rarely, the read count may never reach                production embedding APIs and a live revision stream, and
+study the complementary symbolic substrate—e.g.,
+knowledge objects [25]—for provenance and adherence.
+Concretely, we will replay a timestamped Wikipedia                               [24] Y. Shen, Y. Xiong, W. Xia, and S. Soatto, "Towards
+backward-compatible representation learning," in Proc. IEEE/CVF Conf.
+revision stream against production embedding APIs and                               Computer Vision and Pattern Recognition (CVPR), 2020, pp.
+6368–6377.
+compare against existing vector-database re-indexing                             [25] O. Zahn and S. Chana, "Facts as first class objects: Knowledge objects
+practice, extending the present pilot to real-world retrieval                       for persistent LLM memory," 2026, arXiv preprint arXiv:2603.17781
+[cs.CL].
+and RAG deployments.                                                             [26] Y. Takahashi, "Truth is not enough: An epistemological framework for
+multi-dimensional AI output evaluation with empirical validation in
+human-AI coaching," in Proc. 36th Int. Conf. Information Modelling and
+ACKNOWLEDGMENT                                                                      Knowledge Bases (EJC 2026), Vaasa, Finland, Jun. 8–12, 2026, pp.
+453–472.
+Part of this work used computational infrastructure provided
+by Endgame Labs, Inc.
+
+¹ Run-time retrieval features cited as QSR examples: OpenAI file
+search; Google Gemini File Search; Anthropic Claude file uploads
+and web search.
+
+REFERENCES
+[1] P. Lewis, E. Perez, A. Piktus, et al., "Retrieval-augmented generation for
+knowledge-intensive NLP tasks," in Advances in Neural Information
+Processing Systems, vol. 33, 2020, pp. 9459–9474.
+[2] M. Urban and C. Binnig, "CAESURA: Language models as
+multi-modal query planners," in Proc. 14th Conf. Innovative Data
+Systems Research (CIDR), 2024.
+[3] "Model Context Protocol: Specification (version 2025-11-25)," 2026.
+[4] N. F. Liu, K. Lin, J. Hewitt, et al., "Lost in the middle: How language
+models use long contexts," Trans. Assoc. Comput. Linguist., vol. 12, pp.
+157–173, 2024.
+[5] G. Salton and M. J. McGill, Introduction to Modern Information
+Retrieval. New York, NY, USA: McGraw-Hill, 1983.
+[6] S. Deerwester, S. T. Dumais, G. W. Furnas, T. K. Landauer, and R.
+Harshman, "Indexing by latent semantic analysis," J. Amer. Soc. Inf.
+Sci., vol. 41, no. 6, pp. 391–407, 1990.
+[7] Y. Kiyoki, T. Kitagawa, and T. Hayama, "A metadatabase system for
+semantic image search by a mathematical model of meaning," ACM
+SIGMOD Rec., vol. 23, no. 4, pp. 34–41, 1994.
+[8] K. Ethayarajh, "How contextual are contextualized word
+representations? Comparing the geometry of BERT, ELMo, and GPT-2
+embeddings," in Proc. 2019 Conf. Empirical Methods in Natural
+Language Processing (EMNLP-IJCNLP), 2019, pp. 55–65.
+[9] B. Li, H. Zhou, J. He, M. Wang, Y. Yang, and L. Li, "On the sentence
+embeddings from pre-trained language models," in Proc. 2020 Conf.
+Empirical Methods in Natural Language Processing (EMNLP), 2020,
+pp. 9119–9130.
+[10] T. Gao, X. Yao, and D. Chen, "SimCSE: Simple contrastive learning of
+sentence embeddings," in Proc. 2021 Conf. Empirical Methods in
+Natural Language Processing (EMNLP), 2021, pp. 6894–6910.
+[11] S. Rajaee and M. T. Pilehvar, "A cluster-based approach for improving
+isotropy in contextual embedding space," in Proc. 59th Annu. Meeting
+Assoc. Comput. Linguistics (ACL-IJCNLP), 2021, pp. 575–584.
+[12] N. Muennighoff, N. Tazi, L. Magne, and N. Reimers, "MTEB:
+Massive text embedding benchmark," in Proc. 17th Conf. Eur. Chapter
+Assoc. Comput. Linguistics (EACL), 2023, pp. 2014–2037.
+[13] V. Karpukhin, B. Oğuz, S. Min, et al., "Dense passage retrieval for
+open-domain question answering," in Proc. 2020 Conf. Empirical
+Methods in Natural Language Processing (EMNLP), 2020, pp.
+6769–6781.
+[14] O. Khattab and M. Zaharia, "ColBERT: Efficient and effective passage
+search via contextualized late interaction over BERT," in Proc. 43rd Int.
+ACM SIGIR Conf., 2020, pp. 39–48.
+[15] G. Izacard and E. Grave, "Leveraging passage retrieval with generative
+models for open domain question answering," in Proc. 16th Conf. Eur.
+Chapter Assoc. Comput. Linguistics (EACL), 2021, pp. 874–880.
+[16] A. Asai, Z. Wu, Y. Wang, A. Sil, and H. Hajishirzi, "Self-RAG:
+Learning to retrieve, generate, and critique through self-reflection," in
+Proc. 12th Int. Conf. Learning Representations (ICLR), 2024.
+[17] Y. A. Malkov and D. A. Yashunin, "Efficient and robust approximate
+nearest neighbor search using hierarchical navigable small world
+graphs," IEEE Trans. Pattern Anal. Mach. Intell., vol. 42, no. 4, pp.
+824–836, 2020.
+[18] J. Johnson, M. Douze, and H. Jégou, "Billion-scale similarity search
+with GPUs," IEEE Trans. Big Data, vol. 7, no. 3, pp. 535–547, 2021.
+[19] M. Wang, X. Xu, Q. Yue, and Y. Wang, "A comprehensive survey and
+experimental comparison of graph-based approximate nearest neighbor
+search," Proc. VLDB Endow., vol. 14, no. 11, pp. 1964–1978, 2021.
+[20] M. Brand, "Fast low-rank modifications of the thin singular value
+decomposition," Linear Algebra Appl., vol. 415, no. 1, pp. 20–30, 2006.
+[21] H. Zha and H. D. Simon, "On updating problems in latent semantic
+indexing," SIAM J. Sci. Comput., vol. 21, no. 2, pp. 782–791, 1999.
+[22] A. Kusupati, G. Bhatt, A. Rege, et al., "Matryoshka representation
+learning," in Advances in Neural Information Processing Systems, vol.
+35, 2022, pp. 30233–30249.
+[23] P. H. Schönemann, "A generalized solution of the orthogonal
+Procrustes problem," Psychometrika, vol. 31, no. 1, pp. 1–10, 1966.
+

@@ -1,0 +1,387 @@
+RAG Deserves an Index: Why Ingest-Time Compilation Beats
+Query-Time Interpretation
+Kyle Wild                                Yusuke Takahashi                                Asako Uraki
+Endgame Labs, Inc.                    Faculty of Data Science, Musashino          Faculty of Data Science, Musashino
+San Francisco, USA                                University                                  University
+Asia AI Institute, Musashino                        Asia AI Institute                           Asia AI Institute
+University                                     AIx, Inc.                                   AIx, Inc.
+Tokyo, Japan                                  Tokyo, Japan                                Tokyo, Japan
+orcid.org/0009-0001-6918-3197                 orcid.org/0009-0006-8351-2280               orcid.org/0009-0006-8412-1804
+arXiv:2608.20845v1 [cs.AI] 21 Aug 2026
+
+
+
+
+Abstract                                                                Keywords
+Nearly every retrieval-augmented question-answering system in           ingest-time semantic compilation, semantic substrate, retrieval-
+production ships with a hidden interpreter: on each query a lan-        augmented generation, provenance, derived data, incremental main-
+guage model re-derives the meaning of raw corpus text — resolving       tenance, read planning
+references, attributing claims, reconstructing structure — and then
+throws that work away. The problem is pernicious precisely be-
+cause frontier models do this well and keep getting better at it, and   1    The Interpreter We Ship on Every Query
+waiting for cheaper ones does not close the gap: per-token prices       A modern RAG or agentic system [7] answers a question by retriev-
+have fallen by orders of magnitude while aggregate inference spend      ing raw text and asking a large language model to make sense of
+has risen, because context volume grows faster than prices fall [5].    it — every single time. If the corpus is a year of meetings and the
+This is the modern equivalent of the full-table scan, and the remedy    question is “who committed to the migration deadline?”, the model
+is the one databases found fifty years ago: do the expensive work       must find the speaker, resolve “he” across turns, distinguish an as-
+once, at write time, into a maintained structure that makes reads       sertion from a quotation, and locate the one load-bearing sentence
+cheaper. In databases that structure was the index; a corpus whose      inside kilobytes of adjacent conversation. Then the next query pays
+read pattern is known before it ever meets a user can and should        for all of it again.
+be indexed too.                                                             Databases named this pattern long ago. An interpreter re-translates
+We call the paradigm ingest-time semantic compilation (ISC): com-   the program on every run; a compiler translates once and reuses
+pile a corpus’s meaning into a queryable substrate with two coupled     the result. A system without indexes scans the table on every query,
+layers — incrementally maintained embeddings, and atomic claims         whereas an index lets you pay the cost once, at write time, so reads
+whose provenance is validated at compile time — and treat that sub-     are cheap forever. Query-time semantic reconstruction — QSR, as
+strate as a first-class database object with its own DDL, maintenance   we will call the dominant paradigm — is semantically an unindexed
+contract, migration contract, and cost model. Two existence proofs      scan performed by the most expensive scan operator ever deployed.
+support it. Substrate upkeep scales with change rather than corpus          The analogy is tighter than a rhetorical flourish. A database
+size: incremental updates run 33.7× cheaper than reconstruction         administrator adds an index once the production read pattern is
+while tracking it to floating-point precision. And on a held-out        established: the queries are known, so the work they repeat can be
+sample of 500 broadcast-interview transcripts, compiled claims as       moved to write time. Retrieval-augmented question answering is
+the retrieval payload win every one of 32 budget-by-model cells —       in that position before it ever meets a user. We already know the
+85.2% correct from roughly 2.2k reader tokens against 72.5% from        shape of the read pattern — people will ask questions answerable by
+roughly 16.3k for the best chunk configuration anywhere. The only       reasoning over the semantic information living within the corpus
+baseline that keeps pace on accuracy is a contextualized-chunk          — and we know which interpretive steps every such question will
+pipeline with hybrid retrieval and reranking, statistically indistin-   re-pay for. That is precisely the condition under which a database
+guishable from compiled claims at roughly twenty-one times the          is indexed rather than scanned.
+query-path tokens — and it reaches that parity, we argue, precisely         The costs are no longer hypothetical, and they compound.
+because it has itself begun to compile. We close with the systems           Economic. Agentic workloads inflate read-time context multi-
+agenda this opens, from compilation planners to read planning.          plicatively. Industry token prices per unit fell orders of magnitude
+while aggregate inference spend rose, precisely because context
+volume grew faster than prices fell [5]. Paying a model to re-derive
+the same meaning on every query is the dominant marginal cost of
+deployed systems.
+Behavioral. Context is not accuracy-neutral. Model reliability
+CCS Concepts                                                            degrades measurably as inputs grow, relevant material is lost in the
+• Information systems → Information retrieval; Database de-             middle of long contexts, and irrelevant material actively distracts [6,
+sign and models; • Computing methodologies → Information                8, 13]. More retrieval is not more accuracy; often it is less. Our own
+extraction.                                                             measurements below reproduce this directly.
+                                                                                                             Kyle Wild, Yusuke Takahashi, and Asako Uraki
+
+
+Epistemic. Nothing in the QSR pipeline distinguishes what a         Table 1: The four contracts, what each guarantees, the mech-
+source actually said from what the model inferred while reading         anism that enforces it, and where this paper exhibits it.
+it. Every query is a fresh opportunity to silently re-guess meaning,
+and memory-system benchmarks now measure exactly this failure           Contract                Guarantees                 Enforced by                   Shown
+propagating from extraction into answers [2].                           Compilation (semantic   only source-supported      exact-quote validation gate    §2.1
+The database community has seen this movie. So the question         DDL)                    claims enter
+Maintenance             cost tracks change, not    incremental low-rank           §3.1
+this paper asks is this: what would it mean to build the compiler?                              corpus size                update
+Migration               a model upgrade is an      orthogonal Procrustes          §3.1
+alignment problem
+2   The Vision: A Compiled Semantic Substrate                           Cost model              compile only where reads   𝑅 ∗ as a planner statistic    App. A
+repay it
+Ingest-time semantic compilation performs the semantic work
+when a document arrives and persists it as a semantic substrate
+the system consults thereafter. We propose the substrate as a first-
+a corpus sits on it should be a planned decision, not an architectural
+class database object with two coupled layers.
+accident.
+The geometric layer — embeddings and their index structures,
+maintained incrementally as the corpus and the embedding models
+evolve. This layer answers where is meaning like this?
+2.1         What a compiled claim actually is
+The symbolic layer — atomic, self-contained claims compiled          Concretely, in our reference implementation the substrate is ordi-
+from source text, each carrying non-negotiable provenance: the          nary PostgreSQL. A compiled claim is a row in facts — the self-
+verbatim source span, its author, and its location, validated mechan-   contained claim text, an optional topic and subject–relation–target
+ically at compile time. This layer answers what exactly was said,       triple, a content hash, a lifecycle state, and a pipeline_run_id
+by whom? — and, critically, it is the payload the reading model         recording exactly which extractor, model, and prompt produced
+consumes, not merely an index key that points back into raw text.       it — joined to one or more rows in fact_evidence: the verbatim
+That distinction — compiling the payload, not just the pointer —        quote, its character offsets, its turn range, and the method by which
+separates ISC from contextualized chunking and proposition in-          the quote was located. Provenance is not an annotation on this
+dexing, which improve where retrieval lands while the reader still      schema; it is its foreign keys. A fact references its source docu-
+consumes raw text [1, 3].                                               ment, its evidence references the fact, and UNIQUE(document_id,
+Concretely, instead of returning a 1,000-token transcript window     content_hash) makes recompilation idempotent.
+in which a deadline is discussed somewhere, the substrate returns           The validation gate sits between extraction and insertion. A
+a claim that already carries its own evidence:                          candidate claim must carry a supporting quote; the quote must
+be located in the canonical transcript, and the located span must
+Priya Shah committed to deliver the migration plan by
+resolve to real turns and a real speaker. A candidate that fails —
+September 30.
+Evidence: “I’ll have the migration plan ready by the end
+typically a model-“quoted” sentence that is actually a paraphrase, so
+of September.”                                                  the string search finds no span — is not repaired or approximated. It
+Source: Priya Shah, turn 42, project-planning meeting.          is dropped before it touches the substrate, exactly as a row violating
+a foreign-key constraint never enters a table. On the held-out corpus
+The reader receives the claim, the span that supports it, and the       the gate admitted 69,746 claims, every one carrying a supporting
+attribution, and has to recover none of the three. The original         quote located byte-exactly in its source transcript; in a 20-document
+transcript remains available for inspection, verification, and the      replay of the frozen extraction, the gate rejected 1.1% of candidate
+cases where the compiled form has dropped context the question          claims (29 of 2,724), 28 of them for quotes that could not be located
+needs.                                                                  in the source — the class of unsupported compilation that extraction-
+Around these layers, the paradigm imports the full apparatus         based memory systems are measured to leak [2].
+databases attach to any maintained derived structure.                       Maintenance rides on the same rows: state and superseded_by
+A compilation contract (semantic DDL). What gets compiled,           implement tombstoning and revision without destroying lineage,
+from what sources, under what validation gate. A claim that fails       and an index_outbox table propagates upserts and deletes to the
+exact-quote validation does not enter the substrate: provenance         vector index — the substrate’s redo log in miniature, whose produc-
+behaves like a foreign-key constraint on meaning.                       tion form Section 4 asks the community to design.
+A maintenance contract. Sources change; substrates must
+track them at a cost proportional to change, not corpus size —          3 Two Existence Proofs
+the property that makes materialized views viable, demanded of
+semantics.                                                              3.1 Maintenance scales with change, not size
+A migration contract. Embedding models are the substrate’s           In a controlled synthetic pilot on an evolving substrate — a corpus of
+storage format, and they churn. Model upgrades must be absorbable       synthetic embedding vectors grown from 3,000 to 9,000 documents
+as alignment problems, not full rebuilds.                               over 50 update events, constructed to isolate maintenance cost from
+A cost model. With ingest cost per document, maintenance cost        corpus confounds — incremental low-rank updates cost 8.4 ms per
+per change, and per-query savings, the break-even read count 𝑅 ∗        update against 283 ms for full re-decomposition, 33.7× cheaper
+is an optimizer statistic: compile when expected reads exceed it,       per update and 23.8× cheaper cumulatively, while tracking the
+interpret when they do not. Compilation is a spectrum, and where        fully recomputed subspace to floating-point precision: maximum
+RAG Deserves an Index: Why Ingest-Time Compilation Beats Query-Time Interpretation
+
+
+QSR: interpret on every read                ISC: compile once, then read                                                                        contextualized stack
+90%                                        47.7k, 88.0%
+query arrives                             document arrives
+
+compiled claims
+every query repeats it
+
+
+
+
+retrieve raw passages                        compile + validate                                          85%        2.2k, 85.2%
+paid once
+≈ 21× the tokens, same accuracy
+
+
+
+
+accuracy
+reader model re-interprets
+resolve, attribute, locate                    geometric layer
+
+
+
+
+reads are cheap
+80%
+embeddings, maintained
+
+answer               substrate
+symbolic layer                                                                           best chunk cell
+validated claims                                           75%
+16.3k, 72.5%
+
+query → lookup → answer
+70%
+0%
+Figure 1: Query-time semantic reconstruction repeats the                                                                                     1k          5k         10k                          50k
+
+interpretive work on every read; ingest-time semantic com-                                                                                         tokens read per query (log scale)
+pilation performs it once and maintains the result.
+Figure 2: The read-time frontier on the held-out sample. Com-
+principal-angle drift below 10−11 degrees, recall@10 of 1.0 [14].                                                      piled claims occupy the upper left; the only configuration
+The shape matters as much as the ratio: incremental per-update                                                         that matches them on accuracy sits far to the right, and ev-
+cost stayed flat as the corpus tripled, while full re-decomposition                                                    ery configuration that reads raw text sits below. The vertical
+rose with 𝑁 , so the gap widens rather than closes as a corpus                                                         axis is truncated below 69% (break marked); exact values are
+grows. The cheap path is not a lossy shortcut. A feared embedding-                                                     printed beside each point.
+model migration was absorbed by an orthogonal Procrustes virtual-
+axis update that recovered 0.95 mean cosine to truly re-embedded
+vectors while re-embedding only about 10% of the corpus.                                                               and stayed flat as the budget grew, while chunk reading accuracy
+The standard objection to compiled semantic structures — “you                                                       declined from 81% to 73% as more text was supplied. The advantage
+can’t afford to keep them current” — is, on this evidence, misplaced:                                                  is a model-general reading-quality gap over raw transcript, not
+a large, slowly-changing corpus is precisely where maintenance                                                         retrieval placement — and supplying more raw context is not free
+is cheap and QSR re-pays the most. The pilot is synthetic and                                                          even when it contains the answer.
+its incremental update idealized, so these are best-case bounds;                                                          Against the strongest chunk-side remedy — LLM-contextualized
+validation on real corpora under production embedding APIs is the                                                      chunks with hybrid dense and full-text retrieval fused by reciprocal
+study’s stated next step.                                                                                              rank, plus a cross-encoder reranker, pre-registered before execution
+— the two approaches are statistically indistinguishable. At a 2,048-
+3.2                       Compiled payloads dominate the read-time                                                     token budget the full stack answered 88.0% (439/499) against 85.2%
+frontier                                                                                     (425/499) for facts, McNemar 𝑝 = 0.202; at 16,384 the figures are
+In a controlled dialogue question-answering study on broadcast-                                                        87.4% and 83.6%, 𝑝 = 0.076. Neither difference survives correction
+interview transcripts [16], provenance-validated facts serving as the                                                  for multiple testing. The nominal direction reversed between devel-
+retrieval payload were compared against three chunking policies —                                                      opment and held-out: on the frozen development sample facts led
+fixed-width, turn-aware, and semantic — under identical embedding,                                                     92 to 88 (𝑝 = 0.39), while on held-out the full stack leads by 2.8 to 3.8
+retrieval, and answer models across matched read-token budgets.                                                        points. We report the reversal rather than the more convenient half
+Results are reported on a held-out sample of 500 transcripts and                                                    of it, because the finding is the tie and not its sign — and because
+499 questions sharing no document with the sample used to develop                                                      the tie is bought at roughly 21× the query-path tokens, about 47.7k
+extraction.1 Facts won every one of 32 budget-by-model cells, and                                                      against 2.2k, on every query forever.
+all 24 facts-versus-chunk comparisons survived Holm correction                                                            The stack’s own components do not reach that tie. Its vector
+for multiple testing (𝑝 ≤ 4.9 × 10−6 ; strongest cell 1.4 × 10−42 ) under                                              and hybrid arms answer 73.9% and 75.6%, losing to facts at Holm-
+McNemar’s test on paired per-question outcomes. At a 2,048-token                                                       corrected 𝑝 ≤ 1.4 × 10−4 . Only the assembled stack keeps pace, and
+budget facts answered 85.2% correctly from roughly 2.2k reader                                                         its mechanism analysis is the interesting part: it works precisely
+tokens, while the best chunk configuration anywhere in the sweep                                                       insofar as it, too, performs compilation — the situating preamble
+reached 72.5% from roughly 16.3k. Facts at a 256-token budget                                                          names referents a reader would otherwise resolve — while still
+(69.5%) beat every chunk policy at 2,048. Figure 2 places the three                                                    lacking validated provenance, since nothing checks the generated
+headline configurations on the accuracy-per-token plane.                                                               preamble against the source span. The strongest available chunk
+A decomposition into coverage and reading accuracy explains                                                         pipeline is an incomplete instance of the architecture we propose,
+the shape. Fact payloads carried the gold evidence in 98–99% of cases                                                  paying at query time for work a compiler could validate once.
+1 Three runs of one chunk baseline recorded recall of 0.000 because retrieval executed
+That pattern is this paper’s claim in miniature. Every configu-
+before the embedding index was built. They were deleted before any judging and                                         ration that interprets at query time loses decisively; the only one
+re-run with the embedding step in place; no judged result depends on them.                                             that keeps pace has already begun to compile, and pays twenty-one
+                                                                                                                      Kyle Wild, Yusuke Takahashi, and Asako Uraki
+
+
+times over for the half of the job it does at read time. Full protocol                 What is the full constraint language? Span containment, speaker at-
+and results appear in a companion report [15].                                         tribution, temporal validity, revision lineage; violations as compile
+Compilation is not free, and we can price it. Extraction runs Kimi                  errors, not runtime surprises.
+K2.6 turn-wise over each transcript. On a 20-document replay of                           3. Maintenance and migration at production scale. Incre-
+the frozen extraction it averaged 48.2k prompt and 4.5k completion                     mental subspace tracking and Procrustes alignment worked in a
+tokens per document, about $0.064 per document at current hosted                       controlled pilot. The production questions are streaming variants
+pricing; extrapolated across the corpus that is roughly $32 and                        under real revision loads, anchor selection for migration, bounded
+26.3M tokens to compile all 500 documents. The replayed sample                         staleness contracts, and the semantic analogue of crash recovery:
+yields about 3.6% fewer claims per document than the corpus aver-                      what is the substrate’s redo log?
+age, so the extrapolation is a slight underestimate. Set the figure                       4. The substrate as shared infrastructure. A compiled sub-
+against the contextualized stack’s extra query-path load: its ∼45.5k                   strate is naturally multi-tenant: many agents, assistants, and appli-
+additional tokens per query mean that compiling the entire corpus                      cations reading one maintained semantic layer through standard
+costs what roughly 580 of its queries cost, and even if the full 3.6%                  interfaces. This raises classical questions in new clothes — isolation
+carried through to cost that number moves only to about 600. For                       (whose compilation contract?), versioning (queries against yester-
+this corpus, compilation amortizes inside the first thousand reads                     day’s meaning), and access control at the granularity of claims.
+either way.2 Answer grading in both studies is automated, and the                         5. Reading as a planned operation. Once payloads are com-
+grader is also Kimi K2.6, so extraction and judgment share a model;                    piled, “how much context to read” becomes a per-query physical-
+human calibration and a re-judgment under a different model fam-                       plan choice with measurable accuracy and cost curves — including
+ily are in progress. Until they land we treat the read-path result                     the non-monotonicity we observed directly, where more context re-
+as strong preliminary evidence rather than a settled effectiveness                     duced accuracy. Read planning against a substrate, with the reader
+claim.                                                                                 model’s degradation curve as a cost-model input, is unexplored
+It follows that compiling is sometimes the wrong call, and the                      territory.
+cost model says when. A corpus that is small, highly volatile, or                         6. How to evaluate a compiler. An agenda that asks for plan-
+rarely queried may never reach 𝑅 ∗ : the ingest bill is paid in full                   ners needs a way to tell a good one from a bad one, and end-to-end
+while the per-read saving accrues too slowly to recover it, and per-                   answer accuracy is too coarse: it conflates what was compiled, what
+query reconstruction remains the right architecture. We are not                        was retrieved, and what was read. The substrate’s own properties
+arguing that meaning should always be compiled. We are arguing                         are separately measurable — extraction coverage against the source,
+that whether to compile it is a planning decision with a computable                    provenance validity, self-containment, duplication, staleness under
+answer, and that today it is usually made by default rather than by                    a revision stream, and the rejection rate of the validation gate — and
+estimate.                                                                              a planner should be judged on the decisions it makes given those,
+One existence proof is synthetic and geometric, the other real di-                  not only on the answers that eventually come out. Establishing
+alogue and symbolic. Together they bound the paradigm from both                        that measurement layer is prerequisite to comparing compilation
+sides: the substrate can be kept current for less than reconstruction,                 strategies at all.
+and reading from it beats reading raw text at a fraction of the cost.                     7. Honest boundaries. Our dialogue evidence also contains a
+caution: when a tool-using agent mediated retrieval, the compiled-
+4    The Research Agenda                                                               payload advantage did not automatically survive the agent layer.
+The interaction between compiled substrates and agentic read
+ISC opens a systems agenda with the shape and texture of classical
+strategies — when the agent should ask for siblings, lineage, or
+database research.
+raw source — is open, and we flag it rather than paper over it.
+1. The compilation planner. Not everything deserves compila-
+tion. 𝑅 ∗ varies per document with query popularity, volatility, and
+compilation cost; the planner’s job is choosing, continuously, what
+to compile, to what depth — embeddings only? facts? enriched rela-                     5   Related Visions
+tions? — and what to leave interpreted. This is the optimizer prob-
+Document expansion by query prediction [10] is the oldest instance
+lem restated for meaning, including its adversary: LazyGraphRAG-
+of the instinct we follow: it spends compute at ingest, generating
+style arguments [9] that deferral wins at low read volume are the
+queries a document could answer and appending them before index-
+interpreter half of the trade-off, and the field needs the cost model
+ing, so retrieval lands better later. What it compiles is the pointer —
+that decides per corpus rather than a doctrinal winner.
+the expansion changes what the index matches, while the reader
+2. Provenance as an integrity constraint. The symbolic layer’s
+still receives the original passage — and nothing validates the gener-
+exact-quote gate is a constraint system: every compiled claim is
+ated queries against the source. The lineage matters: moving work
+verifiable against its source span by string comparison, making
+to ingest time in order to improve retrieval is not new. What is new
+hallucinated compilation mechanically rejectable at write time —
+here is compiling the payload the reader consumes, and validating
+the property extraction-based memory systems measurably lack.
+it against the span it came from. Proposition-level indexing [3] de-
+composes passages into standalone propositions and indexes those,
+2 The ∼580 figure is a token-count equivalence rather than a price one: compile-time
+improving where retrieval lands; the reader still receives raw pas-
+and query-time tokens are billed on different models. The dollar version depends on    sage text, so the pointer is compiled and the payload is not. Contex-
+reranker pricing, which varies by deployment.                                          tualized chunking [1] prefixes each chunk with a model-generated
+RAG Deserves an Index: Why Ingest-Time Compilation Beats Query-Time Interpretation
+
+
+Table 2: What each approach compiles, whether the compiled                                for the per-query cost of query-time semantic reconstruction, and
+form is validated against its source, and what the reading                                𝑐𝑟 for the per-query cost of reading the compiled substrate. Over 𝑅
+model actually receives. Only the last row fills both of the                              reads the two architectures cost
+middle columns.
+QSR : 𝑅 𝑐𝑞            ISC : 𝑁𝑐𝑐 + 𝑊 𝑐𝑚 + 𝑅 𝑐𝑟 ,
+Approach                   Compiles                   Val.   Reader receives              and setting them equal gives the break-even read count
+Document expansion [10]    the pointer                no     raw passage plus queries
+𝑁𝑐𝑐 + 𝑊 𝑐𝑚
+Proposition indexing [3]   the pointer                no     raw passage                                            𝑅∗ =              .
+Contextual chunking [1]    pointer, part of payload   no     raw passage plus preamble                                      𝑐𝑞 − 𝑐𝑟
+Agent memory [4, 12]       the payload                no     extracted claims
+GraphRAG family            structure                  no     summaries, traversals            Three properties make this a planner statistic rather than an ac-
+Context compression        nothing; shrinks at read   —      lossy passage
+counting identity. First, 𝑅 ∗ is finite only when 𝑐𝑞 > 𝑐𝑟 : the compiled
+ISC                        the payload                yes    claim with its source span
+path must actually be cheaper to read, which is what Section 3.2
+measures. Second, the maintenance term 𝑊 𝑐𝑚 grows with change
+rather than with 𝑁 , which is what Section 3.1 measures — so a large
+situating preamble, a partial compilation of exactly the reference-
+but stable corpus does not inflate 𝑅 ∗ merely by being large. Third,
+resolution work we target — but nothing validates the preamble
+𝑅 ∗ is a per-document quantity in practice: 𝑁 collapses to 1 when
+against the source span, and the payload again remains raw text.
+the planner asks whether to compile a particular document, and
+Agent-memory systems [4, 12] compile payloads, which is the right
+the decision turns on that document’s expected read count against
+unit, but without a validation gate: benchmarks show extraction er-
+its own compilation cost. A planner that estimates read demand
+rors propagating into downstream answers [2]. GraphRAG-family
+per document, rather than per corpus, is the object we are asking
+systems compile structure for multi-hop reasoning, trading ingest
+the community to build.
+cost for traversal ability, and address a different query class than
+The held-out corpus instantiates the numerator directly. With
+ours. Context-compression methods shrink reads lossily at query
+𝑁 = 500, a 𝑐𝑐 of roughly 48.2k prompt and 4.5k completion tokens
+time, which is interpretation made cheaper rather than compilation.
+per document measured on a 20-document replay and extrapolated,
+And cost-performance analyses of fact-based memory against long
+and no corpus change during the study (𝑊 = 0), compilation cost
+context measure the frontier we care about without asking what
+about 26.3M tokens in total. The denominator is the per-read gap:
+guarantees the facts carry [11]. Each holds one piece. Table 2 lays
+the contextualized-chunk stack, the only baseline that keeps pace
+the field out along the two axes that matter here. Several systems
+on accuracy, spends roughly 45.5k more query-path tokens per
+compile something; only one validates what it compiled against the
+question than a substrate read. Dividing gives 𝑅 ∗ ≈ 580 reads
+source it came from.
+— for a 500-document corpus, compilation pays for itself inside
+The database lineage — materialized views, inverted indexes,
+the first thousand questions. The equivalence is in tokens rather
+latent semantic indexing — supplies the missing discipline: derived
+than dollars, since compile-time and query-time work is billed on
+structures earn their keep through maintenance contracts, integrity
+different models, but the shape of the answer does not depend on
+constraints, and cost models. ISC is the proposal that meaning
+that: 𝑅 ∗ here is a number a planner could act on, not an asymptotic
+deserves the same treatment.
+argument.
+6     Conclusion                                                                              One term is idle in this instance. The study held its corpus fixed,
+so 𝑊 = 0 and the maintenance term vanishes; a deployed substrate
+Fifty years of data systems can be read as one lesson: move work                          over a live corpus would carry it. That is exactly the term Section 3.1
+from read time to write time, then govern the derived structure                           bounds, and the reason the two studies belong in one paper: the
+with diligence and precision. Language models made meaning com-                           read-path study fixes the denominator, the maintenance study keeps
+putable but left it interpreted. Ingest-time semantic compilation                         the numerator from growing with the corpus, and neither alone
+is the claim that it is now compilable — affordably maintained,                           would make 𝑅 ∗ a quantity a planner could estimate.
+mechanically validated, and cheaper to read than the raw text it
+was compiled from. Two controlled studies support feasibility. The                        References
+agenda — planners, constraints, migration, shared substrates, read
+[1] Anthropic. Introducing contextual retrieval. Engineering blog, 2024.
+planning — is wide open, and it looks like database research because
+[2] D. Chen et al. HaluMem: Evaluating hallucinations in memory systems
+it is.                                                                                        of agents. Preprint, arXiv:2511.03506, 2025.
+[3] T. Chen et al. Dense X retrieval: What retrieval granularity should we
+Acknowledgments                                                                               use? In EMNLP, 2024.
+Part of this work used computational infrastructure provided by                           [4] P. Chhikara et al. Mem0: Building production-ready AI agents with
+Endgame Labs, Inc. and AIx, Inc.                                                              scalable long-term memory. Preprint, arXiv:2504.19413, 2025.
+[5] A. Hamilton et al. The token tax of epistemic accuracy: Comparing RAG
+A      The Break-Even Read Count                                                              and long-context architectures for document-grounded generative AI
+applications. Preprint, arXiv:2606.20898, 2026.
+Section 2 claims 𝑅 ∗ is an optimizer statistic. Here it is.                               [6] K. Hong et al. Context rot: How increasing input tokens impacts LLM
+Let a corpus hold 𝑁 documents and receive 𝑊 changes over the                                performance. Chroma technical report, 2025.
+period of interest. Write 𝑐𝑐 for the ingest cost of compiling one                         [7] P. Lewis et al. Retrieval-augmented generation for knowledge-
+document, 𝑐𝑚 for the maintenance cost of absorbing one change, 𝑐𝑞                             intensive NLP tasks. In NeurIPS, 2020.
+                                                                                                               Kyle Wild, Yusuke Takahashi, and Asako Uraki
+
+
+[8] N. F. Liu et al. Lost in the middle: How language models use long       [13] F. Shi et al. Large language models can be easily distracted by irrelevant
+contexts. TACL, 2024.                                                        context. In ICML, 2023.
+[9] Microsoft Research. LazyGraphRAG. Blog, 2024.                           [14] Y. Takahashi, K. Wild, and A. Uraki. Cost scales with change, not
+[10] R. Nogueira, W. Yang, J. Lin, and K. Cho. Document expansion by              corpus size: Incrementally maintaining an evolving semantic substrate.
+query prediction. Preprint, arXiv:1904.08375, 2019.                          In Proc. IEEE Int. Electron. Symp. (IES-KCIC), Jogjakarta, Indonesia, Aug.
+[11] N. Pollertlam and W. Kornsuwannawit. Beyond the context window:              2026. Preprint: arXiv:2608.16621.
+A cost-performance analysis of fact-based memory vs. long-context       [15] K. Wild, Y. Takahashi, and A. Uraki. Compiled semantic payloads for
+LLMs for persistent agents. Preprint, arXiv:2603.04814, 2026.                dialogue question answering. Manuscript in preparation, 2026.
+[12] P. Rasmussen, P. Paliychuk, T. Beauvais, J. Ryan, and D. Chalef. Zep:   [16] C. Zhu et al. MediaSum: A large-scale media interview dataset for
+A temporal knowledge graph architecture for agent memory. Preprint,          dialogue summarization. In NAACL, 2021.
+arXiv:2501.13956, 2025.
+

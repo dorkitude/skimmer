@@ -1,0 +1,653 @@
+1.  Introduction
+     1.1.  Purpose
+     1.2.  History and Evolution
+     1.3.  Core Semantics
+     1.4.  Specifications Obsoleted by This Document
+   2.  Conformance
+     2.1.  Syntax Notation
+     2.2.  Requirements Notation
+     2.3.  Length Requirements
+     2.4.  Error Handling
+     2.5.  Protocol Version
+   3.  Terminology and Core Concepts
+     3.1.  Resources
+     3.2.  Representations
+     3.3.  Connections, Clients, and Servers
+     3.4.  Messages
+     3.5.  User Agents
+     3.6.  Origin Server
+     3.7.  Intermediaries
+     3.8.  Caches
+     3.9.  Example Message Exchange
+   4.  Identifiers in HTTP
+     4.1.  URI References
+     4.2.  HTTP-Related URI Schemes
+       4.2.1.  http URI Scheme
+       4.2.2.  https URI Scheme
+       4.2.3.  http(s) Normalization and Comparison
+       4.2.4.  Deprecation of userinfo in http(s) URIs
+       4.2.5.  http(s) References with Fragment Identifiers
+     4.3.  Authoritative Access
+       4.3.1.  URI Origin
+       4.3.2.  http Origins
+       4.3.3.  https Origins
+       4.3.4.  https Certificate Verification
+       4.3.5.  IP-ID Reference Identity
+   5.  Fields
+     5.1.  Field Names
+     5.2.  Field Lines and Combined Field Value
+     5.3.  Field Order
+     5.4.  Field Limits
+     5.5.  Field Values
+     5.6.  Common Rules for Defining Field Values
+       5.6.1.  Lists (#rule ABNF Extension)
+         5.6.1.1.  Sender Requirements
+         5.6.1.2.  Recipient Requirements
+       5.6.2.  Tokens
+       5.6.3.  Whitespace
+       5.6.4.  Quoted Strings
+       5.6.5.  Comments
+       5.6.6.  Parameters
+       5.6.7.  Date/Time Formats
+   6.  Message Abstraction
+     6.1.  Framing and Completeness
+     6.2.  Control Data
+     6.3.  Header Fields
+     6.4.  Content
+       6.4.1.  Content Semantics
+       6.4.2.  Identifying Content
+     6.5.  Trailer Fields
+       6.5.1.  Limitations on Use of Trailers
+       6.5.2.  Processing Trailer Fields
+     6.6.  Message Metadata
+       6.6.1.  Date
+       6.6.2.  Trailer
+   7.  Routing HTTP Messages
+     7.1.  Determining the Target Resource
+     7.2.  Host and :authority
+     7.3.  Routing Inbound Requests
+       7.3.1.  To a Cache
+       7.3.2.  To a Proxy
+       7.3.3.  To the Origin
+     7.4.  Rejecting Misdirected Requests
+     7.5.  Response Correlation
+     7.6.  Message Forwarding
+       7.6.1.  Connection
+       7.6.2.  Max-Forwards
+       7.6.3.  Via
+     7.7.  Message Transformations
+     7.8.  Upgrade
+   8.  Representation Data and Metadata
+     8.1.  Representation Data
+     8.2.  Representation Metadata
+     8.3.  Content-Type
+       8.3.1.  Media Type
+       8.3.2.  Charset
+       8.3.3.  Multipart Types
+     8.4.  Content-Encoding
+       8.4.1.  Content Codings
+         8.4.1.1.  Compress Coding
+         8.4.1.2.  Deflate Coding
+         8.4.1.3.  Gzip Coding
+     8.5.  Content-Language
+       8.5.1.  Language Tags
+     8.6.  Content-Length
+     8.7.  Content-Location
+     8.8.  Validator Fields
+       8.8.1.  Weak versus Strong
+       8.8.2.  Last-Modified
+         8.8.2.1.  Generation
+         8.8.2.2.  Comparison
+       8.8.3.  ETag
+         8.8.3.1.  Generation
+         8.8.3.2.  Comparison
+         8.8.3.3.  Example: Entity Tags Varying on Content-Negotiated
+                 Resources
+   9.  Methods
+     9.1.  Overview
+     9.2.  Common Method Properties
+       9.2.1.  Safe Methods
+       9.2.2.  Idempotent Methods
+       9.2.3.  Methods and Caching
+     9.3.  Method Definitions
+       9.3.1.  GET
+       9.3.2.  HEAD
+       9.3.3.  POST
+       9.3.4.  PUT
+       9.3.5.  DELETE
+       9.3.6.  CONNECT
+       9.3.7.  OPTIONS
+       9.3.8.  TRACE
+   10. Message Context
+     10.1.  Request Context Fields
+       10.1.1.  Expect
+       10.1.2.  From
+       10.1.3.  Referer
+       10.1.4.  TE
+       10.1.5.  User-Agent
+     10.2.  Response Context Fields
+       10.2.1.  Allow
+       10.2.2.  Location
+       10.2.3.  Retry-After
+       10.2.4.  Server
+   11. HTTP Authentication
+     11.1.  Authentication Scheme
+     11.2.  Authentication Parameters
+     11.3.  Challenge and Response
+     11.4.  Credentials
+     11.5.  Establishing a Protection Space (Realm)
+     11.6.  Authenticating Users to Origin Servers
+       11.6.1.  WWW-Authenticate
+       11.6.2.  Authorization
+       11.6.3.  Authentication-Info
+     11.7.  Authenticating Clients to Proxies
+       11.7.1.  Proxy-Authenticate
+       11.7.2.  Proxy-Authorization
+       11.7.3.  Proxy-Authentication-Info
+   12. Content Negotiation
+     12.1.  Proactive Negotiation
+     12.2.  Reactive Negotiation
+     12.3.  Request Content Negotiation
+     12.4.  Content Negotiation Field Features
+       12.4.1.  Absence
+       12.4.2.  Quality Values
+       12.4.3.  Wildcard Values
+     12.5.  Content Negotiation Fields
+       12.5.1.  Accept
+       12.5.2.  Accept-Charset
+       12.5.3.  Accept-Encoding
+       12.5.4.  Accept-Language
+       12.5.5.  Vary
+   13. Conditional Requests
+     13.1.  Preconditions
+       13.1.1.  If-Match
+       13.1.2.  If-None-Match
+       13.1.3.  If-Modified-Since
+       13.1.4.  If-Unmodified-Since
+       13.1.5.  If-Range
+     13.2.  Evaluation of Preconditions
+       13.2.1.  When to Evaluate
+       13.2.2.  Precedence of Preconditions
+   14. Range Requests
+     14.1.  Range Units
+       14.1.1.  Range Specifiers
+       14.1.2.  Byte Ranges
+     14.2.  Range
+     14.3.  Accept-Ranges
+     14.4.  Content-Range
+     14.5.  Partial PUT
+     14.6.  Media Type multipart/byteranges
+   15. Status Codes
+     15.1.  Overview of Status Codes
+     15.2.  Informational 1xx
+       15.2.1.  100 Continue
+       15.2.2.  101 Switching Protocols
+     15.3.  Successful 2xx
+       15.3.1.  200 OK
+       15.3.2.  201 Created
+       15.3.3.  202 Accepted
+       15.3.4.  203 Non-Authoritative Information
+       15.3.5.  204 No Content
+       15.3.6.  205 Reset Content
+       15.3.7.  206 Partial Content
+         15.3.7.1.  Single Part
+         15.3.7.2.  Multiple Parts
+         15.3.7.3.  Combining Parts
+     15.4.  Redirection 3xx
+       15.4.1.  300 Multiple Choices
+       15.4.2.  301 Moved Permanently
+       15.4.3.  302 Found
+       15.4.4.  303 See Other
+       15.4.5.  304 Not Modified
+       15.4.6.  305 Use Proxy
+       15.4.7.  306 (Unused)
+       15.4.8.  307 Temporary Redirect
+       15.4.9.  308 Permanent Redirect
+     15.5.  Client Error 4xx
+       15.5.1.  400 Bad Request
+       15.5.2.  401 Unauthorized
+       15.5.3.  402 Payment Required
+       15.5.4.  403 Forbidden
+       15.5.5.  404 Not Found
+       15.5.6.  405 Method Not Allowed
+       15.5.7.  406 Not Acceptable
+       15.5.8.  407 Proxy Authentication Required
+       15.5.9.  408 Request Timeout
+       15.5.10. 409 Conflict
+       15.5.11. 410 Gone
+       15.5.12. 411 Length Required
+       15.5.13. 412 Precondition Failed
+       15.5.14. 413 Content Too Large
+       15.5.15. 414 URI Too Long
+       15.5.16. 415 Unsupported Media Type
+       15.5.17. 416 Range Not Satisfiable
+       15.5.18. 417 Expectation Failed
+       15.5.19. 418 (Unused)
+       15.5.20. 421 Misdirected Request
+       15.5.21. 422 Unprocessable Content
+       15.5.22. 426 Upgrade Required
+     15.6.  Server Error 5xx
+       15.6.1.  500 Internal Server Error
+       15.6.2.  501 Not Implemented
+       15.6.3.  502 Bad Gateway
+       15.6.4.  503 Service Unavailable
+       15.6.5.  504 Gateway Timeout
+       15.6.6.  505 HTTP Version Not Supported
+   16. Extending HTTP
+     16.1.  Method Extensibility
+       16.1.1.  Method Registry
+       16.1.2.  Considerations for New Methods
+     16.2.  Status Code Extensibility
+       16.2.1.  Status Code Registry
+       16.2.2.  Considerations for New Status Codes
+     16.3.  Field Extensibility
+       16.3.1.  Field Name Registry
+       16.3.2.  Considerations for New Fields
+         16.3.2.1.  Considerations for New Field Names
+         16.3.2.2.  Considerations for New Field Values
+     16.4.  Authentication Scheme Extensibility
+       16.4.1.  Authentication Scheme Registry
+       16.4.2.  Considerations for New Authentication Schemes
+     16.5.  Range Unit Extensibility
+       16.5.1.  Range Unit Registry
+       16.5.2.  Considerations for New Range Units
+     16.6.  Content Coding Extensibility
+       16.6.1.  Content Coding Registry
+       16.6.2.  Considerations for New Content Codings
+     16.7.  Upgrade Token Registry
+   17. Security Considerations
+     17.1.  Establishing Authority
+     17.2.  Risks of Intermediaries
+     17.3.  Attacks Based on File and Path Names
+     17.4.  Attacks Based on Command, Code, or Query Injection
+     17.5.  Attacks via Protocol Element Length
+     17.6.  Attacks Using Shared-Dictionary Compression
+     17.7.  Disclosure of Personal Information
+     17.8.  Privacy of Server Log Information
+     17.9.  Disclosure of Sensitive Information in URIs
+     17.10. Application Handling of Field Names
+     17.11. Disclosure of Fragment after Redirects
+     17.12. Disclosure of Product Information
+     17.13. Browser Fingerprinting
+     17.14. Validator Retention
+     17.15. Denial-of-Service Attacks Using Range
+     17.16. Authentication Considerations
+       17.16.1.  Confidentiality of Credentials
+       17.16.2.  Credentials and Idle Clients
+       17.16.3.  Protection Spaces
+       17.16.4.  Additional Response Fields
+   18. IANA Considerations
+     18.1.  URI Scheme Registration
+     18.2.  Method Registration
+     18.3.  Status Code Registration
+     18.4.  Field Name Registration
+     18.5.  Authentication Scheme Registration
+     18.6.  Content Coding Registration
+     18.7.  Range Unit Registration
+     18.8.  Media Type Registration
+     18.9.  Port Registration
+     18.10. Upgrade Token Registration
+   19. References
+     19.1.  Normative References
+     19.2.  Informative References
+   Appendix A.  Collected ABNF
+   Appendix B.  Changes from Previous RFCs
+     B.1.  Changes from RFC 2818
+     B.2.  Changes from RFC 7230
+     B.3.  Changes from RFC 7231
+     B.4.  Changes from RFC 7232
+     B.5.  Changes from RFC 7233
+     B.6.  Changes from RFC 7235
+     B.7.  Changes from RFC 7538
+     B.8.  Changes from RFC 7615
+     B.9.  Changes from RFC 7694
+   Acknowledgements
+   Index
+   Authors' Addresses
+
+1.  Introduction
+
+1.1.  Purpose
+
+   The Hypertext Transfer Protocol (HTTP) is a family of stateless,
+   application-level, request/response protocols that share a generic
+   interface, extensible semantics, and self-descriptive messages to
+   enable flexible interaction with network-based hypertext information
+   systems.
+
+   HTTP hides the details of how a service is implemented by presenting
+   a uniform interface to clients that is independent of the types of
+   resources provided.  Likewise, servers do not need to be aware of
+   each client's purpose: a request can be considered in isolation
+   rather than being associated with a specific type of client or a
+   predetermined sequence of application steps.  This allows general-
+   purpose implementations to be used effectively in many different
+   contexts, reduces interaction complexity, and enables independent
+   evolution over time.
+
+   HTTP is also designed for use as an intermediation protocol, wherein
+   proxies and gateways can translate non-HTTP information systems into
+   a more generic interface.
+
+   One consequence of this flexibility is that the protocol cannot be
+   defined in terms of what occurs behind the interface.  Instead, we
+   are limited to defining the syntax of communication, the intent of
+   received communication, and the expected behavior of recipients.  If
+   the communication is considered in isolation, then successful actions
+   ought to be reflected in corresponding changes to the observable
+   interface provided by servers.  However, since multiple clients might
+   act in parallel and perhaps at cross-purposes, we cannot require that
+   such changes be observable beyond the scope of a single response.
+
+1.2.  History and Evolution
+
+   HTTP has been the primary information transfer protocol for the World
+   Wide Web since its introduction in 1990.  It began as a trivial
+   mechanism for low-latency requests, with a single method (GET) to
+   request transfer of a presumed hypertext document identified by a
+   given pathname.  As the Web grew, HTTP was extended to enclose
+   requests and responses within messages, transfer arbitrary data
+   formats using MIME-like media types, and route requests through
+   intermediaries.  These protocols were eventually defined as HTTP/0.9
+   and HTTP/1.0 (see [HTTP/1.0]).
+
+   HTTP/1.1 was designed to refine the protocol's features while
+   retaining compatibility with the existing text-based messaging
+   syntax, improving its interoperability, scalability, and robustness
+   across the Internet.  This included length-based data delimiters for
+   both fixed and dynamic (chunked) content, a consistent framework for
+   content negotiation, opaque validators for conditional requests,
+   cache controls for better cache consistency, range requests for
+   partial updates, and default persistent connections.  HTTP/1.1 was
+   introduced in 1995 and published on the Standards Track in 1997
+   [RFC2068], revised in 1999 [RFC2616], and revised again in 2014
+   ([RFC7230] through [RFC7235]).
+
+   HTTP/2 ([HTTP/2]) introduced a multiplexed session layer on top of
+   the existing TLS and TCP protocols for exchanging concurrent HTTP
+   messages with efficient field compression and server push.  HTTP/3
+   ([HTTP/3]) provides greater independence for concurrent messages by
+   using QUIC as a secure multiplexed transport over UDP instead of TCP.
+
+   All three major versions of HTTP rely on the semantics defined by
+   this document.  They have not obsoleted each other because each one
+   has specific benefits and limitations depending on the context of
+   use.  Implementations are expected to choose the most appropriate
+   transport and messaging syntax for their particular context.
+
+   This revision of HTTP separates the definition of semantics (this
+   document) and caching ([CACHING]) from the current HTTP/1.1 messaging
+   syntax ([HTTP/1.1]) to allow each major protocol version to progress
+   independently while referring to the same core semantics.
+
+1.3.  Core Semantics
+
+   HTTP provides a uniform interface for interacting with a resource
+   (Section 3.1) -- regardless of its type, nature, or implementation --
+   by sending messages that manipulate or transfer representations
+   (Section 3.2).
+
+   Each message is either a request or a response.  A client constructs
+   request messages that communicate its intentions and routes those
+   messages toward an identified origin server.  A server listens for
+   requests, parses each message received, interprets the message
+   semantics in relation to the identified target resource, and responds
+   to that request with one or more response messages.  The client
+   examines received responses to see if its intentions were carried
+   out, determining what to do next based on the status codes and
+   content received.
+
+   HTTP semantics include the intentions defined by each request method
+   (Section 9), extensions to those semantics that might be described in
+   request header fields, status codes that describe the response
+   (Section 15), and other control data and resource metadata that might
+   be given in response fields.
+
+   Semantics also include representation metadata that describe how
+   content is intended to be interpreted by a recipient, request header
+   fields that might influence content selection, and the various
+   selection algorithms that are collectively referred to as "content
+   negotiation" (Section 12).
+
+1.4.  Specifications Obsoleted by This Document
+
+   +============================================+===========+=====+
+   | Title                                      | Reference | See |
+   +============================================+===========+=====+
+   | HTTP Over TLS                              | [RFC2818] | B.1 |
+   +--------------------------------------------+-----------+-----+
+   | HTTP/1.1 Message Syntax and Routing [*]    | [RFC7230] | B.2 |
+   +--------------------------------------------+-----------+-----+
+   | HTTP/1.1 Semantics and Content             | [RFC7231] | B.3 |
+   +--------------------------------------------+-----------+-----+
+   | HTTP/1.1 Conditional Requests              | [RFC7232] | B.4 |
+   +--------------------------------------------+-----------+-----+
+   | HTTP/1.1 Range Requests                    | [RFC7233] | B.5 |
+   +--------------------------------------------+-----------+-----+
+   | HTTP/1.1 Authentication                    | [RFC7235] | B.6 |
+   +--------------------------------------------+-----------+-----+
+   | HTTP Status Code 308 (Permanent Redirect)  | [RFC7538] | B.7 |
+   +--------------------------------------------+-----------+-----+
+   | HTTP Authentication-Info and Proxy-        | [RFC7615] | B.8 |
+   | Authentication-Info Response Header Fields |           |     |
+   +--------------------------------------------+-----------+-----+
+   | HTTP Client-Initiated Content-Encoding     | [RFC7694] | B.9 |
+   +--------------------------------------------+-----------+-----+
+
+                               Table 1
+
+   [*] This document only obsoletes the portions of RFC 7230 that are
+   independent of the HTTP/1.1 messaging syntax and connection
+   management; the remaining bits of RFC 7230 are obsoleted by
+   "HTTP/1.1" [HTTP/1.1].
+
+2.  Conformance
+
+2.1.  Syntax Notation
+
+   This specification uses the Augmented Backus-Naur Form (ABNF)
+   notation of [RFC5234], extended with the notation for case-
+   sensitivity in strings defined in [RFC7405].
+
+   It also uses a list extension, defined in Section 5.6.1, that allows
+   for compact definition of comma-separated lists using a "#" operator
+   (similar to how the "*" operator indicates repetition).  Appendix A
+   shows the collected grammar with all list operators expanded to
+   standard ABNF notation.
+
+   As a convention, ABNF rule names prefixed with "obs-" denote obsolete
+   grammar rules that appear for historical reasons.
+
+   The following core rules are included by reference, as defined in
+   Appendix B.1 of [RFC5234]: ALPHA (letters), CR (carriage return),
+   CRLF (CR LF), CTL (controls), DIGIT (decimal 0-9), DQUOTE (double
+   quote), HEXDIG (hexadecimal 0-9/A-F/a-f), HTAB (horizontal tab), LF
+   (line feed), OCTET (any 8-bit sequence of data), SP (space), and
+   VCHAR (any visible US-ASCII character).
+
+   Section 5.6 defines some generic syntactic components for field
+   values.
+
+   This specification uses the terms "character", "character encoding
+   scheme", "charset", and "protocol element" as they are defined in
+   [RFC6365].
+
+2.2.  Requirements Notation
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+   This specification targets conformance criteria according to the role
+   of a participant in HTTP communication.  Hence, requirements are
+   placed on senders, recipients, clients, servers, user agents,
+   intermediaries, origin servers, proxies, gateways, or caches,
+   depending on what behavior is being constrained by the requirement.
+   Additional requirements are placed on implementations, resource
+   owners, and protocol element registrations when they apply beyond the
+   scope of a single communication.
+
+   The verb "generate" is used instead of "send" where a requirement
+   applies only to implementations that create the protocol element,
+   rather than an implementation that forwards a received element
+   downstream.
+
+   An implementation is considered conformant if it complies with all of
+   the requirements associated with the roles it partakes in HTTP.
+
+   A sender MUST NOT generate protocol elements that do not match the
+   grammar defined by the corresponding ABNF rules.  Within a given
+   message, a sender MUST NOT generate protocol elements or syntax
+   alternatives that are only allowed to be generated by participants in
+   other roles (i.e., a role that the sender does not have for that
+   message).
+
+   Conformance to HTTP includes both conformance to the particular
+   messaging syntax of the protocol version in use and conformance to
+   the semantics of protocol elements sent.  For example, a client that
+   claims conformance to HTTP/1.1 but fails to recognize the features
+   required of HTTP/1.1 recipients will fail to interoperate with
+   servers that adjust their responses in accordance with those claims.
+   Features that reflect user choices, such as content negotiation and
+   user-selected extensions, can impact application behavior beyond the
+   protocol stream; sending protocol elements that inaccurately reflect
+   a user's choices will confuse the user and inhibit choice.
+
+   When an implementation fails semantic conformance, recipients of that
+   implementation's messages will eventually develop workarounds to
+   adjust their behavior accordingly.  A recipient MAY employ such
+   workarounds while remaining conformant to this protocol if the
+   workarounds are limited to the implementations at fault.  For
+   example, servers often scan portions of the User-Agent field value,
+   and user agents often scan the Server field value, to adjust their
+   own behavior with respect to known bugs or poorly chosen defaults.
+
+2.3.  Length Requirements
+
+   A recipient SHOULD parse a received protocol element defensively,
+   with only marginal expectations that the element will conform to its
+   ABNF grammar and fit within a reasonable buffer size.
+
+   HTTP does not have specific length limitations for many of its
+   protocol elements because the lengths that might be appropriate will
+   vary widely, depending on the deployment context and purpose of the
+   implementation.  Hence, interoperability between senders and
+   recipients depends on shared expectations regarding what is a
+   reasonable length for each protocol element.  Furthermore, what is
+   commonly understood to be a reasonable length for some protocol
+   elements has changed over the course of the past three decades of
+   HTTP use and is expected to continue changing in the future.
+
+   At a minimum, a recipient MUST be able to parse and process protocol
+   element lengths that are at least as long as the values that it
+   generates for those same protocol elements in other messages.  For
+   example, an origin server that publishes very long URI references to
+   its own resources needs to be able to parse and process those same
+   references when received as a target URI.
+
+   Many received protocol elements are only parsed to the extent
+   necessary to identify and forward that element downstream.  For
+   example, an intermediary might parse a received field into its field
+   name and field value components, but then forward the field without
+   further parsing inside the field value.
+
+2.4.  Error Handling
+
+   A recipient MUST interpret a received protocol element according to
+   the semantics defined for it by this specification, including
+   extensions to this specification, unless the recipient has determined
+   (through experience or configuration) that the sender incorrectly
+   implements what is implied by those semantics.  For example, an
+   origin server might disregard the contents of a received
+   Accept-Encoding header field if inspection of the User-Agent header
+   field indicates a specific implementation version that is known to
+   fail on receipt of certain content codings.
+
+   Unless noted otherwise, a recipient MAY attempt to recover a usable
+   protocol element from an invalid construct.  HTTP does not define
+   specific error handling mechanisms except when they have a direct
+   impact on security, since different applications of the protocol
+   require different error handling strategies.  For example, a Web
+   browser might wish to transparently recover from a response where the
+   Location header field doesn't parse according to the ABNF, whereas a
+   systems control client might consider any form of error recovery to
+   be dangerous.
+
+   Some requests can be automatically retried by a client in the event
+   of an underlying connection failure, as described in Section 9.2.2.
+
+2.5.  Protocol Version
+
+   HTTP's version number consists of two decimal digits separated by a
+   "." (period or decimal point).  The first digit (major version)
+   indicates the messaging syntax, whereas the second digit (minor
+   version) indicates the highest minor version within that major
+   version to which the sender is conformant (able to understand for
+   future communication).
+
+   While HTTP's core semantics don't change between protocol versions,
+   their expression "on the wire" can change, and so the HTTP version
+   number changes when incompatible changes are made to the wire format.
+   Additionally, HTTP allows incremental, backwards-compatible changes
+   to be made to the protocol without changing its version through the
+   use of defined extension points (Section 16).
+
+   The protocol version as a whole indicates the sender's conformance
+   with the set of requirements laid out in that version's corresponding
+   specification(s).  For example, the version "HTTP/1.1" is defined by
+   the combined specifications of this document, "HTTP Caching"
+   [CACHING], and "HTTP/1.1" [HTTP/1.1].
+
+   HTTP's major version number is incremented when an incompatible
+   message syntax is introduced.  The minor number is incremented when
+   changes made to the protocol have the effect of adding to the message
+   semantics or implying additional capabilities of the sender.
+
+   The minor version advertises the sender's communication capabilities
+   even when the sender is only using a backwards-compatible subset of
+   the protocol, thereby letting the recipient know that more advanced
+   features can be used in response (by servers) or in future requests
+   (by clients).
+
+   When a major version of HTTP does not define any minor versions, the
+   minor version "0" is implied.  The "0" is used when referring to that
+   protocol within elements that require a minor version identifier.
+
+3.  Terminology and Core Concepts
+
+   HTTP was created for the World Wide Web (WWW) architecture and has
+   evolved over time to support the scalability needs of a worldwide
+   hypertext system.  Much of that architecture is reflected in the
+   terminology used to define HTTP.
+
+3.1.  Resources
+
+   The target of an HTTP request is called a "resource".  HTTP does not
+   limit the nature of a resource; it merely defines an interface that
+   might be used to interact with resources.  Most resources are
+   identified by a Uniform Resource Identifier (URI), as described in
+   Section 4.
+
+   One design goal of HTTP is to separate resource identification from
+   request semantics, which is made possible by vesting the request
+   semantics in the request method (Section 9) and a few request-
+   modifying header fields.  A resource cannot treat a request in a
+   manner inconsistent with the semantics of the method of the request.
+   For example, though the URI of a resource might imply semantics that
+   are not safe, a client can expect the resource to avoid actions that
+   are unsafe when processing a request with a safe method (see
+   Section 9.2.1).
+
+   HTTP relies upon the Uniform Resource Identifier (URI) standard [URI]
+   to indicate the target resource (Section 7.1) and relationships
+   between resources.
+
+3.2.  Representations
+
+   A "representation" is information that is intended to reflect a past,
+   current, or desired state of a given resource, in a format that can
+   be readily communicated via the protocol.  A representation consists
+   of a set of representation metadata and a potentially unbounded
+   stream of represe

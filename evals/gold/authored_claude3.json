@@ -1,0 +1,98 @@
+[
+  {
+    "id": "pair1-A",
+    "goal": "Find which front-matter section numbers precede the assurance-level material, and on what page the definitions section starts.",
+    "decisive_fact": "Chunk A lists Introduction (2) p.2, Definitions and Abbreviations (3) p.4, and section 4 starting p.5; B has none of these.",
+    "gold": "A"
+  },
+  {
+    "id": "pair1-B",
+    "goal": "Determine the page listed in the contents for the summary-of-requirements section.",
+    "decisive_fact": "Chunk B lists Summary of Requirements on page 11 (and AAL3 subsections pp. 8-10); A stops at 4.1.2.",
+    "gold": "B"
+  },
+  {
+    "id": "pair2-A",
+    "goal": "Look up the numeric joint-outcome breakdown for Cygnet: what fraction of states had correct facts but a wrong action?",
+    "decisive_fact": "Table 2 in A gives Cygnet U1D0 = 24.6% among explicit joint-outcome columns; B shows only a chart with rounded white numbers.",
+    "gold": "A"
+  },
+  {
+    "id": "pair2-B",
+    "goal": "Find which systems were excluded from the plotted accuracy range because they scored at or under one-half accuracy.",
+    "decisive_fact": "Chunk B's figure note excludes Laya 0.17, Quyet-1.0-Large 0.13, CLM-8B 0.12 as accuracy <= 0.5; A has no such exclusion note.",
+    "gold": "B"
+  },
+  {
+    "id": "pair3-A",
+    "goal": "Check how often an extended session should force the user to authenticate again at the lowest assurance tier.",
+    "decisive_fact": "Chunk A states AAL1 reauthentication should repeat at least every 30 days; B covers AAL2 only.",
+    "gold": "A"
+  },
+  {
+    "id": "pair3-B",
+    "goal": "Confirm whether mid-tier authentication requires resistance to replayed outputs and any expectation about intent.",
+    "decisive_fact": "Chunk B requires at least one AAL2 authenticator to be replay resistant (5.2.8) and intent demonstration (5.2.9); A lacks this.",
+    "gold": "B"
+  },
+  {
+    "id": "pair4-A",
+    "goal": "Find the estimated age of much of the floating debris and examples of the everyday objects found in it.",
+    "decisive_fact": "Chunk A says over 50 years old and lists lighters, toothbrushes, pens, nurdles, plus the 10-fold-per-decade growth since 1945.",
+    "gold": "A"
+  },
+  {
+    "id": "pair4-B",
+    "goal": "Identify which major heading immediately follows the comparison with the Atlantic debris accumulation.",
+    "decisive_fact": "Chunk B ends with the '== History ==' heading; A continues with debris composition details instead.",
+    "gold": "B"
+  },
+  {
+    "id": "pair5-A",
+    "goal": "Find the reported angular deviation bound and retrieval score showing the incremental method matches exact decomposition.",
+    "decisive_fact": "Chunk A gives subspace angles below 10^-11 degrees with recall@10 = 1.0; B omits these numbers.",
+    "gold": "A"
+  },
+  {
+    "id": "pair5-B",
+    "goal": "Determine how many update events the cumulative cost figure covers and the total savings multiple reported.",
+    "decisive_fact": "Chunk B's Fig. 3 caption cites 50 update events and a 23.8x cumulative gap; A lacks both.",
+    "gold": "B"
+  },
+  {
+    "id": "pair6-A",
+    "goal": "Find how many context rows the query-side baseline used in the adversarial governance test and the seed/question layout there.",
+    "decisive_fact": "Chunk A's Table III caption: 6 questions x 5 seeds, 64 context rows for QSR; B lacks this caption.",
+    "gold": "A"
+  },
+  {
+    "id": "pair6-B",
+    "goal": "Find the multiplier by which the expensive-model query-time baseline exceeded the compiled approach in average per-question cost.",
+    "decisive_fact": "Chunk B states Pro + QSR costs 185.10 times more (and QSR 14.21x cost, 21.6x tokens); A gives only raw dollar figures.",
+    "gold": "B"
+  },
+  {
+    "id": "pair7-A",
+    "goal": "Find the duration of the 2010 gyre voyage and what equipment was trialled during it.",
+    "decisive_fact": "Chunk A reports a 30-day 2010 expedition testing prototype cleanup devices; B omits 2010 entirely.",
+    "gold": "A"
+  },
+  {
+    "id": "pair7-B",
+    "goal": "Identify the section heading that comes right after the account of the tsunami-debris survey voyage.",
+    "decisive_fact": "Chunk B ends with the '== Sources of the plastic ==' heading; A has no heading.",
+    "gold": "B"
+  },
+  {
+    "id": "pair8-A",
+    "goal": "Find how many cries followed Alice's second grab outside the window and what she guessed was being smashed.",
+    "decisive_fact": "Chunk A: two little shrieks and Alice's thought about cucumber-frames; absent from B.",
+    "gold": "A"
+  },
+  {
+    "id": "pair8-B",
+    "goal": "Find the threat Alice shouts to stop the plan of burning the house, and what quantity the Rabbit orders next.",
+    "decisive_fact": "Chunk B has Alice threatening to set Dinah on them and the Rabbit asking for a barrowful; A ends before this.",
+    "gold": "B"
+  }
+]

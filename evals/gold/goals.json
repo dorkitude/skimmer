@@ -1,0 +1,614 @@
+[
+ {
+  "id": "g001",
+  "kind": "gold",
+  "goal": "Find the exact number of shared situations where all capable quick systems err despite reading everything right.",
+  "doc": "arxiv-2610.18579",
+  "gold": [
+   "arxiv-2610.18579-06",
+   "arxiv-2610.18579-17",
+   "arxiv-2610.18579-18"
+  ],
+  "decisive_fact": "All 14 competent fast systems fail with every fact right on the same 141 states",
+  "multi": true
+ },
+ {
+  "id": "g002",
+  "kind": "gold",
+  "goal": "What was the total invoiced amount for running the hosted JEV service over the whole corpus?",
+  "doc": "arxiv-2610.18579",
+  "gold": "arxiv-2610.18579-10",
+  "decisive_fact": "JEV was billed $8.79 for all 65,228 records"
+ },
+ {
+  "id": "g003",
+  "kind": "gold",
+  "goal": "How far ahead of lights-out should screens be switched off, per the recommended routine?",
+  "doc": "cdc-sleep",
+  "gold": "cdc-sleep-01",
+  "decisive_fact": "Turning off electronic devices at least 30 minutes before bedtime."
+ },
+ {
+  "id": "g004",
+  "kind": "gold",
+  "goal": "Which agency data tool supplies community-level figures on adults with insufficient rest, and when was the page updated?",
+  "doc": "cdc-sleep",
+  "gold": [
+   "cdc-sleep-00",
+   "cdc-sleep-01",
+   "cdc-sleep-02"
+  ],
+  "decisive_fact": "CDC's PLACES has local estimates on adults not getting enough sleep. ... May 15, 2024",
+  "multi": true
+ },
+ {
+  "id": "g005",
+  "kind": "gold",
+  "goal": "Which two government portal addresses are listed at the very end of the page footer?",
+  "doc": "cdc-sleep",
+  "gold": "cdc-sleep-03",
+  "decisive_fact": "HHS.gov USA.gov"
+ },
+ {
+  "id": "g006",
+  "kind": "gold",
+  "goal": "Which two items did she retrieve upstairs for the hurried gentleman before sipping from an unmarked flask?",
+  "doc": "gutenberg-alice",
+  "gold": "gutenberg-alice-21",
+  "decisive_fact": "she took up the fan and a pair of the gloves"
+ },
+ {
+  "id": "g007",
+  "kind": "gold",
+  "goal": "How many dimensions does the host insist any genuine body must occupy, and which red-haired guest disputes him?",
+  "doc": "gutenberg-timemachine",
+  "gold": "gutenberg-timemachine-01",
+  "decisive_fact": "any real body must have extension in _four_ directions ... Filby, an argumentative person with red hair"
+ },
+ {
+  "id": "g008",
+  "kind": "gold",
+  "goal": "How big was the little apparatus fetched from downstairs, and what substances was it built from?",
+  "doc": "gutenberg-timemachine",
+  "gold": "gutenberg-timemachine-06",
+  "decisive_fact": "a glittering metallic framework, scarcely larger than a small clock ... There was ivory in it"
+ },
+ {
+  "id": "g009",
+  "kind": "gold",
+  "goal": "What rate per line did the newspaperman offer for a word-for-word record of the account?",
+  "doc": "gutenberg-timemachine",
+  "gold": "gutenberg-timemachine-16",
+  "decisive_fact": "\u201cI\u2019d give a shilling a line for a verbatim note,\u201d said the Editor."
+ },
+ {
+  "id": "g010",
+  "kind": "gold",
+  "goal": "How fast was the journey measured in elapsed years per minute as the solar band oscillated?",
+  "doc": "gutenberg-timemachine",
+  "gold": "gutenberg-timemachine-21",
+  "decisive_fact": "my pace was over a year a minute"
+ },
+ {
+  "id": "g011",
+  "kind": "gold",
+  "goal": "Who is credited for the artwork used throughout this document series?",
+  "doc": "nist-sp-800-63b",
+  "gold": "nist-sp-800-63b-07",
+  "decisive_fact": "the authors gratefully acknowledge Kaitlin Boeckl for her artistic graphics contributions"
+ },
+ {
+  "id": "g012",
+  "kind": "gold",
+  "goal": "On what page does the subsection about using physiological traits for verification start?",
+  "doc": "nist-sp-800-63b",
+  "gold": "nist-sp-800-63b-12",
+  "decisive_fact": "5.2.3 Use of Biometrics ............... 26"
+ },
+ {
+  "id": "g013",
+  "kind": "gold",
+  "goal": "At the strictest confidence tier, what kind of device and what resistance property are mandated?",
+  "doc": "nist-sp-800-63b",
+  "gold": "nist-sp-800-63b-22",
+  "decisive_fact": "AAL3 authentication requires a hardware-based authenticator and an authenticator that provides verifier impersonation resistance"
+ },
+ {
+  "id": "g014",
+  "kind": "gold",
+  "goal": "Why does logging in with a fingerprint not require a second separate credential?",
+  "doc": "nist-sp-800-63b",
+  "gold": "nist-sp-800-63b-27",
+  "decisive_fact": "the associated device serves as \u201csomething you have,\u201d while the biometric serves as \u201csomething you are.\u201d"
+ },
+ {
+  "id": "g015",
+  "kind": "gold",
+  "goal": "Which numbered subsections in the outline cover the three legacy payload compression algorithms?",
+  "doc": "rfc9110",
+  "gold": "rfc9110-01",
+  "decisive_fact": "8.4.1.1. Compress Coding ... 8.4.1.2. Deflate Coding ... 8.4.1.3. Gzip Coding"
+ },
+ {
+  "id": "g016",
+  "kind": "gold",
+  "goal": "Which numeric result value in the outline is explicitly flagged as not employed?",
+  "doc": "rfc9110",
+  "gold": "rfc9110-04",
+  "decisive_fact": "15.5.19. 418 (Unused)"
+ },
+ {
+  "id": "g017",
+  "kind": "gold",
+  "goal": "Which earlier TLS-related specification does this document supersede, and which appendix covers it?",
+  "doc": "rfc9110",
+  "gold": "rfc9110-10",
+  "decisive_fact": "HTTP Over TLS | [RFC2818] | B.1"
+ },
+ {
+  "id": "g018",
+  "kind": "gold",
+  "goal": "How many appended commentaries accompanied her translation of the Italian officer's paper?",
+  "doc": "wiki-ada-lovelace",
+  "gold": "wiki-ada-lovelace-01",
+  "decisive_fact": "supplementing it with seven long explanatory notes"
+ },
+ {
+  "id": "g019",
+  "kind": "gold",
+  "goal": "What title did she plan for the illustrated volume on her winged-flight research as a child?",
+  "doc": "wiki-ada-lovelace",
+  "gold": "wiki-ada-lovelace-05",
+  "decisive_fact": "She decided to write a book, Flyology"
+ },
+ {
+  "id": "g020",
+  "kind": "gold",
+  "goal": "Which designer of a famous London legislative building created the couple's chief residence from the mid-1840s?",
+  "doc": "wiki-ada-lovelace",
+  "gold": "wiki-ada-lovelace-07",
+  "decisive_fact": "Horsley Towers, built in the Tudorbethan fashion by the architect of the Houses of Parliament, Charles Barry"
+ },
+ {
+  "id": "g021",
+  "kind": "gold",
+  "goal": "Which tutor wrote to her mother predicting she might reach top rank as an original investigator?",
+  "doc": "wiki-ada-lovelace",
+  "gold": "wiki-ada-lovelace-09",
+  "decisive_fact": "De Morgan suggested that Ada's skill in mathematics might lead her to become \"an original mathematical investigator, perhaps of first-rate eminence\""
+ },
+ {
+  "id": "g022",
+  "kind": "gold",
+  "goal": "What weight ratio of debris versus drifting microscopic organisms is reported for the swirling current zone?",
+  "doc": "wiki-garbage-patch",
+  "gold": "wiki-garbage-patch-01",
+  "decisive_fact": "approximately six pounds of plastic for every pound of plankton"
+ },
+ {
+  "id": "g023",
+  "kind": "gold",
+  "goal": "Which survey trip concentrated on mapping wreckage carried out to sea by the Japanese quake?",
+  "doc": "wiki-garbage-patch",
+  "gold": "wiki-garbage-patch-04",
+  "decisive_fact": "In July/August 2012 ... surveying the extent of tsunami debris from the Japanese earthquake-tsunami"
+ },
+ {
+  "id": "g024",
+  "kind": "gold",
+  "goal": "Which writing systems were found on the recovered objects, and in what frequency order?",
+  "doc": "wiki-garbage-patch",
+  "gold": "wiki-garbage-patch-07",
+  "decisive_fact": "the most common languages identified as Chinese, Japanese, English and Korean, in that order"
+ },
+ {
+  "id": "g025",
+  "kind": "gold",
+  "goal": "Of all polymer manufactured since mid-century, what shares were reprocessed versus burned?",
+  "doc": "wiki-garbage-patch",
+  "gold": "wiki-garbage-patch-10",
+  "decisive_fact": "9% was recycled, 12% was incinerated"
+ },
+ {
+  "id": "g026",
+  "kind": "gold",
+  "goal": "Which familiar geographic areas are invoked to convey the extent of the affected ocean region?",
+  "doc": "wiki-garbage-patch",
+  "gold": "wiki-garbage-patch-12",
+  "decisive_fact": "about twice the size of Texas or three times the size of France"
+ },
+ {
+  "id": "g027",
+  "kind": "gold",
+  "goal": "How many boats and sampling nets took part in the 2015 fleet-based survey?",
+  "doc": "wiki-garbage-patch",
+  "gold": "wiki-garbage-patch-14",
+  "decisive_fact": "crossed the Great Pacific garbage patch with 30 vessels ... 652 survey nets"
+ },
+ {
+  "id": "g028",
+  "kind": "gold",
+  "goal": "Who is credited with the first working build of the technique, and how did it reach the lunar program's computer?",
+  "doc": "wiki-kalman-filter",
+  "gold": "wiki-kalman-filter-03",
+  "decisive_fact": "Stanley F. Schmidt is generally credited with developing the first implementation ... incorporation in the Apollo navigation computer"
+ },
+ {
+  "id": "g029",
+  "kind": "gold",
+  "goal": "Which two spaceflight uses\u2014reusable boosters and station rendezvous craft\u2014are named?",
+  "doc": "wiki-kalman-filter",
+  "gold": "wiki-kalman-filter-05",
+  "decisive_fact": "guidance and navigation systems of reusable launch vehicles and the attitude control and navigation systems of spacecraft which dock at the International Space Station"
+ },
+ {
+  "id": "g030",
+  "kind": "gold",
+  "goal": "In the worked lorry-locating illustration, what technique complements the satellite unit's readings?",
+  "doc": "wiki-kalman-filter",
+  "gold": "wiki-kalman-filter-07",
+  "decisive_fact": "This is a technique known as dead reckoning."
+ },
+ {
+  "id": "g031",
+  "kind": "gold",
+  "goal": "Which combined control problem does this estimator solve alongside the optimal feedback regulator?",
+  "doc": "wiki-kalman-filter",
+  "gold": "wiki-kalman-filter-09",
+  "decisive_fact": "the Kalman filter solves the linear\u2013quadratic\u2013Gaussian control problem (LQG)"
+ },
+ {
+  "id": "d001",
+  "kind": "distractor",
+  "goal": "Find the recommended daily intake of vitamin D for adults."
+ },
+ {
+  "id": "d002",
+  "kind": "distractor",
+  "goal": "What is the capital of Australia and its population?"
+ },
+ {
+  "id": "d003",
+  "kind": "distractor",
+  "goal": "How do I renew a US passport by mail?"
+ },
+ {
+  "id": "d004",
+  "kind": "distractor",
+  "goal": "What is the boiling point of water at sea level in Fahrenheit?"
+ },
+ {
+  "id": "d005",
+  "kind": "distractor",
+  "goal": "Which team won the most recent FIFA World Cup?"
+ },
+ {
+  "id": "d006",
+  "kind": "distractor",
+  "goal": "How many moons does Jupiter have, and what are the four largest called?"
+ },
+ {
+  "id": "d007",
+  "kind": "distractor",
+  "goal": "What is the current price of a first-class US postage stamp?"
+ },
+ {
+  "id": "d008",
+  "kind": "distractor",
+  "goal": "Who won the Nobel Prize in Physics in 2019 and for what?"
+ },
+ {
+  "id": "d009",
+  "kind": "distractor",
+  "goal": "What are the opening hours of the Louvre on Tuesdays?"
+ },
+ {
+  "id": "d010",
+  "kind": "distractor",
+  "goal": "How do I apply for a Schengen visa as a US citizen?"
+ },
+ {
+  "id": "d011",
+  "kind": "distractor",
+  "goal": "What is the airspeed velocity of an unladen swallow?"
+ },
+ {
+  "id": "d012",
+  "kind": "distractor",
+  "goal": "Which driver holds the Formula 1 record for most career wins?"
+ },
+ {
+  "id": "g044",
+  "kind": "gold",
+  "goal": "Find the opening verdict on the worry that edits force full refactorization and that swapping encoders forces re-encoding everything.",
+  "doc": "arxiv-2608.16621",
+  "gold": "arxiv-2608.16621-01",
+  "decisive_fact": "\"We show the objection is largely misplaced.\""
+ },
+ {
+  "id": "g045",
+  "kind": "gold",
+  "goal": "How is earlier work on right-angled meaning spaces positioned: required groundwork or merely kindred prior art?",
+  "doc": "arxiv-2608.16621",
+  "gold": "arxiv-2608.16621-04",
+  "decisive_fact": "\"We treat them as related precedent, not a prerequisite.\""
+ },
+ {
+  "id": "g046",
+  "kind": "gold",
+  "goal": "What big-O expressions are given per update for patching the factorization versus redoing it over everything?",
+  "doc": "arxiv-2608.16621",
+  "gold": "arxiv-2608.16621-08",
+  "decisive_fact": "\"roughly O(Dk\u00b7m + Dk\u00b2) per update\u2014independent of N\" vs \"roughly O(NDk) per iteration\""
+ },
+ {
+  "id": "g047",
+  "kind": "gold",
+  "goal": "What generator settings define the fabricated vectors: vector width, hidden factor count, kept rank, noise scale, drift size?",
+  "doc": "arxiv-2608.16621",
+  "gold": "arxiv-2608.16621-11",
+  "decisive_fact": "\"D = 256 ... B_t \u2208 \u211d^{D\u00d7R0} (R0 = 40) ... perturbation scale 0.03 ... \u03b5 \u223c N(0, 0.15\u00b2 I) ... rank k = 32\""
+ },
+ {
+  "id": "g048",
+  "kind": "gold",
+  "goal": "Which concrete public dataset with timestamps is named as the planned realistic follow-up test bed, and against what baseline system?",
+  "doc": "arxiv-2608.16621",
+  "gold": "arxiv-2608.16621-16",
+  "decisive_fact": "\"replay a timestamped Wikipedia revision stream against production embedding APIs and compare against existing vector-database re-indexing\""
+ },
+ {
+  "id": "g049",
+  "kind": "gold",
+  "goal": "Which bibliography entry supplies journal volume, issue, and page numbers for the proximity-graph nearest-neighbour search method?",
+  "doc": "arxiv-2608.16621",
+  "gold": "arxiv-2608.16621-20",
+  "decisive_fact": "\"Malkov and Yashunin ... IEEE Trans. Pattern Anal. Mach. Intell., vol. 42, no. 4, pp. 824\u2013836, 2020\""
+ },
+ {
+  "id": "g050",
+  "kind": "gold",
+  "goal": "What pricing-versus-spending trend is invoked to argue that waiting for cheaper models will not fix the issue?",
+  "doc": "arxiv-2608.20845",
+  "gold": "arxiv-2608.20845-01",
+  "decisive_fact": "\"per-token prices have fallen by orders of magnitude while aggregate inference spend has risen\""
+ },
+ {
+  "id": "g051",
+  "kind": "gold",
+  "goal": "Find the summary grid of four promised guarantees that pairs each with its enforcing mechanism and the section demonstrating it.",
+  "doc": "arxiv-2608.20845",
+  "gold": "arxiv-2608.20845-05",
+  "decisive_fact": "\"Table 1: The four contracts, what each guarantees, the mechanism that enforces it, and where this paper exhibits it.\""
+ },
+ {
+  "id": "g052",
+  "kind": "gold",
+  "goal": "What millisecond-per-event timings and speedup multiples are reported for patching versus recomputing the decomposition?",
+  "doc": "arxiv-2608.20845",
+  "gold": "arxiv-2608.20845-08",
+  "decisive_fact": "\"8.4 ms per update against 283 ms for full re-decomposition, 33.7\u00d7 cheaper per update and 23.8\u00d7 cheaper cumulatively\""
+ },
+ {
+  "id": "g053",
+  "kind": "gold",
+  "goal": "Against the toughest passage-side competitor, what accuracy pairs and significance values appear at the two window budgets?",
+  "doc": "arxiv-2608.20845",
+  "gold": "arxiv-2608.20845-11",
+  "decisive_fact": "\"88.0% (439/499) against 85.2% (425/499) ... \ud835\udc5d = 0.202; at 16,384 ... 87.4% and 83.6%, \ud835\udc5d = 0.076\""
+ },
+ {
+  "id": "g054",
+  "kind": "gold",
+  "goal": "What procedural mishap is disclosed in a footnote, and how were the affected trials handled before scoring?",
+  "doc": "arxiv-2608.20845",
+  "gold": "arxiv-2608.20845-14",
+  "decisive_fact": "\"Three runs ... recorded recall of 0.000 because retrieval executed before the embedding index was built. They were deleted before any judging and re-run\""
+ },
+ {
+  "id": "g055",
+  "kind": "gold",
+  "goal": "What cautionary observation about an intermediary tool-calling layer qualifies the reported benefit of prepared payloads?",
+  "doc": "arxiv-2608.20845",
+  "gold": "arxiv-2608.20845-17",
+  "decisive_fact": "\"when a tool-using agent mediated retrieval, the compiled-payload advantage did not automatically survive the agent layer\""
+ },
+ {
+  "id": "g056",
+  "kind": "gold",
+  "goal": "Find the side-by-side inventory of rival techniques showing which single row satisfies both checked columns.",
+  "doc": "arxiv-2608.20845",
+  "gold": "arxiv-2608.20845-20",
+  "decisive_fact": "\"Only the last row fills both of the middle columns.\" (ISC: payload, yes, claim with its source span)"
+ },
+ {
+  "id": "g057",
+  "kind": "gold",
+  "goal": "Which two companies are credited for providing compute resources in the thanks section?",
+  "doc": "arxiv-2608.20845",
+  "gold": "arxiv-2608.20845-23",
+  "decisive_fact": "\"computational infrastructure provided by Endgame Labs, Inc. and AIx, Inc.\""
+ },
+ {
+  "id": "g058",
+  "kind": "gold",
+  "goal": "In the summary, what persisted form results after rules about withdrawals, dates, and authority are settled a single time?",
+  "doc": "arxiv-2609.29661",
+  "gold": "arxiv-2609.29661-01",
+  "decisive_fact": "\"the resulting current state is stored as typed records carrying source and revision provenance\""
+ },
+ {
+  "id": "g059",
+  "kind": "gold",
+  "goal": "Which three measurement-hygiene commitments are listed among the stated contributions?",
+  "doc": "arxiv-2609.29661",
+  "gold": "arxiv-2609.29661-04",
+  "decisive_fact": "\"frozen result snapshots, pinned model identifiers, and priced token accounting\""
+ },
+ {
+  "id": "g060",
+  "kind": "gold",
+  "goal": "What eight-field tuple defines the stored unit, and which data-warehouse record pattern is it equated with?",
+  "doc": "arxiv-2609.29661",
+  "gold": "arxiv-2609.29661-07",
+  "decisive_fact": "\"(entity, slot, value, revision, state, environment, source, effective_on)\"; \"Slowly Changing Dimension Type 2 record\""
+ },
+ {
+  "id": "g061",
+  "kind": "gold",
+  "goal": "How did the rewriting step score on conversational transcripts versus encyclopedic prose in length ratio and support rates?",
+  "doc": "arxiv-2609.29661",
+  "gold": "arxiv-2609.29661-10",
+  "decisive_fact": "\"Dialogue (Fed Q&A) 25 0.49\u00d7 97.6% 92.0% / Dense prose (Wikipedia) 30 1.03\u00d7 100.0% 96.7%\""
+ },
+ {
+  "id": "g062",
+  "kind": "gold",
+  "goal": "What dollar-per-question figures and response times are tabulated for the cheap model on the hard six-question adversarial set?",
+  "doc": "arxiv-2609.29661",
+  "gold": "arxiv-2609.29661-14",
+  "decisive_fact": "\"Flash + QSR 0/6\u20131/6 0.00131 8.87 s; Flash + ISC 6/6 all seeds 0.00010 3.06 s\""
+ },
+ {
+  "id": "g063",
+  "kind": "gold",
+  "goal": "By what multiple does processed text volume shrink at matched accuracy, and how well does a heavier model substitute capability?",
+  "doc": "arxiv-2609.29661",
+  "gold": "arxiv-2609.29661-17",
+  "decisive_fact": "\"Tokens processed per question fall by a factor of 21.6 on average\"; \"GLM 5.2 ... 2/3 to 3/3 across seeds\""
+ },
+ {
+  "id": "g064",
+  "kind": "gold",
+  "goal": "Which statistical test, counts, and probability value support the pooled run-level comparison on the hard questions?",
+  "doc": "arxiv-2609.29661",
+  "gold": "arxiv-2609.29661-20",
+  "decisive_fact": "\"Fisher's exact test, 1/30 vs 30/30, p \u2248 2.3 \u00d7 10\u221213\""
+ },
+ {
+  "id": "g065",
+  "kind": "confusable",
+  "goal": "Find which front-matter section numbers precede the assurance-level material, and on what page the definitions section starts.",
+  "doc": "nist-sp-800-63b",
+  "gold": "nist-sp-800-63b-09",
+  "other": "nist-sp-800-63b-10",
+  "decisive_fact": "Chunk A lists Introduction (2) p.2, Definitions and Abbreviations (3) p.4, and section 4 starting p.5; B has none of these."
+ },
+ {
+  "id": "g066",
+  "kind": "confusable",
+  "goal": "Determine the page listed in the contents for the summary-of-requirements section.",
+  "doc": "nist-sp-800-63b",
+  "gold": "nist-sp-800-63b-10",
+  "other": "nist-sp-800-63b-09",
+  "decisive_fact": "Chunk B lists Summary of Requirements on page 11 (and AAL3 subsections pp. 8-10); A stops at 4.1.2."
+ },
+ {
+  "id": "g067",
+  "kind": "confusable",
+  "goal": "Find which systems were excluded from the plotted accuracy range because they scored at or under one-half accuracy.",
+  "doc": "arxiv-2610.18579",
+  "gold": "arxiv-2610.18579-17",
+  "other": "arxiv-2610.18579-16",
+  "decisive_fact": "Chunk B's figure note excludes Laya 0.17, Quyet-1.0-Large 0.13, CLM-8B 0.12 as accuracy <= 0.5; A has no such exclusion note."
+ },
+ {
+  "id": "g068",
+  "kind": "confusable",
+  "goal": "Check how often an extended session should force the user to authenticate again at the lowest assurance tier.",
+  "doc": "nist-sp-800-63b",
+  "gold": "nist-sp-800-63b-25",
+  "other": "nist-sp-800-63b-28",
+  "decisive_fact": "Chunk A states AAL1 reauthentication should repeat at least every 30 days; B covers AAL2 only."
+ },
+ {
+  "id": "g069",
+  "kind": "confusable",
+  "goal": "Confirm whether mid-tier authentication requires resistance to replayed outputs and any expectation about intent.",
+  "doc": "nist-sp-800-63b",
+  "gold": "nist-sp-800-63b-28",
+  "other": "nist-sp-800-63b-25",
+  "decisive_fact": "Chunk B requires at least one AAL2 authenticator to be replay resistant (5.2.8) and intent demonstration (5.2.9); A lacks this."
+ },
+ {
+  "id": "g070",
+  "kind": "confusable",
+  "goal": "Find the estimated age of much of the floating debris and examples of the everyday objects found in it.",
+  "doc": "wiki-garbage-patch",
+  "gold": "wiki-garbage-patch-01",
+  "other": "wiki-garbage-patch-02",
+  "decisive_fact": "Chunk A says over 50 years old and lists lighters, toothbrushes, pens, nurdles, plus the 10-fold-per-decade growth since 1945."
+ },
+ {
+  "id": "g071",
+  "kind": "confusable",
+  "goal": "Identify which major heading immediately follows the comparison with the Atlantic debris accumulation.",
+  "doc": "wiki-garbage-patch",
+  "gold": "wiki-garbage-patch-02",
+  "other": "wiki-garbage-patch-01",
+  "decisive_fact": "Chunk B ends with the '== History ==' heading; A continues with debris composition details instead."
+ },
+ {
+  "id": "g072",
+  "kind": "confusable",
+  "goal": "Find the reported angular deviation bound and retrieval score showing the incremental method matches exact decomposition.",
+  "doc": "arxiv-2608.16621",
+  "gold": "arxiv-2608.16621-13",
+  "other": "arxiv-2608.16621-14",
+  "decisive_fact": "Chunk A gives subspace angles below 10^-11 degrees with recall@10 = 1.0; B omits these numbers."
+ },
+ {
+  "id": "g073",
+  "kind": "confusable",
+  "goal": "Determine how many update events the cumulative cost figure covers and the total savings multiple reported.",
+  "doc": "arxiv-2608.16621",
+  "gold": "arxiv-2608.16621-14",
+  "other": "arxiv-2608.16621-13",
+  "decisive_fact": "Chunk B's Fig. 3 caption cites 50 update events and a 23.8x cumulative gap; A lacks both."
+ },
+ {
+  "id": "g074",
+  "kind": "confusable",
+  "goal": "Find how many context rows the query-side baseline used in the adversarial governance test and the seed/question layout there.",
+  "doc": "arxiv-2609.29661",
+  "gold": "arxiv-2609.29661-14",
+  "other": "arxiv-2609.29661-15",
+  "decisive_fact": "Chunk A's Table III caption: 6 questions x 5 seeds, 64 context rows for QSR; B lacks this caption."
+ },
+ {
+  "id": "g075",
+  "kind": "confusable",
+  "goal": "Find the duration of the 2010 gyre voyage and what equipment was trialled during it.",
+  "doc": "wiki-garbage-patch",
+  "gold": "wiki-garbage-patch-04",
+  "other": "wiki-garbage-patch-05",
+  "decisive_fact": "Chunk A reports a 30-day 2010 expedition testing prototype cleanup devices; B omits 2010 entirely."
+ },
+ {
+  "id": "g076",
+  "kind": "confusable",
+  "goal": "Identify the section heading that comes right after the account of the tsunami-debris survey voyage.",
+  "doc": "wiki-garbage-patch",
+  "gold": "wiki-garbage-patch-05",
+  "other": "wiki-garbage-patch-04",
+  "decisive_fact": "Chunk B ends with the '== Sources of the plastic ==' heading; A has no heading."
+ },
+ {
+  "id": "g077",
+  "kind": "confusable",
+  "goal": "Find how many cries followed Alice's second grab outside the window and what she guessed was being smashed.",
+  "doc": "gutenberg-alice",
+  "gold": "gutenberg-alice-24",
+  "other": "gutenberg-alice-25",
+  "decisive_fact": "Chunk A: two little shrieks and Alice's thought about cucumber-frames; absent from B."
+ },
+ {
+  "id": "g078",
+  "kind": "confusable",
+  "goal": "Find the threat Alice shouts to stop the plan of burning the house, and what quantity the Rabbit orders next.",
+  "doc": "gutenberg-alice",
+  "gold": "gutenberg-alice-25",
+  "other": "gutenberg-alice-24",
+  "decisive_fact": "Chunk B has Alice threatening to set Dinah on them and the Rabbit asking for a barrowful; A ends before this."
+ }
+]

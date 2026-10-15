@@ -1,0 +1,1851 @@
+Reading Right, Acting Wrong:
+Diagnosing Decision Failures of System One Models in Agent Loops*
+Yubo Li
+
+Ramayya Krishnan Rema Padman
+Carnegie Mellon University
+{yubol, rk2x, rpadman}@andrew.cmu.edu
+
+arXiv:2610.18579v1 [cs.AI] 13 Oct 2026
+
+Abstract
+
+telligence per dollar (TypeSafe AI, 2026). The
+System One models we evaluate answer a complete state in a median of 27–225 ms, against 317–
+947 ms for likelihood readouts of open-weight language models and 2.3 s for a reasoning model (§4).
+We study only their choice interface, in which the
+model selects among supplied options.
+When such a model picks the wrong action, there
+is no chain of thought to read. The error has two
+very different explanations. The model may have
+misread what the agent already knows, for example by missing that the last action failed or losing
+track of what it holds; or it may have read all of it
+correctly and still chosen badly. The first points to
+the state representation or the context budget, the
+second to the decision itself. Final-action accuracy
+cannot tell these cases apart, and generated rationales need not reflect the computation behind an
+answer (Turpin et al., 2023; Lanham et al., 2023).
+Conversely, a correct action does not show that the
+model understood the trace.
+We therefore ask, behaviorally: can System One
+models understand the information an agent has
+obtained and act correctly on it, and when they
+fail, can we tell failures of comprehension from
+failures of decision? On a single agent decision
+state we ask, each in isolation, the next-action question and factual probes whose answers the environment determines, such as whether the last action
+succeeded, what the agent carries, or whether an
+action is permitted. Crossing “all measured facts
+correct” with “action correct” gives four observable
+outcomes (Figure 1). Around this measurement
+we build a frozen benchmark of 65,228 records,
+19,663 of them paired test states, from simulators
+with exact ground truth (ALFWorld, BabyAI-Text,
+TextWorld), customer-service policies (τ 2 -bench),
+tool use, web navigation and coding traces, with
+every admissible action in context and gold labels
+computed only from what the agent has seen. We
+evaluate seventeen fast systems, fourteen System
+
+System One models choose an agent’s next action by scoring a supplied set of options in a
+single pass. This makes them fast and cheap,
+but when they choose wrongly there is nothing to inspect: did the model misread what the
+agent has seen, or read it correctly and still act
+wrongly? We answer behaviorally. On a frozen
+benchmark of agent decision states from simulated environments, customer-service policies,
+tool use, web navigation and coding, we pair
+every next-action question with factual probes
+about the same state, each answered independently. Across seventeen fast systems and a reasoning model, the answer is consistent: most
+wrong actions follow correct reading, and the
+more accurate a system, the more of its errors
+take this form. These errors are not noise; they
+gather on the same states across systems of
+every kind. Where the probed facts provably
+determine the action, models that read every
+fact still fail to combine them, and their own
+answers, composed by code, repair the failure.
+On real states, what is missing is often not a
+fact but the next sub-goal.
+
+1
+
+Introduction
+
+An agent acting in an environment repeatedly reads
+the feedback of its previous actions, works out
+where it stands, and chooses what to do next. In
+most current agents each such step is a call to a
+large language model that writes out its reasoning
+and then names an action (Yao et al., 2023). A
+growing family of System One models takes a different route (TypeSafe AI, 2026; Liquid AI, 2026;
+Kwok et al., 2026; Palmer, 2026; Convai Innovations, 2026; Cloudflare, 2026). Given the agent’s
+state and a set of candidate answers, they return a
+probability distribution over the supplied options
+and generate no text; their output is consumed directly by code, and their developers emphasize in* Project website: https://yubol-bobo.github.
+io/System_one_model_evaluation
+
+1
+
+Agent decision state a real ALFWorld test state
+Goal
+
+put a cool tomato in microwave.
+
+Executed history
+1
+
+look
+
+2
+
+go to sinkbasin 1
+→ sees a tomato 2 on it
+
+3
+
+take tomato 2 from sinkbasin 1
+→ now holds tomato 2
+
+Admissible actions
+
+all 31 in context
+
+go to fridge 1
+← gold
+go to microwave 1
+examine tomato 2
+... 28 more
+
+Decision request
+
+Paired outcome
+
+Which action should the agent take next?
+go to microwave 1
+
+1.00
+
+✗
+
+go to fridge 1
+
+0.00
+
+✓
+
+Probe requests each answered alone
+yes 0.97
+
+✓
+
+where is the agent?
+
+sinkbasin 1 1.00
+
+✓
+
+what is it holding?
+
+tomato 2 1.00
+
+✓
+
+no 0.81
+
+✓
+
+last action succeeded?
+
+tomato already cooled?
+
+Action correct?
+
+no
+
+✗
+
+facts right,
+action right
+
+facts right,
+action wrong
+
+a fact wrong,
+action right
+
+a fact wrong,
+action wrong
+
+All probes correct?
+
+yes
+
+✓
+
+the gold set is derived only from what the trace reveals
+
+Figure 1: Paired measurement on a real ALFWorld state. Left: the goal, the history and all 31 admissible actions;
+the gold action follows only from what the trace reveals. Middle: the decision and each factual probe are answered
+independently on the same state (JEV’s answers: every probe right, action wrong). Right: crossing all facts correct
+(U ) with action correct (D) gives four outcomes; this state is facts right, action wrong.
+
+• Accuracy hides the rest. Removing the history collapses accuracy where earlier observations matter, policy edits are read correctly
+but acted on in only 22–72% of cases, and
+calibration error ranges from 2.6% to 26.6%
+(§7).
+
+One models of three kinds (hosted APIs, openweight models, and recipes that read a frozen language model) and three likelihood readouts of openweight language models, with a reasoning model,
+GPT-6.1, as a reference.
+The short answer is that these models mostly
+read right and act wrong. Our main findings are:
+
+We also contribute a model-free criterion for when
+probes can support attributing an error to the decision (§2.4), states that satisfy it by construction,
+and an evaluation of eighteen systems that combines the paired diagnostics with cost, latency and
+calibration. The paired outcomes are behavioral
+evidence: they do not identify a model’s internal
+computation, and we do not claim that the probes
+exhaust every relevant fact.
+
+• Most wrong actions follow correct reading.
+For the six most accurate systems, 73–85%
+of decision errors occur on states where every
+measured fact is answered correctly, and the
+share grows with accuracy (§5.1).
+• The errors are structured. All 14 competent
+fast systems fail with every fact right on the
+same 141 states, where chance predicts none
+(§5.3).
+• When the probes suffice, the failure is composition. On generated states whose probes
+determine the action, models that read every
+fact and decide perfectly from the facts alone
+lose 20–45 points when they must do both
+from the trace. Their own fact answers recover 15–28 points, and composing the action
+in code from them reaches 0.96–1.00 (§6.1).
+
+2
+
+Measuring Comprehension and
+Decision on the Same State
+
+2.1
+
+Decision states
+
+A decision state s consists of a task goal, the executed history of actions and the observations they
+produced, any rules that govern the environment or
+policy, and the set A(s) of admissible next actions.
+The model must choose one element of A(s) and
+is never asked to generate an action. Every admissible action is placed in context with its name and a
+description, nothing is shortlisted, and no language
+model proposes candidates; tool calls with open
+arguments are enumerated from the environment
+or database. Gold is a set G(s) ⊆ A(s) computed
+only from information available to the agent: in the
+simulators, the first actions of all shortest plans on a
+
+• On real states, the decision itself is often
+missing. Correct answers to the benchmark’s
+probes add at most 7 points for all but two
+systems. On ALFWorld, stating the next subgoal adds 16 points for JEV, any block of facts
+at most 5 (§6.2, §6.3).
+2
+
+map built from what the trace entails, or, when the
+needed objects have not yet been seen, the actions
+that reveal unseen locations. A decision is correct,
+D(s) = 1, if the chosen action lies in G(s).
+2.2
+
+determine the action, and a wrong action after correct probes cannot be attributed to deciding alone.
+Pairwise intersections are not enough; the check
+must consider the whole group. In finite environments it is exhaustive; in natural data, absence of a
+counterexample does not prove sufficiency. Passing it means the probes can support a diagnosis,
+not that the model uses those facts.
+
+Factual probes
+
+On annotated states we also ask closed factual
+probes whose answers the simulator state, database
+or data labels determine: the outcome of the last action, the agent’s location and inventory, completed
+subgoals, whether an action is permitted, and which
+observation establishes a fact. Each question, probe
+or decision, is answered on the state alone; several
+may share a request, but no question or answer is
+added to another question’s input and no gold fact
+is revealed. “Paired” means that the input state is
+identical, not that we observe stages of the model’s
+computation.
+2.3
+
+2.5
+
+To see what drives the outcomes, the benchmark
+also contains a trace ablation that removes the
+executed history, observation minimal pairs that
+edit only the last observation relevantly or irrelevantly, stated rule changes that make prior knowledge wrong, and difficulty ladders over trace length
+and the distance from the decisive observation
+(§7); encoding controls are not analyzed here (Appendix B.5).
+
+Four observable outcomes
+
+Let Ui = 1 if all applicable probes of state i are
+answered correctly. Ui is measured-fact performance, not complete understanding. Crossing U
+with D gives four outcomes; we write U1D0 for
+U =1, D=0 (facts right, action wrong), and U1D1,
+U0D1, U0D0 likewise. Each licenses less than it
+may seem (Table 5 in Appendix B); in particular,
+U1D0 does not show that the failure lies purely
+in deciding, and U0D1 does not show a shortcut.
+Questions a system cannot answer because of an
+input limit are counted wrong and reported as coverage. We report counts pooled over the 19,663
+paired test states, which summarize prevalence and
+are not a ranking statistic (cell-weighted estimates
+and cluster bootstrap: Appendix B.3).
+2.4
+
+3
+
+A U1D0 outcome suggests a decision failure only if
+the probes capture what the decision requires, and
+this can be checked without the model. Holding
+goal, rules and remaining context fixed, let P (s)
+be the vector of correct probe answers. For a group
+of states S sharing a probe vector, the probe set is
+sufficient on S if
+s∈S G(s) ̸= ∅,
+
+Benchmark
+
+The frozen benchmark has 65,228 records, 59,234
+test and 5,994 dev (Table 6 in Appendix C). Most
+paired states come from three simulators with exact ground truth: ALFWorld, BabyAI-Text and
+TextWorld cooking games (Shridhar et al., 2021;
+Paglieri et al., 2025; Chevalier-Boisvert et al., 2019;
+Carta et al., 2023; Côté et al., 2018; Cui et al.,
+2025). Trajectories are rolled out by each environment’s expert, by a noisy variant and by a variant that issues invalid commands, so traces contain failures and detours; no language model takes
+part. Gold sets were checked against breadth-first
+search in the real environments. From τ 2 -bench airline and retail (Barres et al., 2026) we take policyconstrained states with tool calls enumerated from
+the database and probes on record fields and permissions. Tool selection, web navigation and AgentRM trees (Xu et al., 2026; Shi et al., 2025; Patil
+et al., 2025; Ross et al., 2025; Deng et al., 2023; Xia
+et al., 2025) carry probes on fields stated in the trace
+(the visible-field probes), and 360 coding records
+built from real repository histories ask which edit
+caused a regression and which limited next action
+follows. Ladders vary trace length, distance from
+the decisive observation and novelty, and confirmation cohorts generated later from new seeds re-test
+the findings on states no earlier run had seen. A
+further 32,700 records of text-understanding primitives are part of the frozen population but not analyzed here.
+
+When can a probe set support the
+diagnosis?
+
+T
+
+Controlled variations
+
+(1)
+
+that is, if some action is correct in every state the
+agent could be in given those answers. If two states
+share the correct probe answers but have disjoint
+gold sets, answering every probe correctly cannot
+3
+
+Records are split into dev and test by source
+(game, user, repository), and every request byte,
+option order and label is frozen in a hash-sealed
+manifest before analysis. An independent content
+audit flagged 98 test records, which we keep and
+treat in a sensitivity analysis (§5.4). Because fixed
+public items can be overfit, the follow-up studies
+also use freshly generated states, including states
+whose probes are sufficient by construction (§6.1).
+
+4
+
+chronous API with an item’s questions sent in parallel (Appendix D).
+Cost. JEV was billed $8.79 for all 65,228 records
+($0.13 per 1,000 decision states) and OpenAI Decisions $18.69 ($0.29). For self-hosted systems
+we estimate cost from the panel’s time per state
+at a stated GPU price. The efficient frontier (Figure 2) runs from Laya and Kev-9B through Cygnet,
+Decider-chat-31B and JEV to Eikos-27B, which
+reaches 0.795 at about 1.4 times JEV’s cost, and
+Gemma-4-31B (0.811 at about five times). GPT-6.1
+reaches 0.884 for $642 under batch pricing, about
+73 times JEV per state. Hosted models can change
+between versions: a rerun of JEV’s decisions five
+days after the formal run matched on 96.3% of
+2,783 states (Appendix D).
+
+Systems and Protocol
+
+Systems. Table 1 lists the seventeen fast systems
+and the reasoning reference, grouped by type. The
+fourteen System One models return a native distribution over the supplied options in one pass: two
+hosted APIs, JEV and OpenAI Decisions; ten released open-weight models, served locally from
+pinned revisions with their authors’ code and settings; and two recipes that read a frozen openweight language model through the same interface.
+Gemma-4-31B, Qwen3.8-27B and Qwen3.5-9B
+are read out by complete-option likelihood with
+thinking disabled, which gives a distribution of
+the same form. GPT-6.1 Sol (medium reasoning)
+answers each question in a separate call with the
+selected option and a verbalized distribution; it is a
+reference with deliberation, not a competitor.
+
+5
+
+Reading Correctly Is Not Enough
+
+We first ask how often measured comprehension
+and action correctness come apart, how costly the
+errors are, and whether they are idiosyncratic to a
+model or attached to particular states.
+5.1
+
+Most decision errors follow correct
+reading
+
+Table 2 and Figure 3 give the four outcomes for all
+eighteen systems on the same 19,663 states. For the
+six most accurate systems, 73–85% of all decision
+errors occur on states where every measured fact
+is answered correctly. Conditional on all measured
+facts being correct, the action is still wrong in 10–
+21% of states. The converse also holds: when at
+least one fact is answered wrongly, the action is
+nevertheless correct in 62–70% of states. Neither
+direction of the pairing is a reliable proxy for the
+other.
+The share of errors that follow correct reading
+grows with accuracy (Figure 3b). Among the fast
+systems above 0.5 accuracy it ranges from 49%
+(Kev-9B) to 81% (Gemma), and it is 85% for the
+reasoning reference, GPT-6.1. Stronger systems
+mainly stop misreading; they do not stop choosing wrongly after reading correctly. Deliberation
+helps: GPT-6.1 raises decision accuracy to 0.884,
+7 points above Gemma and 9–12 points above the
+three most accurate System One models (Eikos27B, Clef and JEV), at about 70 times JEV’s cost
+per state (§4). But its remaining errors are of the
+same kind, and in an even larger proportion. CLM8B, Laya and Quyet-1.0-Large rarely answer both
+the probes and the action correctly (U1D1 1.1%,
+
+Identical inputs. Every system receives the same
+frozen requests, and we never truncate a state, drop
+options or reselect records. A question beyond
+a system’s documented input limit is recorded as
+unsupported, counted wrong and reported as coverage; this matters mainly for Laya, Quyet-1.0-Large
+(which refuses more than ten options, including every ALFWorld decision), Perplexity Decider-27B,
+and the servers of Vega-27B and SimpleJev-27B
+on the longest states (Appendix D). A system that
+answers fewer than half of the questions of an analysis is left out of it and named (the coverage rule).
+Readouts differ by design, so comparisons are between deployed choice interfaces and do not isolate
+architecture, size or training data. All systems receive all 65,228 records.
+Latency. Accuracy runs batch requests, so we
+time a separate latency panel of 163 test items,
+one per difficulty cell, answered strictly one item
+at a time after five warm-up items; we report the
+first pass on complete answers (Table 1). Systems
+marked there are estimated from their sequential
+accuracy runs; GPT-6.1 is timed through its syn4
+
+Latency (ms)
+System
+
+Model
+
+System One models, hosted API
+JEV 1.13 (TypeSafe AI,
+hosted
+2026)
+OpenAI Decisions
+hosted (public beta)
+(OpenAI, 2026a)
+System One models, open weights
+Clef-27B (Cloudflare,
+Qwen3.8-27B,
+2026)
+post-trained
+Kev-9B (Palmer, 2026)
+Qwen3.5-9B-Base
+CLM-8B (Kwok et al.,
+Qwen3-8B embeddings
+2026)
+Laya (Convai Innovations, encoder
+2026)
+Eikos-27B (Vicentino,
+Qwen3.8-27B
+2026)
+fine-tune, FP8
+Qwen3.8-27B fine-tune
+Perplexity Decider-27B
+(Perplexity AI, 2026)
+SimpleJev-27B
+Qwen3.8-27B + LoRA
+(SimpleJev, 2026)
+Vega-27B (vLLM
+Qwen3.8-27B +
+Semantic Router Team,
+adapter
+2026)
+Torchcast-27B (Torchcast StartLux-DecisionAI, 2026)
+27B fine-tune
+Quyet-1.0-Large (Nguyen, Gemma-4-31B-it +
+2026)
+LoRA
+System One readout of a frozen LLM
+Cygnet (Blockbrain Labs, Gemma-4-12B-it
+2026)
+Decider-chat-31B (Mapika, Gemma-4-31B-it
+2026)
+LLM, likelihood readout (thinking off)
+Gemma-4-31B (Gemma
+Gemma-4-31B-it
+Team, 2026)
+Qwen3.8-27B (Qwen
+Qwen3.8-27B
+Team, 2026b)
+Qwen3.5-9B (Qwen Team, Qwen3.5-9B
+2026a)
+
+Readout
+
+Input limit
+
+p50
+
+p95
+
+native distribution
+
+32k
+
+205.7
+
+290.5
+
+native distribution (two
+decimals)
+
+none documented
+
+150.6∗
+
+197.6∗
+
+native schema head
+
+32k†
+
+130.9
+
+1,990.5
+
+pointer head
+two-tower head
+
+64k state
+32k per text†
+
+98.1
+39.2
+
+562.0
+475.9
+
+native distribution
+
+512
+
+27.4
+
+69.8
+
+letter readout
+
+32k†
+
+114.0∗
+
+1,117.8∗
+
+readout head
+
+8k per question
+
+85.4∗
+
+1,294.3∗
+
+pointer head
+
+32k† ; GPU memory§
+
+162.4∗
+
+3,798.9∗
+
+Decision 2.0 runtime
+
+32k; GPU memory§
+
+224.9∗
+
+3,756.8∗
+
+letter readout
+
+32k†
+
+111.1∗
+
+2,164.5∗
+
+letter readout
+
+state cut at 6k; ≤10
+options‡
+
+113.4∗
+
+1,297.3∗
+
+57.0
+
+698.0
+
+grouped letter probabilities 16k
+letter readout
+
+8k; state cut at 4k‡
+
+68.3∗
+
+550.6∗
+
+option likelihood, thinking
+off
+option likelihood, thinking
+off
+option likelihood, thinking
+off
+
+32k
+
+397.9
+
+3,476.5
+
+32k
+
+947.0 12,598.8
+
+32k
+
+317.0
+
+LLM, reasoning (reference) (evaluated per question)
+GPT-6.1 Sol (OpenAI,
+hosted reasoning model answer + verbalized
+2026b)
+distribution
+
+–
+
+2,502.7
+
+2,276.0¶ 5,756.8¶
+
+Table 1: Systems by type, with readouts, input limits and median and 95th-percentile latency on the latency panel
+(§4; local systems on one H100). ∗ Estimated from sequential accuracy runs. † Our explicit budget (release defaults:
+16k for Clef-27B and Eikos-27B, 8k for SimpleJev-27B, 256k for Torchcast-27B; CLM-8B’s serving example uses
+2k). ‡ Applied by the author’s runtime: Decider-chat-31B cuts states beyond 4,096 tokens; Quyet-1.0-Large cuts
+states to at most 6,000 tokens and refuses more than ten options. § The server fails on the longest states on one
+80 GB H100. ¶ Synchronous API, one question per request, an item’s questions sent in parallel.
+
+5
+
+System One, hosted API
+System One, open weights
+
+System One readout, frozen LLM
+LLM, likelihood readout
+
+a
+
+LLM, reasoning (reference)
+efficient frontier
+
+dominated region
+
+b
+
+decision accuracy (paired states)
+
+0.90
+0.85
+0.80
+0.75
+0.70
+0.65
+0.60
+0.55
+0.20
+0.15
+0.10
+10−1
+
+101
+
+100
+
+102
+
+cost per 1,000 decision states (USD, log scale)
+
+103
+
+median latency per state (ms, log scale)
+
+Figure 2: Paired decision accuracy against (a) cost per 1,000 decision states and (b) median latency. The step line
+is the efficient frontier. Hosted costs are measured billing; self-hosted costs assume $2.50 per H100-hour on the
+latency panel, an upper bound for batched serving (§4). Markers give the system category; Laya, Quyet-1.0-Large
+and CLM-8B lie below the axis break.
+
+P (D=1 | U )
+
+Errors with
+
+Coverage
+
+D
+
+U
+
+U1D1
+
+U1D0
+
+U0D1
+
+U0D0
+
+U =1
+
+U =0
+
+U =1 (%)
+
+(%)
+
+System One models, hosted API
+JEV
+0.763
+OpenAI Decisions
+0.706
+
+0.833
+0.789
+
+66.0
+58.2
+
+17.3
+20.6
+
+10.4
+12.4
+
+6.4
+8.7
+
+0.792
+0.738
+
+0.619
+0.588
+
+73.1
+70.3
+
+100.0
+99.6
+
+System One models, open weights
+Eikos-27B
+0.795
+Clef-27B
+0.777
+Vega-27B
+0.748
+Perplexity Decider-27B† 0.723
+Torchcast-27B
+0.678
+Kev-9B
+0.626
+SimpleJev-27B†
+0.592
+Laya
+0.166
+Quyet-1.0-Large†
+0.129
+CLM-8B
+0.123
+
+0.850
+0.833
+0.776
+0.832
+0.858
+0.600
+0.758
+0.039
+0.256
+0.092
+
+69.1
+66.4
+63.0
+66.0
+60.4
+41.6
+48.2
+0.4
+2.7
+1.1
+
+15.9
+17.0
+14.6
+17.3
+25.3
+18.4
+27.6
+3.5
+23.0
+8.1
+
+10.4
+11.3
+11.9
+6.3
+7.3
+21.0
+11.0
+16.2
+10.2
+11.2
+
+4.6
+5.4
+10.6
+10.4
+6.9
+19.0
+13.2
+79.9
+64.2
+79.6
+
+0.813
+0.796
+0.812
+0.793
+0.705
+0.693
+0.636
+0.110
+0.104
+0.122
+
+0.695
+0.678
+0.529
+0.378
+0.517
+0.525
+0.454
+0.168
+0.137
+0.123
+
+77.7
+76.0
+58.0
+62.3
+78.7
+49.2
+67.6
+4.1
+26.3
+9.2
+
+100.0
+100.0
+95.1
+90.7
+100.0
+100.0
+93.4
+97.0
+3.8
+100.0
+
+System One readout of a frozen LLM
+Decider-chat-31B
+0.719 0.786
+Cygnet
+0.683 0.812
+
+61.2
+56.6
+
+17.4
+24.6
+
+10.7
+11.7
+
+10.7
+7.1
+
+0.778
+0.697
+
+0.501
+0.623
+
+62.0
+77.6
+
+99.7
+99.7
+
+LLM, likelihood readout (thinking off)
+Gemma-4-31B
+0.811 0.888
+Qwen3.8-27B
+0.793 0.848
+Qwen3.5-9B
+0.569 0.640
+
+73.5
+68.6
+40.1
+
+15.3
+16.2
+23.9
+
+7.6
+10.6
+16.8
+
+3.6
+4.6
+19.1
+
+0.828
+0.809
+0.626
+
+0.678
+0.699
+0.468
+
+80.9
+78.0
+55.6
+
+100.0
+100.0
+100.0
+
+LLM, reasoning (reference)
+GPT-6.1∗
+0.884
+
+84.4
+
+9.9
+
+4.0
+
+1.7
+
+0.895
+
+0.701
+
+85.2
+
+99.2
+
+Accuracy
+System
+
+Joint outcome (% of states)
+
+0.943
+
+Table 2: Paired outcomes on the 19,663 paired test states (pooled counts). D: decision accuracy; U : share of states
+with every measured fact correct. The last two columns give the share of errors made with U =1 and coverage (states
+with every answer supported). Bold: best fast system. ∗ Reasoning reference. † Coverage below 95%.
+
+6
+
+a
+
+b
+facts right, action right
+
+facts right, action wrong
+
+fact wrong, action right
+
+fact wrong, action wrong
+
+System One models, hosted API
+
+System One, hosted API
+System One, open weights
+System One readout, frozen LLM
+
+LLM, likelihood readout
+LLM, reasoning (reference)
+
+acc.
+
+JEV
+
+17
+
+OpenAI Decisions
+
+90%
+
+.763
+
+21
+
+.706
+
+System One models, open weights
+16
+
+.795
+
+Clef-27B
+
+17
+
+.777
+
+Vega-27B
+
+15
+
+.748
+
+Perplexity Decider-27B
+
+17
+
+.723
+
+Torchcast-27B
+
+25
+
+.678
+
+Kev-9B
+
+18
+
+.626
+
+SimpleJev-27B
+
+28
+
+.592
+
+Laya
+
+.166
+
+Quyet-1.0-Large
+
+23
+
+CLM-8B
+
+.129
+
+8
+
+.123
+
+System One readout of a frozen LLM
+
+Decider-chat-31B
+
+17
+
+.719
+
+Cygnet
+
+25
+
+.683
+
+80%
+
+share of decision errors made
+with every measured fact correct
+
+Eikos-27B
+
+70%
+
+60%
+
+LLM, likelihood readout (thinking off)
+
+Gemma-4-31B
+
+15
+
+.811
+
+Qwen3.8-27B
+
+16
+
+.793
+
+Qwen3.5-9B
+
+24
+
+.569
+
+LLM, reasoning (reference)
+
+GPT-6.1
+
+10
+
+0
+
+25
+
+50
+
+75
+
+.884
+
+100%
+
+share of paired test states
+
+50%
+not shown (accuracy ≤ 0.5):
+Laya 0.17, Quyet-1.0-Large 0.13, CLM-8B 0.12
+
+0.6
+
+0.7
+
+0.8
+
+0.9
+
+decision accuracy (paired states)
+
+Figure 3: Paired outcomes on the 19,663 paired test states. (a) Share of states in each outcome; the white number is
+the share with every fact right but the wrong action. (b) Decision accuracy against the share of errors made with
+every fact right; marker shape gives the system category. The more accurate the system, the larger this share.
+
+0.4% and 2.7%), largely because of input limits
+that we count as wrong (§4).
+The pattern does not depend on the type of system. Among the System One models, the hosted
+APIs make 73% (JEV) and 70% (OpenAI Decisions) of their errors after correct reading, the openweight models above 0.5 accuracy from 49% (Kev9B) to 79% (Torchcast-27B; 78% for Eikos-27B,
+the most accurate System One model at 0.795), and
+the two readouts of a frozen LLM 62% (Deciderchat-31B) and 78% (Cygnet); the LLM likelihood
+readouts make 56–81%. Systems differ in how often a correct reading still leads to the wrong action:
+OpenAI Decisions acts wrongly in 26% of states
+with every fact right, Torchcast-27B in 30% and
+SimpleJev-27B in 36%, against 17–21% for the
+five most accurate fast systems; SimpleJev-27B,
+which reads well (U = 0.758) but decides correctly
+on only 0.592 of paired states, thus makes 68%
+of its errors after correct reading. Torchcast-27B
+is the clearest case: it reads better than any other
+System One model (U = 0.858, second among fast
+systems only to Gemma) but decides correctly on
+only 0.678 of paired states, the largest gap between
+reading and acting of any competent system, so
+
+that 79% of its errors follow correct reading; it is
+weakest on ALFWorld (0.565). Perplexity Decider27B and Decider-chat-31B rarely act correctly after
+a misread fact (P (D | U =0) 0.38 and 0.50), partly
+because a refused or shortened long state counts
+against both the probes and the decision (on τ 2 bench, with the longest states, they reach 0.53 and
+0.48); Vega-27B, strong in TextWorld (0.880), is
+weak on τ 2 -bench and on the visible-field probes
+(0.60 and 0.61), where its server fails on the longest
+states.
+The pattern is not driven by one domain (Figure 4). Among the six strongest systems, the share
+of errors after correct reading is 68–82% in ALFWorld, 62–100% in BabyAI, 80–94% in TextWorld
+and 77–90% in τ 2 -bench. Two panels make the
+dissociation especially visible. On a TextWorld
+cohort generated after all earlier runs, JEV and
+Gemma both answer every probe correctly, yet
+their decision accuracies are 95.0% and 73.2%;
+Gemma has 161 of 600 states with all facts right
+and the action wrong, against 30 for JEV. On coding traces, both choose the correct next action on all
+300 test states while answering the paired probes
+at 85.2% and 97.1%. A saturated action score here
+7
+
+a
+
+Decision accuracy (%)
+
+b
+
+All
+
+rld
+yAI
+Wo
+ALF
+B ab
+9,097
+
+2,181
+
+ds
+d
+h
+fiel
+ow
+o rl
+ing
+enc isible
+rkfl
+tW
+b
+x
+e
+2
+T
+τ
+V
+Wo
+Co d
+2,400
+
+4,719
+
+726
+
+240
+
+JEV
+
+76
+
+71
+
+73
+
+90
+
+79
+
+71
+
+OpenAI Decisions
+
+71
+
+72
+
+52
+
+84
+
+69
+
+64
+
+states
+
+19,663
+
+Errors made with every measured fact correct (%)
+
+300
+
+All
+
+19,663
+
+rld
+yAI
+Wo
+ALF
+B ab
+9,097
+
+2,181
+
+ds
+d
+h
+fiel
+ow
+o rl
+ing
+enc isible
+rkfl
+tW
+b
+x
+e
+2
+T
+τ
+V
+Wo
+Co d
+2,400
+
+4,719
+
+726
+
+240
+
+90
+
+100
+
+73
+
+68
+
+69
+
+92
+
+81
+
+92
+
+100
+
+95
+
+85
+
+70
+
+71
+
+48
+
+81
+
+82
+
+81
+
+50
+0
+
+300
+
+System One models, hosted API
+
+22
+
+System One models, open weights
+
+Eikos-27B
+
+80
+
+77
+
+75
+
+84
+
+84
+
+70
+
+95
+
+100
+
+78
+
+74
+
+75
+
+94
+
+78
+
+96
+
+Clef-27B
+
+78
+
+81
+
+64
+
+79
+
+76
+
+66
+
+99
+
+98
+
+76
+
+68
+
+69
+
+83
+
+86
+
+90
+
+Vega-27B
+
+75
+
+80
+
+76
+
+88
+
+60
+
+61
+
+65
+
+99
+
+58
+
+63
+
+69
+
+90
+
+46
+
+52
+
+71
+
+Perplexity Decider-27B
+
+72
+
+81
+
+74
+
+78
+
+53
+
+52
+
+90
+
+100
+
+62
+
+75
+
+75
+
+94
+
+41
+
+59
+
+100
+
+Torchcast-27B
+
+68
+
+56
+
+77
+
+70
+
+80
+
+75
+
+95
+
+100
+
+79
+
+76
+
+74
+
+92
+
+80
+
+98
+
+100
+
+Kev-9B
+
+63
+
+61
+
+62
+
+60
+
+66
+
+49
+
+95
+
+81
+
+49
+
+43
+
+45
+
+69
+
+48
+
+77
+
+8
+
+SimpleJev-27B
+
+59
+
+54
+
+72
+
+66
+
+56
+
+60
+
+82
+
+100
+
+68
+
+78
+
+64
+
+91
+
+41
+
+48
+
+44
+
+26
+
+Laya
+
+17
+
+16
+
+16
+
+16
+
+14
+
+22
+
+52
+
+48
+
+4
+
+2
+
+0
+
+12
+
+3
+
+25
+
+0
+
+0
+
+Quyet-1.0-Large
+
+13
+
+0
+
+75
+
+11
+
+1
+
+42
+
+0
+
+90
+
+26
+
+0
+
+0
+
+56
+
+62
+
+56
+
+45
+
+90
+
+CLM-8B
+
+12
+
+16
+
+7
+
+9
+
+2
+
+31
+
+78
+
+38
+
+9
+
+4
+
+2
+
+11
+
+17
+
+29
+
+30
+
+12
+
+System One readout of a frozen LLM
+
+Decider-chat-31B
+
+72
+
+81
+
+73
+
+80
+
+47
+
+64
+
+90
+
+94
+
+62
+
+81
+
+75
+
+82
+
+42
+
+66
+
+50
+
+6
+
+Cygnet
+
+68
+
+67
+
+62
+
+70
+
+72
+
+58
+
+95
+
+92
+
+78
+
+78
+
+65
+
+89
+
+79
+
+80
+
+100
+
+4
+
+LLM, likelihood readout (thinking off)
+
+Gemma-4-31B
+
+81
+
+81
+
+75
+
+83
+
+83
+
+66
+
+95
+
+100
+
+81
+
+82
+
+77
+
+88
+
+77
+
+88
+
+100
+
+Qwen3.8-27B
+
+79
+
+79
+
+69
+
+89
+
+81
+
+63
+
+77
+
+100
+
+78
+
+80
+
+62
+
+81
+
+83
+
+86
+
+79
+
+Qwen3.5-9B
+
+57
+
+53
+
+49
+
+66
+
+61
+
+54

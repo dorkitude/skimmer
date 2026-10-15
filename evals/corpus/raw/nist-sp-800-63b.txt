@@ -1,0 +1,858 @@
+Withdrawn NIST Technical Series Publication
+Warning Notice
+The attached publication has been withdrawn (archived), and is provided solely for historical purposes.
+It may have been superseded by another publication (indicated below).
+
+Withdrawn Publication
+Series/Number
+Title
+Publication Date(s)
+Withdrawal Date
+Withdrawal Note
+
+NIST Special Publication 800-63B
+Digital Identity Guidelines: Authentication and Lifecycle Management
+June 2017 (includes updates as of 03-02-2020)
+August 1, 2025
+NIST SP 800-63B is withdrawn and superseded in its entirety by NIST SP 80063B-4.
+
+Superseding Publication(s) (if applicable)
+The attached publication has been superseded by the following publication(s):
+Series/Number
+Title
+Author(s)
+Publication Date(s)
+URL/DOI
+
+NIST SP 800-63B-4
+Digital Identity Guidelines: Authentication and Authenticator Management
+David Temoshok, et al.
+July 2025
+https://doi.org/10.6028/NIST.SP.800-63B-4
+
+Additional Information (if applicable)
+Contact
+Latest revision of the
+attached publication
+Related Information
+Withdrawal
+Announcement Link
+
+Applied Cybersecurity Division (Information Technology Laboratory)
+https://csrc.nist.gov/pubs/sp/800/63/b/4/final
+https://www.nist.gov/identity-access-management/nist-special-publication800-63-digital-identity-guidelines
+
+Date updated: July 24, 2025
+
+NIST Special Publication 800-63B
+
+Digital Identity Guidelines
+Authentication and Lifecycle Management
+
+Paul A. Grassi
+James L. Fenton
+Elaine M. Newton
+Ray A. Perlner
+Andrew R. Regenscheid
+William E. Burr
+Justin P. Richer
+Privacy Authors:
+Naomi B. Lefkovitz
+Jamie M. Danker
+Usability Authors:
+Yee-Yin Choong
+Kristen K. Greene
+Mary F. Theofanos
+
+This publication is available free of charge from:
+https://doi.org/10.6028/NIST.SP.800-63b
+
+NIST Special Publication 800-63B
+
+Digital Identity Guidelines
+Authentication and Lifecycle Management
+Paul A. Grassi
+Elaine M. Newton
+Applied Cybersecurity Division
+Information Technology Laboratory
+
+Ray A. Perlner
+Andrew R. Regenscheid
+Computer Security Division
+Information Technology Laboratory
+
+James L. Fenton
+Altmode Networks
+Los Altos, Calif.
+
+William E. Burr
+Dakota Consulting, Inc.
+Silver Spring, Md.
+Justin P. Richer
+Bespoke Engineering
+Billerica, Mass.
+
+Privacy Authors:
+Naomi B. Lefkovitz
+Applied Cybersecurity Division
+Information Technology Laboratory
+
+Usability Authors:
+Yee-Yin Choong
+Kristen K. Greene
+Information Access Division
+Information Technology Laboratory
+
+Jamie M. Danker
+National Protection and Programs Directorate
+Department of Homeland Security
+
+Mary F. Theofanos
+Office of Data and Informatics
+Material Measurement Laboratory
+
+This publication is available free of charge from:
+https://doi.org/10.6028/NIST.SP.800-63b
+
+June 2017
+
+INCLUDES UPDATES AS OF 03-02-2020; PAGE VIII
+
+U.S. Department of Commerce
+
+Wilbur L. Ross, Jr., Secretary
+
+National Institute of Standards and Technology
+Kent Rochford, Acting NIST Director and Under Secretary of Commerce for Standards and Technology
+
+Authority
+
+This publication has been developed by NIST in accordance with its statutory responsibilities
+under the Federal Information Security Modernization Act (FISMA) of 2014, 44 U.S.C. § 3551 et
+seq., Public Law (P.L.) 113-283. NIST is responsible for developing information security
+standards and guidelines, including minimum requirements for federal systems, but such standards
+and guidelines shall not apply to national security systems without the express approval of
+appropriate federal officials exercising policy authority over such systems. This guideline is
+consistent with the requirements of the Office of Management and Budget (OMB) Circular A-130.
+Nothing in this publication should be taken to contradict the standards and guidelines made
+mandatory and binding on federal agencies by the Secretary of Commerce under statutory
+authority. Nor should these guidelines be interpreted as altering or superseding the existing
+authorities of the Secretary of Commerce, Director of the OMB, or any other federal official. This
+publication may be used by nongovernmental organizations on a voluntary basis and is not subject
+to copyright in the United States. Attribution would, however, be appreciated by NIST.
+National Institute of Standards and Technology Special Publication 800-63B
+Natl. Inst. Stand. Technol. Spec. Publ. 800-63B, 79 pages (June 2017)
+CODEN: NSPUE2
+This publication is available free of charge from:
+https://doi.org/10.6028/NIST.SP.800-63b
+Certain commercial entities, equipment, or materials may be identified in this document in order to describe an
+experimental procedure or concept adequately. Such identification is not intended to imply recommendation or
+endorsement by NIST, nor is it intended to imply that the entities, materials, or equipment are necessarily the best
+available for the purpose.
+There may be references in this publication to other publications currently under development by NIST in accordance
+with its assigned statutory responsibilities. The information in this publication, including concepts and methodologies,
+may be used by federal agencies even before the completion of such companion publications. Thus, until each
+publication is completed, current requirements, guidelines, and procedures, where they exist, remain operative. For
+planning and transition purposes, federal agencies may wish to closely follow the development of these new
+publications by NIST.
+Organizations are encouraged to review all draft publications during public comment periods and provide feedback to
+NIST. Many NIST cybersecurity publications, other than the ones noted above, are available at
+http://csrc.nist.gov/publications.
+
+Comments on this publication may be submitted to:
+National Institute of Standards and Technology
+Attn: Applied Cybersecurity Division, Information Technology Laboratory
+100 Bureau Drive (Mail Stop 2000) Gaithersburg, MD 20899-2000
+Email: dig-comments@nist.gov
+
+All comments are subject to release under the Freedom of Information Act (FOIA).
+
+NIST SP 800-63B
+
+DIGITAL IDENTITY GUIDELINES:
+AUTHENTICATION & LIFECYCLE MANAGEMENT
+
+Reports on Computer Systems Technology
+
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-63b
+
+The Information Technology Laboratory (ITL) at the National Institute of Standards and
+Technology (NIST) promotes the U.S. economy and public welfare by providing technical
+leadership for the Nation’s measurement and standards infrastructure. ITL develops tests, test
+methods, reference data, proof of concept implementations, and technical analyses to advance the
+development and productive use of information technology. ITL’s responsibilities include the
+development of management, administrative, technical, and physical standards and guidelines for
+the cost-effective security and privacy of other than national security-related information in federal
+information systems. The Special Publication 800-series reports on ITL’s research, guidelines, and
+outreach efforts in information system security, and its collaborative activities with industry,
+government, and academic organizations.
+Abstract
+These guidelines provide technical requirements for federal agencies implementing digital identity
+services and are not intended to constrain the development or use of standards outside of this
+purpose. These guidelines focus on the authentication of subjects interacting with government
+systems over open networks, establishing that a given claimant is a subscriber who has been
+previously authenticated. The result of the authentication process may be used locally by the
+system performing the authentication or may be asserted elsewhere in a federated identity system.
+This document defines technical requirements for each of the three authenticator assurance levels.
+This publication supersedes corresponding sections of NIST Special Publication (SP) 800-63-2.
+Keywords
+authentication; credential service provider; digital authentication; digital credentials; electronic
+authentication; electronic credentials, federation.
+
+ii
+
+NIST SP 800-63B
+
+DIGITAL IDENTITY GUIDELINES:
+AUTHENTICATION & LIFECYCLE MANAGEMENT
+
+Acknowledgments
+The authors gratefully acknowledge Kaitlin Boeckl for her artistic graphics contributions to all
+volumes in the SP 800-63 suite and the contributions of our many reviewers, including Joni
+Brennan from the Digital ID & Authentication Council of Canada (DIACC), Kat Megas, Ellen
+Nadeau, and Ben Piccarreta from NIST, and Ryan Galluzzo and Danna Gabel O’Rourke from
+Deloitte & Touche LLP.
+
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-63b
+
+The authors would also like to acknowledge the thought leadership and innovation of the original
+authors: Donna F. Dodson, W. Timothy Polk, Sarbari Gupta, and Emad A. Nabbus. Without
+their tireless efforts, we would not have had the incredible baseline from which to evolve 800-63
+to the document it is today. In addition, special thanks to the Federal Privacy Council’s Digital
+Authentication Task Force for the contributions to the development of privacy requirements and
+considerations.
+Requirements Notation and Conventions
+The terms “SHALL” and “SHALL NOT” indicate requirements to be followed strictly in order
+to conform to the publication and from which no deviation is permitted.
+The terms “SHOULD” and “SHOULD NOT” indicate that among several possibilities one is
+recommended as particularly suitable, without mentioning or excluding others, or that a certain
+course of action is preferred but not necessarily required, or that (in the negative form) a certain
+possibility or course of action is discouraged but not prohibited.
+The terms “MAY” and “NEED NOT” indicate a course of action permissible within the limits of
+the publication.
+The terms “CAN” and “CANNOT” indicate a possibility or capability, whether material,
+physical or causal or, in the negative, the absence of that possibility or capability.
+
+iii
+
+NIST SP 800-63B
+
+DIGITAL IDENTITY GUIDELINES:
+AUTHENTICATION & LIFECYCLE MANAGEMENT
+
+Table of Contents
+1
+
+Purpose................................................................................................................... 1
+
+2
+
+Introduction ............................................................................................................ 2
+
+3
+
+Definitions and Abbreviations .............................................................................. 4
+
+4
+
+Authenticator Assurance Levels .......................................................................... 5
+Authenticator Assurance Level 1 .................................................................... 5
+4.1.1 Permitted Authenticator Types ............................................................. 5
+4.1.2 Authenticator and Verifier Requirements .............................................. 6
+
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-63b
+
+4.1.3 Reauthentication................................................................................... 6
+4.1.4 Security Controls .................................................................................. 6
+4.1.5 Records Retention Policy ..................................................................... 6
+Authenticator Assurance Level 2 .................................................................... 6
+4.2.1 Permitted Authenticator Types ............................................................. 7
+4.2.2 Authenticator and Verifier Requirements .............................................. 7
+4.2.3 Reauthentication................................................................................... 8
+4.2.4 Security Controls .................................................................................. 8
+4.2.5 Records Retention Policy ..................................................................... 8
+Authenticator Assurance Level 3 .................................................................... 8
+4.3.1 Permitted Authenticator Types ............................................................. 9
+4.3.2 Authenticator and Verifier Requirements .............................................. 9
+4.3.3 Reauthentication................................................................................. 10
+4.3.4 Security Controls ................................................................................ 10
+4.3.5 Records Retention Policy ................................................................... 10
+Privacy Requirements ................................................................................... 10
+Summary of Requirements ........................................................................... 11
+5
+
+Authenticator and Verifier Requirements .......................................................... 13
+Requirements by Authenticator Type ............................................................ 13
+5.1.1 Memorized Secrets............................................................................. 13
+5.1.2 Look-Up Secrets ................................................................................. 15
+5.1.3 Out-of-Band Devices .......................................................................... 16
+5.1.4 Single-Factor OTP Device .................................................................. 19
+5.1.5 Multi-Factor OTP Devices .................................................................. 20
+5.1.6 Single-Factor Cryptographic Software ................................................ 22
+iv
+
+NIST SP 800-63B
+
+DIGITAL IDENTITY GUIDELINES:
+AUTHENTICATION & LIFECYCLE MANAGEMENT
+
+5.1.7 Single-Factor Cryptographic Devices ................................................. 22
+5.1.8 Multi-Factor Cryptographic Software .................................................. 23
+5.1.9 Multi-Factor Cryptographic Devices.................................................... 24
+General Authenticator Requirements ............................................................ 25
+5.2.1 Physical Authenticators ...................................................................... 25
+5.2.2 Rate Limiting (Throttling) .................................................................... 25
+5.2.3 Use of Biometrics ............................................................................... 26
+5.2.4 Attestation .......................................................................................... 28
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-63b
+
+5.2.5 Verifier Impersonation Resistance ...................................................... 28
+5.2.6 Verifier-CSP Communications ............................................................ 29
+5.2.7 Verifier-Compromise Resistance ........................................................ 29
+5.2.8 Replay Resistance.............................................................................. 30
+5.2.9 Authentication Intent ........................................................................... 30
+5.2.10 Restricted Authenticators ................................................................... 30
+6
+
+Authenticator Lifecycle Management................................................................. 32
+Authenticator Binding .................................................................................... 32
+6.1.1 Binding at Enrollment ......................................................................... 33
+6.1.2 Post-Enrollment Binding ..................................................................... 34
+6.1.3 Binding to a Subscriber-provided Authenticator ................................. 35
+6.1.4 Renewal ............................................................................................. 35
+Loss, Theft, Damage, and Unauthorized Duplication .................................... 35
+Expiration ...................................................................................................... 36
+Revocation and Termination ......................................................................... 36
+
+7
+
+Session Management .......................................................................................... 37
+Session Bindings .......................................................................................... 37
+7.1.1 Browser Cookies ................................................................................ 38
+7.1.2 Access Tokens ................................................................................... 38
+7.1.3 Device Identification ........................................................................... 38
+Reauthentication ........................................................................................... 39
+7.2.1 Reauthentication from a Federation or Assertion ............................... 39
+
+8
+
+Threats and Security Considerations................................................................. 41
+Authenticator Threats.................................................................................... 41
+Threat Mitigation Strategies .......................................................................... 45
+v
+
+NIST SP 800-63B
+
+DIGITAL IDENTITY GUIDELINES:
+AUTHENTICATION & LIFECYCLE MANAGEMENT
+
+Authenticator Recovery................................................................................. 47
+Session Attacks ............................................................................................ 47
+9
+
+Privacy Considerations ....................................................................................... 48
+Privacy Risk Assessment.............................................................................. 48
+Privacy Controls ............................................................................................ 48
+Processing Limitation .................................................................................... 48
+48
+Agency-Specific Privacy Compliance............................................................ 49
+
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-63b
+
+10 Usability Considerations ..................................................................................... 50
+Usability Considerations Common to Authenticators .................................... 51
+Usability Considerations by Authenticator Type ............................................ 53
+10.2.1 Memorized Secrets............................................................................. 53
+10.2.2 Look-Up Secrets ................................................................................. 54
+10.2.3 Out-of-Band ........................................................................................ 54
+10.2.4 Single-Factor OTP Device .................................................................. 54
+10.2.5 Multi-Factor OTP Device .................................................................... 55
+10.2.6 Single-Factor Cryptographic Software ................................................ 56
+10.2.7 Single-Factor Cryptographic Device ................................................... 56
+10.2.8 Multi-Factor Cryptographic Software .................................................. 56
+10.2.9 Multi-Factor Cryptographic Device ..................................................... 57
+Summary of Usability Considerations ........................................................... 57
+Biometrics Usability Considerations .............................................................. 59
+11 References............................................................................................................ 62
+General References ...................................................................................... 62
+Standards ..................................................................................................... 63
+NIST Special Publications............................................................................. 64
+Federal Information Processing Standards ................................................... 65
+List of Appendices
+Appendix A— Strength of Memorized Secrets ......................................................... 67
+A.1 Introduction ................................................................................................... 67
+A.2 Length ........................................................................................................... 67
+A.3 Complexity .................................................................................................... 68
+vi
+
+NIST SP 800-63B
+
+DIGITAL IDENTITY GUIDELINES:
+AUTHENTICATION & LIFECYCLE MANAGEMENT
+
+A.4 Randomly-Chosen Secrets ........................................................................... 69
+A.5 Summary ...................................................................................................... 69
+List of Tables
+Table 2-1 Normative and Informative Sections of SP 800-63B ....................................... 3
+Table 4-1 AAL Summary of Requirements .................................................................... 11
+Table 8-1 Authenticator Threats .................................................................................... 41
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-63b
+
+Table 8-2 Mitigating Authenticator Threats.................................................................... 45
+
+vii
+
+NIST SP 800-63B
+
+DIGITAL IDENTITY GUIDELINES:
+AUTHENTICATION & LIFECYCLE MANAGEMENT
+
+Errata
+This table contains changes that have been incorporated into Special Publication 800-63B. Errata
+updates can include corrections, clarifications, or other minor changes in the publication that are
+either editorial or substantive in nature.
+Date
+2017-12-01
+
+Type
+Editorial
+Editorial
+
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-63b
+
+Substantive
+Editorial
+Substantive
+Editorial
+Editorial
+
+Editorial
+Editorial
+Editorial
+Substantive
+
+2020-03-02
+
+Editorial
+Editorial
+Substantive
+Editorial
+Editorial
+Editorial
+Editorial
+
+Change
+Updated AAL descriptions for
+consistency with other text in document
+Deleted “cryptographic” to consistently
+reflect authenticator options at AAL3
+Refined the requirements about
+processing of attributes
+Make language regarding activation
+factors for multifactor authenticators
+consistent
+Recognize use of hardware TPM as
+hardware crypto authenticator
+Improve normative language on
+authenticated protected channels for
+biometrics
+Changed “transaction” to “binding
+transaction” to emphasize that
+requirement doesn’t apply to
+authentication transactions
+
+Location
+Introduction
+
+Replaced out-of-context note at end of
+section 7.2
+Changed IdP to CSP to match
+terminology used elsewhere in this
+document
+Corrected capitalization of Side Channel
+Attack
+Changed the title to processing
+limitation; clarified the language,
+incorporated privacy objectives
+language, and specified that consent is
+explicit
+Added NISTIR 8062 as a reference
+Corrected title of SP 800-63C
+Clarified wording of verifier
+impersonation resistance requirement
+Emphasized use of key unlocked by
+additional factor to sign nonce
+Provided examples of risk-based
+behavior observations
+Removed redundant phrase and added
+missing conjunction
+Updated URL for reference [Blacklists]
+
+§7.2
+
+viii
+
+§4.3
+§4.4
+§5.1.5.1, 5.1.8.1, and
+5.1.9.1
+§5.1.7.1, 5.1.9.1
+§5.2.3
+§6.1.1
+
+Table 8-1
+Table 8-2
+§9.3
+
+§11.1
+§11.3
+§4.3.2
+§5.1.9.1
+§5.2.2
+§5.2.3
+§11.1
+
+NIST SP 800-63B
+
+1
+
+DIGITAL IDENTITY GUIDELINES:
+AUTHENTICATION & LIFECYCLE MANAGEMENT
+
+Purpose
+
+This section is informative.
+This document and its companion documents, Special Publication (SP) 800-63, SP 800-63A,
+and SP 800-63C, provide technical guidelines to agencies for the implementation of digital
+authentication.
+
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-63b
+
+1
+
+NIST SP 800-63B
+
+2
+
+DIGITAL IDENTITY GUIDELINES:
+AUTHENTICATION & LIFECYCLE MANAGEMENT
+
+Introduction
+
+This section is informative.
+
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-63b
+
+Digital identity is the unique representation of a subject engaged in an online transaction. A
+digital identity is always unique in the context of a digital service, but does not necessarily need
+to be traceable back to a specific real-life subject. In other words, accessing a digital service may
+not mean that the underlying subject’s real-life representation is known. Identity proofing
+establishes that a subject is actually who they claim to be. Digital authentication is the process of
+determining the validity of one or more authenticators used to claim a digital identity.
+Authentication establishes that a subject attempting to access a digital service is in control of the
+technologies used to authenticate. For services in which return visits are applicable, successfully
+authenticating provides reasonable risk-based assurances that the subject accessing the service
+today is the same as the one who accessed the service previously. Digital identity presents a
+technical challenge because it often involves the proofing of individuals over an open network
+and always involves the authentication of individuals over an open network. This presents
+multiple opportunities for impersonation and other attacks which can lead to fraudulent claims of
+a subject’s digital identity.
+The ongoing authentication of subscribers is central to the process of associating a subscriber
+with their online activity. Subscriber authentication is performed by verifying that the claimant
+controls one or more authenticators (called tokens in earlier versions of SP 800-63) associated
+with a given subscriber. A successful authentication results in the assertion of an identifier, either
+pseudonymous or non-pseudonymous, and optionally other identity information, to the relying
+party (RP).
+This document provides recommendations on types of authentication processes, including
+choices of authenticators, that may be used at various Authenticator Assurance Levels (AALs). It
+also provides recommendations on the lifecycle of authenticators, including revocation in the
+event of loss or theft.
+This technical guideline applies to digital authentication of subjects to systems over a network. It
+does not address the authentication of a person for physical access (e.g., to a building), though
+some credentials used for digital access may also be used for physical access authentication. This
+technical guideline also requires that federal systems and service providers participating in
+authentication protocols be authenticated to subscribers.
+The strength of an authentication transaction is characterized by an ordinal measurement known
+as the AAL. Stronger authentication (a higher AAL) requires malicious actors to have better
+capabilities and expend greater resources in order to successfully subvert the authentication
+process. Authentication at higher AALs can effectively reduce the risk of attacks. A high-level
+summary of the technical requirements for each of the AALs is provided below; see Sections
+4 and 5 of this document for specific normative requirements.
+Authenticator Assurance Level 1: AAL1 provides some assurance that the claimant controls an
+authenticator bound to the subscriber’s account. AAL1 requires either single-factor or multifactor authentication using a wide range of available authentication technologies. Successful
+2
+
+NIST SP 800-63B
+
+DIGITAL IDENTITY GUIDELINES:
+AUTHENTICATION & LIFECYCLE MANAGEMENT
+
+authentication requires that the claimant prove possession and control of the authenticator
+through a secure authentication protocol.
+Authenticator Assurance Level 2: AAL2 provides high confidence that the claimant controls
+authenticator(s) bound to the subscriber’s account. Proof of possession and control of two
+different authentication factors is required through secure authentication protocol(s). Approved
+cryptographic techniques are required at AAL2 and above.
+
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-63b
+
+Authenticator Assurance Level 3: AAL3 provides very high confidence that the claimant
+controls authenticator(s) bound to the subscriber’s account. Authentication at AAL3 is based on
+proof of possession of a key through a cryptographic protocol. AAL3 authentication requires a
+hardware-based authenticator and an authenticator that provides verifier impersonation
+resistance; the same device may fulfill both these requirements. In order to authenticate at AAL3,
+claimants are required to prove possession and control of two distinct authentication
+factors through secure authentication protocol(s). Approved cryptographic techniques are
+required.
+The following table states which sections of the document are normative and which are
+informative:
+Table 2-1 Normative and Informative Sections of SP 800-63B
+
+Section Name
+
+Normative/Informative
+
+1. Purpose
+
+Informative
+
+2. Introduction
+
+Informative
+
+3. Definitions and Abbreviations
+
+Informative
+
+4. Authenticator Assurance Levels
+
+Normative
+
+5. Authenticator and Verifier Requirements
+
+Normative
+
+6. Authenticator Lifecycle Management
+
+Normative
+
+7. Session Management
+
+Normative
+
+8. Threat and Security Considerations
+
+Informative
+
+9. Privacy Considerations
+
+Informative
+
+10. Usability Considerations
+
+Informative
+
+11. References
+
+Informative
+
+Appendix A — Strength of Memorized
+Secrets
+
+Informative
+
+3
+
+NIST SP 800-63B
+
+3
+
+DIGITAL IDENTITY GUIDELINES:
+AUTHENTICATION & LIFECYCLE MANAGEMENT
+
+Definitions and Abbreviations
+
+See SP 800-63, Appendix A for a complete set of definitions and abbreviations.
+
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-63b
+
+4
+
+NIST SP 800-63B
+
+4
+
+DIGITAL IDENTITY GUIDELINES:
+AUTHENTICATION & LIFECYCLE MANAGEMENT
+
+Authenticator Assurance Levels
+
+This section contains both normative and informative material.
+To satisfy the requirements of a given AAL, a claimant SHALL be authenticated with at least a
+given level of strength to be recognized as a subscriber. The result of an authentication process is
+an identifier that SHALL be used each time that subscriber authenticates to that RP. The
+identifier MAY be pseudonymous. Subscriber identifiers SHOULD NOT be reused for a
+different subject but SHOULD be reused when a previously-enrolled subject is re-enrolled by the
+CSP. Other attributes that identify the subscriber as a unique subject MAY also be provided.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-63b
+
+Detailed normative requirements for authenticators and verifiers at each AAL are provided in
+Section 5.
+See SP 800-63 Section 6.2 for details on how to choose the most appropriate AAL.
+FIPS 140 requirements are satisfied by FIPS 140-2 or newer revisions.
+At IAL1, it is possible that attributes are collected and made available by the digital identity
+service. Any PII or other personal information — whether self-asserted or validated — requires
+multi-factor authentication. Therefore, agencies SHALL select a minimum of AAL2 when selfasserted PII or other personal information is made available online.
+Authenticator Assurance Level 1
+
+This section is normative.
+AAL1 provides some assurance that the claimant controls an authenticator bound to the
+subscriber’s account. AAL1 requires either single-factor or multi-factor authentication using a
+wide range of available authentication technologies. Successful authentication requires that the
+claimant prove possession and control of the authenticator through a secure authentication
+protocol.
+4.1.1
+
+Permitted Authenticator Types
+
+AAL1 authentication SHALL occur by the use of any of the following authenticator types, which
+are defined in Section 5:
+•
+•
+•
+•
+•
+•
+•
+•
+•
+
+Memorized Secret (Section 5.1.1)
+Look-Up Secret (Section 5.1.2)
+Out-of-Band Devices (Section 5.1.3)
+Single-Factor One-Time Password (OTP) Device (Section 5.1.4)
+Multi-Factor OTP Device (Section 5.1.5)
+Single-Factor Cryptographic Software (Section 5.1.6)
+Single-Factor Cryptographic Device (Section 5.1.7)
+Multi-Factor Cryptographic Software (Section 5.1.8)
+Multi-Factor Cryptographic Device (Section 5.1.9)
+5
+
+NIST SP 800-63B
+
+4.1.2
+
+DIGITAL IDENTITY GUIDELINES:
+AUTHENTICATION & LIFECYCLE MANAGEMENT
+
+Authenticator and Verifier Requirements
+
+Cryptographic authenticators used at AAL1 SHALL use approved cryptography. Software-based
+authenticators that operate within the context of an operating system MAY, where applicable,
+attempt to detect compromise (e.g., by malware) of the user endpoint in which they are running
+and SHOULD NOT complete the operation when such a compromise is detected.
+Communication between the claimant and verifier (using the primary channel in the case of an
+out-of-band authenticator) SHALL be via an authenticated protected channel to provide
+confidentiality of the authenticator output and resistance to man-in-the-middle (MitM) attacks.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-63b
+
+Verifiers operated by government agencies at AAL1 SHALL be validated to meet the
+requirements of FIPS 140 Level 1.
+4.1.3
+
+Reauthentication
+
+Periodic reauthentication of subscriber sessions SHALL be performed as described in Section
+7.2. At AAL1, reauthentication of the subscriber SHOULD be repeated at least once per 30 days
+during an extended usage session, regardless of user activity. The session SHOULD be
+terminated (i.e., logged out) when this time limit is reached.
+4.1.4
+
+Security Controls
+
+The CSP SHALL employ appropriately-tailored security controls from the low baseline of
+security controls defined in SP 800-53 or equivalent federal (e.g., FEDRAMP) or industry
+standard. The CSP SHALL ensure that the minimum assurance-related controls for lowimpact systems, or equivalent, are satisfied.
+4.1.5
+
+Records Retention Policy
+
+The CSP shall comply with its respective records retention policies in accordance with
+applicable laws, regulations, and policies, including any National Archives and Records
+Administration (NARA) records retention schedules that may apply. If the CSP opts to retain
+records in the absence of any mandatory requirements, the CSP SHALL conduct a risk
+management process, including assessments of privacy and security risks, to determine how long
+records should be retained and SHALL inform the subscriber of that retention policy.
+Authenticator Assurance Level 2
+
+This section is normative.
+AAL2 provides high confidence that the claimant controls authenticator(s) bound to the
+subscriber’s account. Proof of possession and control of two distinct authentication factors is
+required through secure authentication protocol(s). Approved cryptographic techniques are
+required at AAL2 and above.
+
+6
+
+NIST SP 800-63B
+
+4.2.1
+
+DIGITAL IDENTITY GUIDELINES:
+AUTHENTICATION & LIFECYCLE MANAGEMENT
+
+Permitted Authenticator Types
+
+At AAL2, authentication SHALL occur by the use of either a multi-factor authenticator or a
+combination of two single-factor authenticators. A multi-factor authenticator requires two factors
+to execute a single authentication event, such as a cryptographically-secure device with an
+integrated biometric sensor that is required to activate the device. Authenticator requirements are
+specified in Section 5.
+When a multi-factor authenticator is used, any of the following MAY be used:
+
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-63b
+
+•
+•
+•
+
+Multi-Factor OTP Device (Section 5.1.5)
+Multi-Factor Cryptographic Software (Section 5.1.8)
+Multi-Factor Cryptographic Device (Section 5.1.9)
+
+When a combination of two single-factor authenticators is used, it SHALL include a Memorized
+Secret authenticator (Section 5.1.1) and one possession-based (i.e., “something you have”)
+authenticator from the following list:
+•
+•
+•
+•
+•
+
+Look-Up Secret (Section 5.1.2)
+Out-of-Band Device (Section 5.1.3)
+Single-Factor OTP Device (Section 5.1.4)
+Single-Factor Cryptographic Software (Section 5.1.6)
+Single-Factor Cryptographic Device (Section 5.1.7)
+Note: When biometric authentication meets the requirements in Section 5.2.3, the device
+has to be authenticated in addition to the biometric — a biometric is recognized as a factor,
+but not recognized as an authenticator by itself. Therefore, when conducting authentication
+with a biometric, it is unnecessary to use two authenticators because the associated device
+serves as “something you have,” while the biometric serves as “something you are.”
+
+4.2.2
+
+Authenticator and Verifier Requirements
+
+Cryptographic authenticators used at AAL2 SHALL use approved cryptography. Authenticators
+procured by government agencies SHALL be validated to meet the requirements of FIPS
+140 Level 1. Software-based authenticators that operate within the context of an operating
+system MAY, where applicable, attempt to detect compromise of the platform in which they are
+running (e.g., by malware) and SHOULD NOT complete the operation when such a compromise
+is detected. At least one authenticator used at AAL2 SHALL be replay resistant as described
+in Section 5.2.8. Authentication at AAL2 SHOULD demonstrate authentication intent from at
+least one authenticator as discussed in Section 5.2.9.
+Communication between the claimant and verifier (the primary channel in the case of an out-ofband authenticator) SHALL be via an authenticated protected channel to provide confidentiality
+of the authenticator output and resistance to MitM attacks.
+Verifiers operated by government agencies at AAL2 SHALL be validated to meet the
+requirements of FIPS 140 Level 1.
+7
