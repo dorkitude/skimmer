@@ -13,8 +13,3 @@ about the right subject, satisfies any constraints the goal states, and is
 something the reader would want to look at or act on. Answer no if it is off
 topic, fails a stated constraint, is a duplicate-looking or empty entry, or
 only shares surface keywords with the goal. Judge only this one item.
-
-Goal: {{.Goal}}
-
-Item {{.ID}}:
-{{.Text}}

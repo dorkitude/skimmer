@@ -17,7 +17,10 @@ func TestBuiltinDefaultsRender(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s render: %v", kind, err)
 		}
-		for _, want := range []string{"find the GOAL", "item_3", "the TEXT"} {
+		// Goal and text live in the request state; the question itself only
+		// points at the item (state-pointer design), so only the id must
+		// appear in the rendered question.
+		for _, want := range []string{"item_3"} {
 			if !strings.Contains(out, want) {
 				t.Errorf("%s: rendered prompt lacks %q", kind, want)
 			}
