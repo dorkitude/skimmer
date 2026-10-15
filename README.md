@@ -179,6 +179,18 @@ Kept file chunks are cited as path:start-end; open the file there if you need mo
 If skimmer reports nothing relevant, rephrase the goal or lower `-t` before reading raw.
 ```
 
+## Evals
+
+The skim filter is measured, not vibes: [`evals/`](evals/README.md) holds a
+public-document corpus (with attributions), a gold-by-construction goal set
+(52 gold + 14 in-doc near-duplicate confusables + 12 distractors), and a live
+harness that runs the real pipeline against a pinned Jev model and archives
+every per-chunk probability, with history foldered by skimmer version
+(`evals/skimmer/0.1.101/`). Measured on `jev-1.14.0`: recall 1.000, distractor
+leak 0.000, stable across draws, robust to boundary shifts; threshold 0.5 is
+conservative (0.7 keeps 30% fewer chunks at identical recall), and 2000-char
+chunks are the measured sweet spot. Nothing in `go test` makes a live call.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). The release process is in [AGENTS.md](AGENTS.md#release-strategy), and changes are listed in [CHANGELOG.md](CHANGELOG.md).

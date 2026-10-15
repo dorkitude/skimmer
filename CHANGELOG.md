@@ -5,6 +5,18 @@ Versions are semver with large patch numbers (`0.1.100`, `0.1.101`, ...).
 
 ## [Unreleased]
 
+### Added
+
+- Evals for the skim filter itself (`evals/`): a 12-document public corpus with
+  attributions, a gold-by-construction goal set (52 gold, 14 mechanically-found
+  near-duplicate confusables, 12 distractors) authored and blind-audited across
+  two model families, a live harness running the real pipeline against a pinned
+  Jev model with every per-chunk probability archived, and eval history
+  foldered by skimmer version. Measured on `jev-1.14.0`: recall 1.000,
+  distractor leak 0.000, robust to boundary shifts; threshold 0.5 is
+  conservative (0.7 keeps 30% fewer chunks at identical recall), and 2000-char
+  chunks are the measured sweet spot. No behavior change to the CLI.
+
 ## [0.1.100] - 2026-10-10
 
 First release.
