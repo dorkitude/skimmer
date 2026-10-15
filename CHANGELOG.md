@@ -5,6 +5,8 @@ Versions are semver with large patch numbers (`0.1.100`, `0.1.101`, ...).
 
 ## [Unreleased]
 
+## [0.1.102] - 2026-10-15
+
 ### Changed
 
 - Built-in `skim` and `filter` prompts no longer paste the goal or the chunk
