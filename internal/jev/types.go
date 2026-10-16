@@ -1,7 +1,10 @@
 // Package jev is a client for TypeSafe's Jev System One API.
 package jev
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // QuestionType enumerates the supported System One question types.
 type QuestionType string
@@ -15,12 +18,24 @@ const (
 type Question struct {
 	Type         QuestionType `json:"type"`
 	Instructions string       `json:"instructions"`
-	Criteria     []string     `json:"criteria,omitempty"`
+	// Criteria is a Noul's *NoulCriteria or a Score's []string of levels.
+	Criteria any `json:"criteria,omitempty"`
 }
 
-// NoulQuestion builds a yes/no question.
-func NoulQuestion(instructions string) Question {
-	return Question{Type: TypeNoul, Instructions: instructions}
+// NoulCriteria says what a yes and a no mean, for a yes/no question whose
+// boundary is subtle.
+type NoulCriteria struct {
+	True  string `json:"true" yaml:"true"`
+	False string `json:"false" yaml:"false"`
+}
+
+// NoulQuestion builds a yes/no question. criteria may be nil.
+func NoulQuestion(instructions string, criteria *NoulCriteria) Question {
+	q := Question{Type: TypeNoul, Instructions: instructions}
+	if criteria != nil {
+		q.Criteria = criteria
+	}
+	return q
 }
 
 // SystemOneRequest is the POST /v1/systemone body.
@@ -43,12 +58,32 @@ type Answer struct {
 type Usage struct {
 	InputTokens  int `json:"input_tokens"`
 	OutputTokens int `json:"output_tokens"`
+	// Model is the versioned model ID that answered (the response's model
+	// field). Requests answered by different models list them all, comma
+	// separated.
+	Model string `json:"-"`
 }
 
 // Add accumulates another usage record into u.
 func (u *Usage) Add(o Usage) {
 	u.InputTokens += o.InputTokens
 	u.OutputTokens += o.OutputTokens
+	u.Model = joinModels(u.Model, o.Model)
+}
+
+func joinModels(a, b string) string {
+	if b == "" {
+		return a
+	}
+	for _, m := range strings.Split(a, ",") {
+		if m == b {
+			return a
+		}
+	}
+	if a == "" {
+		return b
+	}
+	return a + "," + b
 }
 
 // SystemOneResponse is the POST /v1/systemone response.

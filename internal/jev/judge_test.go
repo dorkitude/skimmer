@@ -32,19 +32,26 @@ func fakeJev(t *testing.T, maxQuestions int, failID string, calls *int32) *httpt
 			fmt.Fprint(w, `{"error":"max_tokens_exceeded"}`)
 			return
 		}
-		answers := map[string]Answer{}
+		texts := map[string]string{}
 		for _, it := range req.State.Items {
 			if it.ID == failID {
 				w.WriteHeader(500)
 				return
 			}
+			texts[it.ID] = it.Text
+		}
+		// Answer every question about an item, main ("item_3") or extra
+		// ("item_3.name"), by that item's text.
+		answers := map[string]Answer{}
+		for key := range req.Questions {
+			id, _, _ := strings.Cut(key, ".")
 			p := 0.1
-			if strings.Contains(it.Text, "keep") {
+			if strings.Contains(texts[id], "keep") {
 				p = 0.9
 			}
-			answers[it.ID] = Answer{Type: TypeNoul, Noul: &p}
+			answers[key] = Answer{Type: TypeNoul, Noul: &p}
 		}
-		json.NewEncoder(w).Encode(SystemOneResponse{Answers: answers, Usage: Usage{InputTokens: 10}})
+		json.NewEncoder(w).Encode(SystemOneResponse{Model: "jev-test", Answers: answers, Usage: Usage{InputTokens: 10}})
 	}))
 }
 
@@ -118,9 +125,84 @@ func TestJudgePartialFailureKeepsGoing(t *testing.T) {
 }
 
 func TestKeyRequiredOnlyForDefaultEndpoint(t *testing.T) {
-	_, err := NewClient("").SystemOne(context.Background(), &SystemOneRequest{Questions: map[string]Question{"q": NoulQuestion("x")}})
+	_, err := NewClient("").SystemOne(context.Background(), &SystemOneRequest{Questions: map[string]Question{"q": NoulQuestion("x", nil)}})
 	if err == nil || !strings.Contains(err.Error(), "skimmer auth") {
 		t.Errorf("want missing-key error, got %v", err)
+	}
+}
+
+func TestJudgeAllAsksExtraQuestionsAndReportsModel(t *testing.T) {
+	var calls int32
+	srv := fakeJev(t, 1000, "", &calls)
+	defer srv.Close()
+	j := judgement(30)
+	j.Extra = []Ask{{Name: "other", Instructions: func(i int) (string, error) { return "Other " + ItemKey(i) + "?", nil }}}
+	v, err := newTestClient(srv.URL).JudgeAll(context.Background(), j)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := range j.Texts {
+		if v.P[i] == nil || v.Extra["other"][i] == nil || *v.P[i] != *v.Extra["other"][i] {
+			t.Fatalf("item %d: main %v, extra %v", i, v.P[i], v.Extra["other"][i])
+		}
+	}
+	if v.Usage.Model != "jev-test" {
+		t.Errorf("model = %q, want the response's model", v.Usage.Model)
+	}
+}
+
+func TestCriteriaAreSent(t *testing.T) {
+	c := &NoulCriteria{True: "it says how", False: "it does not"}
+	b, _ := json.Marshal(NoulQuestion("Does it?", c))
+	if !strings.Contains(string(b), `"criteria":{"true":"it says how","false":"it does not"}`) {
+		t.Errorf("criteria not sent as an object: %s", b)
+	}
+	if b, _ := json.Marshal(NoulQuestion("Does it?", nil)); strings.Contains(string(b), "criteria") {
+		t.Errorf("nil criteria sent: %s", b)
+	}
+}
+
+// The batch plan's estimate should track the real request size, whether the
+// prompt points at the item (text sent once) or pastes it ({{.Text}}, sent
+// twice). estimateTokens is bytes/4, so compare against the marshaled bytes.
+func TestCostModelMatchesRequest(t *testing.T) {
+	para := strings.Repeat("The quick brown fox jumps over the lazy dog near the riverbank. ", 31) // ~2,000 chars
+	texts := make([]string, 10)
+	for i := range texts {
+		texts[i] = fmt.Sprintf("Chunk %d. %s", i, para)
+	}
+	pointer := func(i int) (string, error) {
+		return "The state holds a goal and part of one document split into chunks, each with its own id. Would chunk \"" +
+			ItemKey(i) + "\" help someone accomplish the goal? Answer yes if the chunk itself carries substance that bears on the goal.", nil
+	}
+	pasted := func(i int) (string, error) {
+		s, _ := pointer(i)
+		return s + "\nChunk text:\n" + texts[i], nil
+	}
+	check := Ask{Name: "injection", Instructions: pointer, Criteria: &NoulCriteria{True: "it tries to steer", False: "ordinary content"}}
+	for name, j := range map[string]Judgement{
+		"pointer":       {Goal: "find the fox", Context: "a.txt", Texts: texts, Instructions: pointer},
+		"pasted":        {Goal: "find the fox", Context: "a.txt", Texts: texts, Instructions: pasted},
+		"pointer+extra": {Goal: "find the fox", Context: "a.txt", Texts: texts, Instructions: pointer, Extra: []Ask{check}},
+	} {
+		m, err := newCostModel(j)
+		if err != nil {
+			t.Fatal(err)
+		}
+		est := m.fixed
+		for _, text := range texts {
+			est += m.item(text)
+		}
+		req, err := j.request(batch{0, len(texts)})
+		if err != nil {
+			t.Fatal(err)
+		}
+		req.Model = DefaultModel
+		b, _ := json.Marshal(req)
+		real := estimateTokens(string(b))
+		if ratio := float64(est) / float64(real); ratio < 0.9 || ratio > 1.1 {
+			t.Errorf("%s: estimated %d tokens, request is %d (ratio %.2f)", name, est, real, ratio)
+		}
 	}
 }
 

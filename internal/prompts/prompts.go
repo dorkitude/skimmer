@@ -16,20 +16,22 @@ import (
 
 	"go.yaml.in/yaml/v3"
 
+	"github.com/dorkitude/skimmer/internal/jev"
 	embedded "github.com/dorkitude/skimmer/prompts"
 )
 
 // Kinds of prompt, each a directory under prompts/.
 const (
-	SkimDocument  = "skim_document"
-	FilterResults = "filter_results"
+	SkimDocument   = "skim_document"
+	FilterResults  = "filter_results"
+	InjectionCheck = "injection_check"
 
 	// Default is the prompt used when none is named.
 	Default = "DEFAULT"
 )
 
 // Kinds lists every prompt kind.
-var Kinds = []string{SkimDocument, FilterResults}
+var Kinds = []string{SkimDocument, FilterResults, InjectionCheck}
 
 // Prompt is a parsed prompt file.
 type Prompt struct {
@@ -37,6 +39,9 @@ type Prompt struct {
 	Description string `yaml:"description"`
 	Type        string `yaml:"type"` // only "noul" is supported
 	Model       string `yaml:"model"`
+	// Criteria optionally says what yes and no mean. It is sent as the
+	// question's criteria, as written (it is not a template).
+	Criteria *jev.NoulCriteria `yaml:"criteria"`
 
 	// Body is the raw template text after the frontmatter.
 	Body string `yaml:"-"`
@@ -84,6 +89,9 @@ func Parse(name string, content []byte) (*Prompt, error) {
 	}
 	if p.Type != "noul" {
 		return nil, fmt.Errorf("prompt %s: type %q is not supported (skimmer asks yes/no questions: use noul)", name, p.Type)
+	}
+	if c := p.Criteria; c != nil && (strings.TrimSpace(c.True) == "" || strings.TrimSpace(c.False) == "") {
+		return nil, fmt.Errorf("prompt %s: criteria needs both true and false", name)
 	}
 	p.Body = strings.TrimSpace(string(body))
 	if p.Body == "" {
@@ -223,4 +231,14 @@ func Raw(kind, ref, userDir string) (string, string, error) {
 	}
 	b, err := os.ReadFile(p.Origin)
 	return string(b), p.Origin, err
+}
+
+// Ask turns the prompt into a question put to every item, rendering it with
+// data(i) for item i.
+func (p *Prompt) Ask(name string, data func(i int) Data) jev.Ask {
+	return jev.Ask{
+		Name:         name,
+		Instructions: func(i int) (string, error) { return p.Render(data(i)) },
+		Criteria:     p.Criteria,
+	}
 }

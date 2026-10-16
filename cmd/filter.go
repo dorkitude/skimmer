@@ -15,6 +15,7 @@ import (
 	"github.com/dorkitude/skimmer/internal/items"
 	"github.com/dorkitude/skimmer/internal/jev"
 	"github.com/dorkitude/skimmer/internal/prompts"
+	"github.com/dorkitude/skimmer/internal/skim"
 )
 
 var filterOpts struct {
@@ -28,6 +29,7 @@ var filterOpts struct {
 	max       int
 	scores    bool
 	quiet     bool
+	injection bool
 }
 
 var filterCmd = &cobra.Command{
@@ -64,6 +66,7 @@ func init() {
 	f.IntVarP(&filterOpts.max, "max", "n", 0, "keep at most N items, best first (0 = no cap)")
 	f.BoolVar(&filterOpts.scores, "scores", false, "include each kept item's index and P(relevant)")
 	f.BoolVarP(&filterOpts.quiet, "quiet", "q", false, "no summary on stderr")
+	f.BoolVar(&filterOpts.injection, "injection-check", false, "also ask whether each item tries to steer the reader, and drop the ones that do (a filter, not a security boundary)")
 	_ = filterCmd.MarkFlagRequired("goal")
 	rootCmd.AddCommand(filterCmd)
 }
@@ -114,26 +117,36 @@ func runFilter(cmd *cobra.Command, args []string) error {
 	for i := range list.Raw {
 		texts[i] = list.Text(i, filterOpts.fields, filterOpts.itemChars)
 	}
-	ps, usage, err := client.Judge(cmd.Context(), jev.Judgement{
-		Goal:  filterOpts.goal,
-		Texts: texts,
-		Instructions: func(i int) (string, error) {
-			return prompt.Render(prompts.Data{Goal: filterOpts.goal, ID: jev.ItemKey(i), Index: i, Text: texts[i]})
-		},
-	})
+	itemData := func(i int) prompts.Data {
+		return prompts.Data{Goal: filterOpts.goal, ID: jev.ItemKey(i), Index: i, Text: texts[i]}
+	}
+	ask := prompt.Ask("", itemData)
+	j := jev.Judgement{Goal: filterOpts.goal, Texts: texts, Instructions: ask.Instructions, Criteria: ask.Criteria}
+	if filterOpts.injection {
+		check, err := prompts.Load(prompts.InjectionCheck, "", promptDir(cfg))
+		if err != nil {
+			return err
+		}
+		j.Extra = append(j.Extra, check.Ask("injection", itemData))
+	}
+	v, err := client.JudgeAll(cmd.Context(), j)
+	ps, usage := v.P, v.Usage
 	var partial *jev.PartialError
 	if err != nil && !errors.As(err, &partial) {
 		return err
 	}
 
-	var keep []int
+	var keep, flagged []int
 	unjudged := 0
 	for i, p := range ps {
 		switch {
 		case p == nil:
 			unjudged++
 			keep = append(keep, i) // never silently drop what Jev didn't see
-		case *p >= cfg.Threshold:
+		case *p < cfg.Threshold:
+		case filterOpts.injection && v.Extra["injection"][i] != nil && *v.Extra["injection"][i] >= skim.InjectionThreshold:
+			flagged = append(flagged, i)
+		default:
 			keep = append(keep, i)
 		}
 	}
@@ -155,9 +168,10 @@ func runFilter(cmd *cobra.Command, args []string) error {
 		if unjudged > 0 {
 			msg += fmt.Sprintf(", %d unjudged kept: %v", unjudged, partial)
 		}
-		if usage.InputTokens > 0 {
-			msg += fmt.Sprintf(" · jev %s tokens", human(usage.InputTokens+usage.OutputTokens))
+		if len(flagged) > 0 {
+			msg += fmt.Sprintf(", %d dropped by --injection-check (indices %v)", len(flagged), flagged)
 		}
+		msg += usageNote(usage)
 		fmt.Fprintln(os.Stderr, msg)
 	}
 	return nil

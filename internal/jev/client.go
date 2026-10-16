@@ -15,7 +15,10 @@ import (
 // Defaults.
 const (
 	DefaultBaseURL = "https://api.typesafe.ai"
-	DefaultModel   = "jev-latest"
+	// DefaultModel is pinned to the version skimmer's evals measured. An
+	// alias such as jev-latest moves, and with it every answer and the
+	// threshold advice.
+	DefaultModel   = "jev-1.14.0"
 	DefaultTimeout = 60 * time.Second
 	systemOnePath  = "/v1/systemone"
 	maxAttempts    = 3
@@ -30,7 +33,7 @@ type Client struct {
 	// proxy that injects credentials itself (e.g. an exe.dev integration).
 	APIKey  string
 	BaseURL string // default: https://api.typesafe.ai
-	Model   string // default: jev-latest
+	Model   string // default: DefaultModel
 
 	// HTTPClient defaults to one with DefaultTimeout.
 	HTTPClient *http.Client
@@ -202,6 +205,7 @@ func (c *Client) once(ctx context.Context, payload []byte) (*SystemOneResponse, 
 	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
 		return nil, fmt.Errorf("jev: decode response: %w", err)
 	}
+	out.Usage.Model = out.Model
 	return &out, nil
 }
 
@@ -222,7 +226,7 @@ func retryable(err error) bool {
 func (c *Client) Validate(ctx context.Context) error {
 	req := &SystemOneRequest{
 		State:     map[string]any{"text": "hello world"},
-		Questions: map[string]Question{"greeting": NoulQuestion("Is the text a greeting?")},
+		Questions: map[string]Question{"greeting": NoulQuestion("Is the text a greeting?", nil)},
 	}
 	_, err := c.SystemOne(ctx, req)
 	return err
