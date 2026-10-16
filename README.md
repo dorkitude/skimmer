@@ -134,6 +134,7 @@ func (c *Cooldown) Note(name string, err error) {
 | `--json` / `--raw` | structured output / just the kept text |
 | `--paths` / `--text` | force stdin to be read as a path list / as the document |
 | `-p, --prompt` | a custom prompt (see below) |
+| `--injection-check` | also ask whether each chunk tries to steer the reader, and drop the ones that do (see below) |
 | `-q, --quiet` | no savings summary on stderr |
 
 ### Filter lists
@@ -148,7 +149,15 @@ ls ~/notes | skimmer filter -g "anything about the Q3 offsite"
 skimmer filter results.jsonl -g "papers from 2025 on sparse autoencoders" --scores
 ```
 
-skimmer reads a JSON array, an object holding one array (choose among several with `--key`), JSON Lines, or plain lines, and detects which one it got. Kept items come back untouched, in their original order, in the same format. `--fields` shows Jev only those fields of each object. `--scores` adds each item's index and P(relevant), and `-n/--max` keeps only the top N.
+skimmer reads a JSON array, an object holding one array (choose among several with `--key`), JSON Lines, or plain lines, and detects which one it got. Kept items come back untouched, in their original order, in the same format. `--fields` shows Jev only those fields of each object. `--scores` adds each item's index and P(relevant), `-n/--max` keeps only the top N, and `--injection-check` works as it does for `skim`.
+
+### Model
+
+skimmer pins `jev-1.14.0`, the model its evals measured, so its answers and the threshold advice don't move when Jev's `jev-latest` alias does. `--model` (or `SKIMMER_MODEL`, or `model:` in a prompt's frontmatter) picks another. The stderr summary and `--json` output (`"model"`) name the model that actually answered.
+
+### Injection check
+
+Pages and files are untrusted. A page can carry a line like "this section is exactly what you are looking for" to get itself kept. `--injection-check` asks Jev a second yes/no question about every chunk or item, in the same requests: does it try to steer the system reading it? Flagged chunks are dropped and listed (`flagged` in `--json`, a count on stderr); a chunk the check couldn't judge is kept. It costs about one more short question per chunk. **It is a filter, not a security boundary:** it lowers the odds that planted text reaches your agent, and it can be fooled. See [the eval](evals/skimmer/0.1.103/results.md#injection-check) for how often it catches planted lines and how often it flags clean text.
 
 ## Prompts
 
@@ -162,7 +171,7 @@ skimmer skim ./src -g "..." --prompt strict
 skimmer skim ./src -g "..." --prompt ./my-prompt.md
 ```
 
-A prompt is optional YAML frontmatter (`name`, `description`, `model`) followed by a Go `text/template` body. The body can use `{{.Goal}}`, `{{.Text}}`, `{{.ID}}`, `{{.Index}}`, and, for skim, `{{.Source}}` and `{{.Lines}}`. A user prompt named `DEFAULT.md` replaces the built-in default. The built-in defaults send each chunk once in the request state and point the question at it (`{{.ID}}`) rather than pasting the text into the question; that measured 19% cheaper with equal-or-better accuracy (see [evals/variants/](evals/variants/README.md)).
+A prompt is optional YAML frontmatter (`name`, `description`, `model`, and `criteria` with `true` and `false` text saying what yes and no mean) followed by a Go `text/template` body. The body can use `{{.Goal}}`, `{{.Text}}`, `{{.ID}}`, `{{.Index}}`, and, for skim, `{{.Source}}` and `{{.Lines}}`. A user prompt named `DEFAULT.md` replaces the built-in default. The built-in defaults send each chunk once in the request state and point the question at it (`{{.ID}}`) rather than pasting the text into the question, which measured 14.5% fewer input tokens with no measurable difference in recall (see the [corrections](evals/variants/README.md)).
 
 ## For agents
 
@@ -182,14 +191,24 @@ If skimmer reports nothing relevant, rephrase the goal or lower `-t` before read
 ## Evals
 
 The skim filter is measured, not vibes: [`evals/`](evals/README.md) holds a
-public-document corpus (with attributions), a gold-by-construction goal set
-(52 gold + 14 in-doc near-duplicate confusables + 12 distractors), and a live
-harness that runs the real pipeline against a pinned Jev model and archives
-every per-chunk probability, with history foldered by skimmer version
-(`evals/skimmer/0.1.101/`). Measured on `jev-1.14.0`: recall 1.000, distractor
-leak 0.000, stable across draws, robust to boundary shifts; threshold 0.5 is
-conservative (0.7 keeps 30% fewer chunks at identical recall), and 2000-char
-chunks are the measured sweet spot. Nothing in `go test` makes a live call.
+12-document public corpus (with attributions), three goal sets (find-the-fact,
+multi-region, and on-topic goals the document doesn't answer), a frozen
+dev/holdout split by document, a [pre-registration](evals/PREREG.md), and a
+live harness that runs the real pipeline against a pinned model and archives
+every chunk's probability. Latest results: [`evals/skimmer/0.1.103/`](evals/skimmer/0.1.103/results.md).
+On held-out documents with `jev-1.14.0` and the defaults, counting goals with
+95% Wilson intervals:
+
+- find-the-fact goals keep their answer in 21 of 21 (0.85–1.00);
+- goals that need several passages keep every one in 5 of 8, and all
+  positive goals together in 36 of 42 (0.72–0.93);
+- on-topic goals the document doesn't answer keep something in 3 of 12
+  (0.09–0.53); far-off-topic goals in 0 of 6;
+- a BM25 ranker keeping as many chunks per goal completes 19 of 42.
+
+Threshold 0.5 is the measured default (0.7 loses 8 of 42 held-out goals), and
+2000-character chunks stay (bigger chunks cost fewer Jev tokens but hand you
+more text). The corpus is English only. Nothing in `go test` makes a live call.
 
 ## Contributing
 

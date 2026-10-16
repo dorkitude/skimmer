@@ -1,0 +1,24 @@
+{
+  "frozen": "2026-10-16",
+  "note": "Documents are split, not goals, so no document is in both halves. Chosen by hand to balance document families (arXiv, Gutenberg, Wikipedia, standards/government) and goal kinds before any run on 0.1.103. Tune on dev only; report holdout once. Settings chosen before this split (threshold advice, 2000-char chunks, the state-pointer prompt) saw every document, so holdout is unseen only for choices made after 2026-10-16.",
+  "dev_docs": [
+    "arxiv-2608.16621",
+    "arxiv-2608.20845",
+    "cdc-sleep",
+    "gutenberg-timemachine",
+    "nist-sp-800-63b",
+    "wiki-garbage-patch"
+  ],
+  "holdout_docs": [
+    "arxiv-2609.29661",
+    "arxiv-2610.18579",
+    "gutenberg-alice",
+    "rfc9110",
+    "wiki-ada-lovelace",
+    "wiki-kalman-filter"
+  ],
+  "distractors": {
+    "dev": ["d001", "d003", "d005", "d007", "d009", "d011"],
+    "holdout": ["d002", "d004", "d006", "d008", "d010", "d012"]
+  }
+}

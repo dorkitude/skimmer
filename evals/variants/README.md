@@ -1,5 +1,26 @@
 # Technique variants, measured head-to-head
 
+> **Corrections (2026-10-16, [issue #3](https://github.com/dorkitude/skimmer/issues/3)).**
+> Kept as history; [`../skimmer/0.1.103/results.md`](../skimmer/0.1.103/results.md)
+> re-runs the question-design comparison through the real pipeline on
+> held-out documents.
+>
+> - **Token column:** the archived `<variant>-runs.json` files give mean
+>   input tokens per goal of 11,602 (base), 9,914 (state), 11,706 (atomic),
+>   11,087 (collect) and 12,748 (rerank), identical in both draws. The table's
+>   5,053 / 4,105 / 5,113 / 10,341 / 12,245 cannot be reproduced from them.
+>   On the archives, state is **14.5%** cheaper than base, not 19%, and
+>   collect is not "double tokens".
+> - **"Equal-or-better recall at every rank" does not hold:** state's R@10
+>   is 0.986 against base's 1.000. Per goal (the prompt that hit in more of
+>   its two draws), they differ on at most 2 of 36 goals at each R@k and on
+>   6 at all-modes@10, split 3 and 3; exact McNemar p ≥ 0.5 everywhere. This
+>   data cannot tell them apart.
+> - **The atomic variant multiplied its two answers**, so an on-topic but
+>   thin chunk scored near zero. 0.1.103 tests a weighted sum and a gate.
+> - **This harness was not the shipped pipeline:** it sent each document in
+>   one request, without the source context or batching.
+
 Five ways of asking Jev the same skim question, run on the same frozen
 goals-v2 eval (36 off-frame goals, 12 public documents, pinned
 `jev-1.14.0`, 2 draws each, single-document mode, ranked by per-chunk
