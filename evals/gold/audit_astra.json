@@ -1,0 +1,2847 @@
+{
+ "auditor": "gpt-6-astra via codex exec (reasoning effort high)",
+ "entries": [
+  {
+   "id": "d001",
+   "set": "v1",
+   "kind": "distractor",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "No supplied chunk contains a recommended daily intake of vitamin D for adults. The health-related CDC text gives sleep recommendations, not vitamin D intake."
+  },
+  {
+   "id": "d002",
+   "set": "v1",
+   "kind": "distractor",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "No chunk identifies Australia's capital or provides its population. The mention of Australia in gutenberg-alice-02 answers neither part of the goal."
+  },
+  {
+   "id": "d003",
+   "set": "v1",
+   "kind": "distractor",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "No provided chunk contains information about renewing a US passport by mail, including eligibility, forms, required documents, fees, or mailing instructions."
+  },
+  {
+   "id": "d004",
+   "set": "v1",
+   "kind": "distractor",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "No provided chunk states the boiling point of water at sea level, in Fahrenheit or any other temperature scale."
+  },
+  {
+   "id": "d005",
+   "set": "v1",
+   "kind": "distractor",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "None of the provided chunks identifies a FIFA World Cup winner or contains information answering the goal."
+  },
+  {
+   "id": "d006",
+   "set": "v1",
+   "kind": "distractor",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "No provided chunk states how many moons Jupiter has or names any of its four largest moons."
+  },
+  {
+   "id": "d007",
+   "set": "v1",
+   "kind": "distractor",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "None of the provided chunks contains information about the price of a first-class US postage stamp."
+  },
+  {
+   "id": "d008",
+   "set": "v1",
+   "kind": "distractor",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "No provided chunk identifies any 2019 Nobel Prize in Physics winner or the work honored by that prize."
+  },
+  {
+   "id": "d009",
+   "set": "v1",
+   "kind": "distractor",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "No provided chunk contains information about the Louvre’s opening hours or its Tuesday schedule."
+  },
+  {
+   "id": "d010",
+   "set": "v1",
+   "kind": "distractor",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "No supplied chunk contains information about Schengen visas or how US citizens apply for them."
+  },
+  {
+   "id": "d011",
+   "set": "v1",
+   "kind": "distractor",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "No provided chunk contains information about the airspeed velocity of an unladen swallow."
+  },
+  {
+   "id": "d012",
+   "set": "v1",
+   "kind": "distractor",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "No provided chunk identifies the Formula 1 driver with the most career wins or provides any Formula 1 win records."
+  },
+  {
+   "id": "g001",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2610.18579-06",
+    "arxiv-2610.18579-17",
+    "arxiv-2610.18579-18"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2610.18579-06",
+     "supports": true,
+     "note": "Explicitly states that all 14 competent fast systems fail with every fact right on the same 141 states."
+    },
+    {
+     "chunk": "arxiv-2610.18579-17",
+     "supports": false,
+     "note": "Reports per-system outcome shares, but no exact count of shared failure states."
+    },
+    {
+     "chunk": "arxiv-2610.18579-18",
+     "supports": false,
+     "note": "Discusses error percentages and reading–acting gaps, but does not give the shared-state count."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The answer is 141 shared states. Chunk 06 directly supplies it; chunks 17 and 18 do not."
+  },
+  {
+   "id": "g002",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2610.18579-10"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2610.18579-10",
+     "supports": true,
+     "note": "Explicitly states: “JEV was billed $8.79 for all 65,228 records.”"
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The total invoiced amount for JEV over the whole corpus was $8.79, directly stated in the gold chunk."
+  },
+  {
+   "id": "g003",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "cdc-sleep-01"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "cdc-sleep-01",
+     "supports": true,
+     "note": "Explicitly recommends turning off electronic devices at least 30 minutes before bedtime."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The recommended interval is at least 30 minutes before bedtime. Only cdc-sleep-01 contains this answer."
+  },
+  {
+   "id": "g004",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "cdc-sleep-00",
+    "cdc-sleep-01",
+    "cdc-sleep-02"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "cdc-sleep-00",
+     "supports": true,
+     "note": "Answers only the date part: May 15, 2024. Does not identify the data tool."
+    },
+    {
+     "chunk": "cdc-sleep-01",
+     "supports": false,
+     "note": "Contains neither the data tool nor the page date."
+    },
+    {
+     "chunk": "cdc-sleep-02",
+     "supports": true,
+     "note": "Contains both answers: CDC's PLACES provides local estimates of adults not getting enough sleep, and the page date is May 15, 2024."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk cdc-sleep-02 fully answers the goal, so the verdict is agree. The claim that any listed gold chunk is sufficient is incorrect: cdc-sleep-00 supplies only the date, and cdc-sleep-01 supplies neither part."
+  },
+  {
+   "id": "g005",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "cdc-sleep-03"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "cdc-sleep-03",
+     "supports": true,
+     "note": "The chunk ends with the two footer portal addresses: HHS.gov and USA.gov."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Both requested addresses appear at the very end of cdc-sleep-03 and in no other chunk."
+  },
+  {
+   "id": "g006",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "gutenberg-alice-21"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "gutenberg-alice-21",
+     "supports": true,
+     "note": "Explicitly says she took up the fan and a pair of tiny white kid gloves before drinking from the bottle without a label."
+    }
+   ],
+   "other_answering_chunks": [
+    "gutenberg-alice-20"
+   ],
+   "answerable": true,
+   "explanation": "The items were a fan and a pair of gloves. Chunk 20 independently identifies both in the Rabbit’s request and describes Alice hurrying upstairs to fetch them; chunk 21 confirms the retrieval before drinking."
+  },
+  {
+   "id": "g007",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "gutenberg-timemachine-01"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "gutenberg-timemachine-01",
+     "supports": true,
+     "note": "Explicitly states that any real body must extend in four directions and identifies the objecting Filby as red-haired."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The answer is four dimensions and Filby. Chunk 01 contains both facts. Chunk 00 repeats the Filby identification only in its overlap with the gold chunk; other chunks do not independently establish the specific claim about genuine bodies or identify its red-haired challenger."
+  },
+  {
+   "id": "g008",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "gutenberg-timemachine-06"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "gutenberg-timemachine-06",
+     "supports": true,
+     "note": "Describes it as scarcely larger than a small clock, with a metallic framework, ivory, and a transparent crystalline substance."
+    }
+   ],
+   "other_answering_chunks": [
+    "gutenberg-timemachine-08"
+   ],
+   "answerable": true,
+   "explanation": "Chunk 06 answers both size and materials. Chunk 08 independently supports the materials part by describing the little machine as glittering brass and ivory. Chunk 10 describes the larger machine, not the little apparatus."
+  },
+  {
+   "id": "g009",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "gutenberg-timemachine-16"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "gutenberg-timemachine-16",
+     "supports": true,
+     "note": "The Editor explicitly offers “a shilling a line for a verbatim note.”"
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The offered rate was one shilling per line. No other supplied chunk contains that rate."
+  },
+  {
+   "id": "g010",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "gutenberg-timemachine-21"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "gutenberg-timemachine-21",
+     "supports": true,
+     "note": "Explicitly states that as the sun belt swayed between solstices, “my pace was over a year a minute.”"
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The speed was over one elapsed year per minute. Chunk 22 repeats the answer only in its overlap with the gold chunk, so it is excluded."
+  },
+  {
+   "id": "g011",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "nist-sp-800-63b-07"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "nist-sp-800-63b-07",
+     "supports": true,
+     "note": "Explicitly credits Kaitlin Boeckl for artistic graphics contributions to all volumes in the SP 800-63 suite."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 07 directly answers the goal: Kaitlin Boeckl is credited for the series’ artwork. No other supplied chunk contains this credit."
+  },
+  {
+   "id": "g012",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "nist-sp-800-63b-12"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "nist-sp-800-63b-12",
+     "supports": true,
+     "note": "The entry “5.2.3 Use of Biometrics ... 26” explicitly gives the requested starting page, rather than merely naming the subsection."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The subsection about using physiological traits is “Use of Biometrics,” which starts on page 26."
+  },
+  {
+   "id": "g013",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "nist-sp-800-63b-22"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "nist-sp-800-63b-22",
+     "supports": true,
+     "note": "Explicitly states that AAL3 requires a hardware-based authenticator and an authenticator providing verifier impersonation resistance; the same device may satisfy both requirements."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 22 directly answers both parts of the goal for AAL3, the strictest confidence tier."
+  },
+  {
+   "id": "g014",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "nist-sp-800-63b-27"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "nist-sp-800-63b-27",
+     "supports": true,
+     "note": "Explicitly explains that the authenticated device supplies “something you have” and the biometric supplies “something you are,” so two separate authenticators are unnecessary."
+    }
+   ],
+   "other_answering_chunks": [
+    "nist-sp-800-63b-26"
+   ],
+   "answerable": true,
+   "explanation": "Chunk 26 independently explains that one multi-factor authenticator can satisfy both factors, using a cryptographically secure device activated by an integrated biometric sensor as its example. Fingerprint authentication still requires authenticating the associated device. Chunk 28 contains only overlapping answer text from the gold chunk."
+  },
+  {
+   "id": "g015",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "rfc9110-01"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "rfc9110-01",
+     "supports": true,
+     "note": "Lists 8.4.1.1 Compress Coding, 8.4.1.2 Deflate Coding, and 8.4.1.3 Gzip Coding—the requested numbered subsections."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The goal specifically asks for subsection numbers in the outline, so these entries directly answer it rather than merely point to potentially relevant content. No other supplied chunk contains them."
+  },
+  {
+   "id": "g016",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "rfc9110-04"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "rfc9110-04",
+     "supports": true,
+     "note": "“15.5.19. 418 (Unused)” explicitly identifies 418 as unused, directly answering the outline-specific goal."
+    }
+   ],
+   "other_answering_chunks": [
+    "rfc9110-03"
+   ],
+   "answerable": true,
+   "explanation": "The gold chunk explicitly flags 418 as unused. Independently of the overlapping 418 entry, rfc9110-03 also lists “306 (Unused)”. Thus the outline identifies two qualifying values, making the question's singular wording ambiguous."
+  },
+  {
+   "id": "g017",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "rfc9110-10"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "rfc9110-10",
+     "supports": true,
+     "note": "The table of specifications obsoleted by this document identifies HTTP Over TLS (RFC 2818) and points to Appendix B.1."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk rfc9110-10 directly answers both parts. No other supplied chunk independently answers the goal; rfc9110-05 contains only table-of-contents entries."
+  },
+  {
+   "id": "g018",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "wiki-ada-lovelace-01"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-ada-lovelace-01",
+     "supports": true,
+     "note": "It states that Lovelace supplemented her translation of Luigi Menabrea's article with seven long explanatory notes."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The answer is seven. Chunk wiki-ada-lovelace-02 repeats this fact only in its overlap with the gold chunk, so it is excluded from other_answering_chunks."
+  },
+  {
+   "id": "g019",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "wiki-ada-lovelace-05"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-ada-lovelace-05",
+     "supports": true,
+     "note": "Explicitly names Flyology as the book she planned to illustrate with plates of findings from her childhood flight research."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The planned title was Flyology. Only chunk wiki-ada-lovelace-05 contains this answer."
+  },
+  {
+   "id": "g020",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "wiki-ada-lovelace-07"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-ada-lovelace-07",
+     "supports": true,
+     "note": "Identifies Charles Barry, architect of the Houses of Parliament, as the builder of Horsley Towers, the family's main house from 1845."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 07 directly answers the goal: Charles Barry. No other supplied chunk contains the answer."
+  },
+  {
+   "id": "g021",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "wiki-ada-lovelace-09"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-ada-lovelace-09",
+     "supports": true,
+     "note": "Identifies Augustus De Morgan as writing to Lady Byron that Ada might become \"an original mathematical investigator, perhaps of first-rate eminence\"."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The answer is Augustus De Morgan, explicitly identified in chunk 09. No other chunk contains the requested prediction."
+  },
+  {
+   "id": "g022",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "wiki-garbage-patch-01"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-garbage-patch-01",
+     "supports": true,
+     "note": "Explicitly reports approximately six pounds of plastic for every pound of plankton: a 6:1 weight ratio."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 02 repeats the answer only through overlap with the gold chunk. Chunk 15 reports a sevenfold concentration comparison but does not explicitly identify it as a weight ratio."
+  },
+  {
+   "id": "g023",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "wiki-garbage-patch-04"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-garbage-patch-04",
+     "supports": true,
+     "note": "Identifies Ocean Voyages Institute’s July/August 2012 expedition as focused on surveying tsunami debris from the Japanese earthquake-tsunami."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 04 directly identifies the expedition and its purpose. Chunk 05 repeats only overlapping text and does not independently identify the expedition’s organizer or date."
+  },
+  {
+   "id": "g024",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "wiki-garbage-patch-07"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-garbage-patch-07",
+     "supports": true,
+     "note": "Explicitly ranks the writings on 201 plastic objects by frequency: Chinese, Japanese, English, then Korean."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 07 directly supplies the requested frequency order, though the document describes these as languages rather than formally distinguishing writing systems. No other chunk provides this information."
+  },
+  {
+   "id": "g025",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "wiki-garbage-patch-10"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-garbage-patch-10",
+     "supports": true,
+     "note": "Discusses plastic produced since 1950 and explicitly states that 9% was recycled and 12% was incinerated."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 10 contains the requested shares. Chunk 11 repeats them only through overlap with chunk 10, so it is excluded from other answering chunks."
+  },
+  {
+   "id": "g026",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "wiki-garbage-patch-12"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-garbage-patch-12",
+     "supports": true,
+     "note": "Explicitly compares the patch to twice the size of Texas or three times the size of France."
+    }
+   ],
+   "other_answering_chunks": [
+    "wiki-garbage-patch-00"
+   ],
+   "answerable": true,
+   "explanation": "The geographic comparisons are Texas and France. Chunk 00 independently supplies the Texas comparison."
+  },
+  {
+   "id": "g027",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "wiki-garbage-patch-14"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-garbage-patch-14",
+     "supports": true,
+     "note": "Explicitly states that the 2015 survey used 30 vessels and 652 survey nets."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 14 directly answers both parts: 30 boats and 652 sampling nets. No other chunk contains these counts."
+  },
+  {
+   "id": "g028",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "wiki-kalman-filter-03"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-kalman-filter-03",
+     "supports": true,
+     "note": "Credits Stanley F. Schmidt with the first implementation. During Kálmán’s visit to NASA Ames, Schmidt recognized its applicability to Apollo trajectory estimation, leading to its incorporation in the Apollo navigation computer."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 03 directly answers both parts. Chunk 04 mentions Apollo’s use of the filter but does not explain its adoption or identify the first implementer."
+  },
+  {
+   "id": "g029",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "wiki-kalman-filter-05"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-kalman-filter-05",
+     "supports": true,
+     "note": "Explicitly names guidance and navigation for reusable launch vehicles, and attitude control and navigation for spacecraft docking at the International Space Station."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 05 contains both requested uses. Chunk 04 contains the same sentence, but only as text overlapping with the gold chunk, so it is excluded from other_answering_chunks."
+  },
+  {
+   "id": "g030",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "wiki-kalman-filter-07"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-kalman-filter-07",
+     "supports": true,
+     "note": "Explicitly identifies dead reckoning—integrating velocity using wheel revolutions and steering angle—as the technique complementing GPS readings."
+    }
+   ],
+   "other_answering_chunks": [
+    "wiki-kalman-filter-08"
+   ],
+   "answerable": true,
+   "explanation": "The answer is dead reckoning. Beyond its overlap with chunk 07, chunk 08 independently explains how dead reckoning position estimates are combined with GPS measurements."
+  },
+  {
+   "id": "g031",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "wiki-kalman-filter-09"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-kalman-filter-09",
+     "supports": true,
+     "note": "Explicitly states that together with the linear-quadratic regulator (LQR), the Kalman filter solves the linear–quadratic–Gaussian control problem (LQG)."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 09 directly answers the goal: the combined problem is linear–quadratic–Gaussian control (LQG). No other chunk independently contains this answer."
+  },
+  {
+   "id": "g044",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2608.16621-01"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.16621-01",
+     "supports": true,
+     "note": "States the maintenance and full re-embedding objections, then gives the opening verdict: “We show the objection is largely misplaced.”"
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 01 directly contains the requested opening verdict. Later chunks provide supporting methods and results, rather than that opening verdict."
+  },
+  {
+   "id": "g045",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2608.16621-04"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.16621-04",
+     "supports": true,
+     "note": "Describes earlier orthogonalized semantic spaces and explicitly states: \"We treat them as related precedent, not a prerequisite.\""
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Earlier work is positioned as kindred prior art, not required groundwork. Chunk 04 directly answers the goal; no other chunk independently states this relationship."
+  },
+  {
+   "id": "g046",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2608.16621-08"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.16621-08",
+     "supports": true,
+     "note": "Explicitly gives incremental updates as roughly O(Dk·m + Dk²) per update, independent of N to first order, versus full re-SVD at roughly O(NDk) per iteration."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2608.16621-10",
+    "arxiv-2608.16621-12"
+   ],
+   "answerable": true,
+   "explanation": "Chunk 08 contains the complete comparison. Under the rule allowing support for one part, chunk 10 additionally gives the pilot's incremental implementation cost O(mD² + D³), and chunk 12 gives its full recomputation cost O(ND²). These are independent passages, not overlap with the gold chunk."
+  },
+  {
+   "id": "g047",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2608.16621-11"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.16621-11",
+     "supports": true,
+     "note": "Explicitly gives all five settings: vector width D=256, hidden factor count R0=40, kept rank k=32, noise standard deviation 0.15, and drift perturbation scale 0.03."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2608.16621-02",
+    "arxiv-2608.16621-09"
+   ],
+   "answerable": true,
+   "explanation": "The gold chunk fully answers the goal. Chunks 02 and 09 independently supply the width (256) and kept rank (32), supporting parts of the goal. Chunk 12's noise scale 0.05 concerns the separate model-migration test."
+  },
+  {
+   "id": "g048",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2608.16621-16"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.16621-16",
+     "supports": true,
+     "note": "Explicitly names a timestamped Wikipedia revision stream as the planned test bed and existing vector-database re-indexing as the baseline."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 16 contains both requested facts. Chunk 17 repeats the baseline only through boundary overlap and supplies no independent additional answer."
+  },
+  {
+   "id": "g049",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2608.16621-20"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.16621-20",
+     "supports": true,
+     "note": "Entry [17], by Y. A. Malkov and D. A. Yashunin, gives the hierarchical navigable small world graph nearest-neighbor method: IEEE Trans. Pattern Anal. Mach. Intell., vol. 42, no. 4, pp. 824–836, 2020."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The gold chunk contains the complete bibliography entry with the requested journal volume, issue, and page numbers. No other chunk independently contains that answer."
+  },
+  {
+   "id": "g050",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2608.20845-01"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.20845-01",
+     "supports": true,
+     "note": "Explicitly states that per-token prices fell by orders of magnitude while aggregate inference spending rose because context volume grew faster than prices fell."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2608.20845-03"
+   ],
+   "answerable": true,
+   "explanation": "The gold chunk directly invokes this trend to explain why waiting for cheaper models will not close the gap. Chunk 03 independently repeats the pricing-versus-spending trend and its cause."
+  },
+  {
+   "id": "g051",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2608.20845-05"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.20845-05",
+     "supports": true,
+     "note": "Contains the complete Table 1 grid: compilation, maintenance, migration, and cost model, each paired with its guarantee, enforcing mechanism, and demonstrating section (§2.1, §3.1, §3.1, and Appendix A)."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 05 contains the actual four-row summary grid, not merely its caption. No other chunk independently contains the requested grid."
+  },
+  {
+   "id": "g052",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2608.20845-08"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.20845-08",
+     "supports": true,
+     "note": "Reports 8.4 ms per incremental update versus 283 ms for full re-decomposition, with 33.7× per-update and 23.8× cumulative savings."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2608.20845-02"
+   ],
+   "answerable": true,
+   "explanation": "Chunk 08 explicitly supplies all requested timings and multiples. Chunk 02 independently answers the speedup part by reporting incremental updates as 33.7× cheaper than reconstruction, though it omits the timings and cumulative multiple."
+  },
+  {
+   "id": "g053",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2608.20845-11"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.20845-11",
+     "supports": true,
+     "note": "Contains both comparisons (full contextualized stack versus facts): at 2,048 tokens, 88.0% (439/499) versus 85.2% (425/499), McNemar p = 0.202; at 16,384 tokens, 87.4% versus 83.6%, p = 0.076."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The gold chunk explicitly identifies the strongest chunk-side competitor and supplies both accuracy pairs and significance values. Chunk 12 repeats the second pair only through boundary overlap."
+  },
+  {
+   "id": "g054",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2608.20845-14"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.20845-14",
+     "supports": true,
+     "note": "The footnote states that three chunk-baseline runs returned recall of 0.000 because retrieval ran before the embedding index was built. They were deleted before judging and rerun with the embedding step in place; no judged result depends on them."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 14 contains the complete mishap and remedy. Chunk 13 contains only an overlapping, incomplete start of the footnote."
+  },
+  {
+   "id": "g055",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2608.20845-17"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.20845-17",
+     "supports": true,
+     "note": "Explicitly states that when a tool-using agent mediated retrieval, the compiled-payload advantage did not automatically survive the agent layer."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 17 directly contains the caution requested. Chunk 18 discusses unresolved agentic reading strategies but does not independently state the observed loss of advantage."
+  },
+  {
+   "id": "g056",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2608.20845-20"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.20845-20",
+     "supports": true,
+     "note": "Table 2 contains the side-by-side inventory and identifies ISC as the only row satisfying both columns: compiles the payload and validates it against its source. The reader receives a claim with its source span."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 20 contains the complete comparison and explicitly states that only the last row fills both middle columns. No other chunk independently supplies the requested inventory."
+  },
+  {
+   "id": "g057",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2608.20845-23"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.20845-23",
+     "supports": true,
+     "note": "The acknowledgments explicitly credit Endgame Labs, Inc. and AIx, Inc. for providing computational infrastructure."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 23 directly answers the goal. No other chunk independently credits the companies for compute resources."
+  },
+  {
+   "id": "g058",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2609.29661-01"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2609.29661-01",
+     "supports": true,
+     "note": "The abstract explicitly says the resulting current state is stored as typed records carrying source and revision provenance after the governance rules are resolved once."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2609.29661-03",
+    "arxiv-2609.29661-06",
+    "arxiv-2609.29661-07",
+    "arxiv-2609.29661-08",
+    "arxiv-2609.29661-17"
+   ],
+   "answerable": true,
+   "explanation": "The persisted form is typed fact records carrying source and revision provenance. Other listed chunks independently describe these persisted rows, their fields, or governance-resolved facts stored with provenance."
+  },
+  {
+   "id": "g059",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2609.29661-04"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2609.29661-04",
+     "supports": true,
+     "note": "Explicitly lists all three: frozen result snapshots, pinned model identifiers, and priced token accounting."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2609.29661-10",
+    "arxiv-2609.29661-11"
+   ],
+   "answerable": true,
+   "explanation": "Chunk 04 gives the complete list among the contributions. Under the partial-support rule, chunk 10 independently confirms pinned model identifiers, and chunk 11 confirms frozen result snapshots and token accounting using published prices."
+  },
+  {
+   "id": "g060",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2609.29661-07"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2609.29661-07",
+     "supports": true,
+     "note": "Explicitly defines the fact row as (entity, slot, value, revision, state, environment, source, effective_on) and equates it structurally with a Slowly Changing Dimension Type 2 record."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 07 directly contains both requested facts. No other chunk independently provides either the complete eight-field tuple or the record-pattern equivalence."
+  },
+  {
+   "id": "g061",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2609.29661-10"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2609.29661-10",
+     "supports": true,
+     "note": "Table II gives dialogue: 0.49× length, 97.6% entailment, 92.0% QA fidelity; encyclopedic prose: 1.03×, 100.0%, 96.7%, respectively."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2609.29661-06",
+    "arxiv-2609.29661-11"
+   ],
+   "answerable": true,
+   "explanation": "Chunk 11 independently reports the complete comparison. Chunk 06 supports part of the goal by reporting both length ratios and dialogue’s 97.6% entailment rate."
+  },
+  {
+   "id": "g062",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2609.29661-14"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2609.29661-14",
+     "supports": true,
+     "note": "Table III gives DeepSeek V4 Flash mean cost per question and latency on the six-question adversarial set: QSR $0.00131 and 8.87 s; ISC $0.00010 and 3.06 s."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The gold chunk explicitly contains both requested cost and response-time pairs. Chunk 15 repeats the ISC row only through overlap with the gold chunk, so it is excluded."
+  },
+  {
+   "id": "g063",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2609.29661-17"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2609.29661-17",
+     "supports": true,
+     "note": "Explicitly reports 21.6× fewer tokens at identical accuracy. GLM 5.2 achieves 2/3–3/3 across seeds, at roughly 100× higher marginal cost and without seed-robust exactness."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2609.29661-02",
+    "arxiv-2609.29661-05",
+    "arxiv-2609.29661-14",
+    "arxiv-2609.29661-15",
+    "arxiv-2609.29661-16"
+   ],
+   "answerable": true,
+   "explanation": "The gold chunk answers both parts directly. Other chunks independently provide the token reduction or heavier-model performance; chunk 14 gives matched-accuracy token counts whose ratio is approximately 21.6."
+  },
+  {
+   "id": "g064",
+   "set": "v1",
+   "kind": "gold",
+   "gold": [
+    "arxiv-2609.29661-20"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2609.29661-20",
+     "supports": true,
+     "note": "Explicitly reports Fisher’s exact test, 1/30 versus 30/30, and p ≈ 2.3 × 10⁻¹³ for the pooled run-level adversarial comparison."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2609.29661-02",
+    "arxiv-2609.29661-12"
+   ],
+   "answerable": true,
+   "explanation": "Chunk 20 supplies all three requested details. Chunks 02 and 12 independently provide the pooled counts, supporting that part of the goal, but omit the test and probability value."
+  },
+  {
+   "id": "g065",
+   "set": "v1",
+   "kind": "confusable",
+   "gold": [
+    "nist-sp-800-63b-09"
+   ],
+   "other": "nist-sp-800-63b-10",
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "nist-sp-800-63b-09",
+     "supports": false,
+     "note": "The cited section numbers and pages occur only in a table of contents, which the instructions explicitly exclude."
+    }
+   ],
+   "other_answering_chunks": [
+    "nist-sp-800-63b-22",
+    "nist-sp-800-63b-23"
+   ],
+   "answerable": true,
+   "explanation": "Chunk 22's normative/informative table identifies sections 1 (Purpose), 2 (Introduction), and 3 (Definitions and Abbreviations) before section 4 (Authenticator Assurance Levels). Chunk 23 contains the actual definitions section on page 4. Each supports a part of the goal independently. Chunk 10 does not answer the goal."
+  },
+  {
+   "id": "g066",
+   "set": "v1",
+   "kind": "confusable",
+   "gold": [
+    "nist-sp-800-63b-10"
+   ],
+   "other": "nist-sp-800-63b-09",
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "nist-sp-800-63b-10",
+     "supports": true,
+     "note": "The contents explicitly lists “Summary of Requirements” on page 11."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 09 lacks the requested entry. Chunk 11 repeats it only through overlap with the gold chunk, so it is excluded. Chunk 17 lists a similarly named table, not the requested section."
+  },
+  {
+   "id": "g067",
+   "set": "v1",
+   "kind": "confusable",
+   "gold": [
+    "arxiv-2610.18579-17"
+   ],
+   "other": "arxiv-2610.18579-16",
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2610.18579-17",
+     "supports": true,
+     "note": "Explicitly states: “not shown (accuracy ≤ 0.5): Laya 0.17, Quyet-1.0-Large 0.13, CLM-8B 0.12.”"
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 17 names the excluded systems and the accuracy cutoff. Chunk 16 reports their accuracies but does not say they were excluded from the plot. Chunk 15 places them below an axis break in a different figure, which does not establish exclusion."
+  },
+  {
+   "id": "g068",
+   "set": "v1",
+   "kind": "confusable",
+   "gold": [
+    "nist-sp-800-63b-25"
+   ],
+   "other": "nist-sp-800-63b-28",
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "nist-sp-800-63b-25",
+     "supports": true,
+     "note": "Explicitly states that AAL1 reauthentication SHOULD occur at least once per 30 days during an extended usage session, regardless of user activity, and the session SHOULD terminate at that limit."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 25 directly answers the lowest-tier (AAL1) timing question. Chunk 28 covers AAL2 authenticator and verifier requirements and gives no reauthentication interval."
+  },
+  {
+   "id": "g069",
+   "set": "v1",
+   "kind": "confusable",
+   "gold": [
+    "nist-sp-800-63b-28"
+   ],
+   "other": "nist-sp-800-63b-25",
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "nist-sp-800-63b-28",
+     "supports": true,
+     "note": "Explicitly states that at AAL2 at least one authenticator SHALL be replay resistant, and authentication SHOULD demonstrate intent from at least one authenticator."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 28 answers both parts. Replay resistance is mandatory; demonstrating authentication intent is recommended, not mandatory. Chunk 25 addresses AAL1 and contains neither the AAL2 replay-resistance requirement nor its intent recommendation."
+  },
+  {
+   "id": "g070",
+   "set": "v1",
+   "kind": "confusable",
+   "gold": [
+    "wiki-garbage-patch-01"
+   ],
+   "other": "wiki-garbage-patch-02",
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-garbage-patch-01",
+     "supports": true,
+     "note": "States that plastic is over 50 years old and lists everyday objects including lighters, toothbrushes, water bottles, pens, and baby bottles."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 02 contains neither the age nor everyday-object examples. Chunk 00 repeats the relevant evidence in its overlap with chunk 01, so it is excluded from other answering chunks. The document says 'some,' not 'much,' of the plastic is over 50 years old; the growth rate is irrelevant to this goal."
+  },
+  {
+   "id": "g071",
+   "set": "v1",
+   "kind": "confusable",
+   "gold": [
+    "wiki-garbage-patch-02"
+   ],
+   "other": "wiki-garbage-patch-01",
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-garbage-patch-02",
+     "supports": true,
+     "note": "The Atlantic comparison is immediately followed by the major heading \"History\"."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 01 contains the Atlantic comparison but no following heading. Chunk 03 contains the History heading but cannot independently establish that it follows the comparison. The label is correct, although its claim that chunk 01 continues with debris composition details is inaccurate."
+  },
+  {
+   "id": "g072",
+   "set": "v1",
+   "kind": "confusable",
+   "gold": [
+    "arxiv-2608.16621-13"
+   ],
+   "other": "arxiv-2608.16621-14",
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.16621-13",
+     "supports": true,
+     "note": "Reports angular drift below 10⁻¹¹ degrees and recall@10 = 1.0, explicitly stating agreement with full re-SVD to floating-point precision."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2608.16621-02",
+    "arxiv-2608.16621-09",
+    "arxiv-2608.16621-10",
+    "arxiv-2608.16621-11"
+   ],
+   "answerable": true,
+   "explanation": "Chunks 02, 09, and 11 report both values; chunk 10 supplies the retrieval-score part. Chunk 12's bound appears only in its overlap with the gold chunk, so it is excluded. Near-duplicate 14 states agreement but supplies neither requested numerical result."
+  },
+  {
+   "id": "g073",
+   "set": "v1",
+   "kind": "confusable",
+   "gold": [
+    "arxiv-2608.16621-14"
+   ],
+   "other": "arxiv-2608.16621-13",
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.16621-14",
+     "supports": true,
+     "note": "Fig. 3 explicitly covers 50 update events and reports 23.8× cumulative savings."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2608.16621-02",
+    "arxiv-2608.16621-09",
+    "arxiv-2608.16621-10",
+    "arxiv-2608.16621-11"
+   ],
+   "answerable": true,
+   "explanation": "Chunk 13 contains neither requested value. Chunks 02, 09, and 10 independently provide both values; chunk 11 supports the event-count part. Chunk 15 repeats the answer only through overlap with gold chunk 14, so it is excluded."
+  },
+  {
+   "id": "g074",
+   "set": "v1",
+   "kind": "confusable",
+   "gold": [
+    "arxiv-2609.29661-14"
+   ],
+   "other": "arxiv-2609.29661-15",
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2609.29661-14",
+     "supports": true,
+     "note": "Table III explicitly specifies 64 QSR context rows and 6 questions × 5 seeds."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2609.29661-02",
+    "arxiv-2609.29661-11",
+    "arxiv-2609.29661-12",
+    "arxiv-2609.29661-17",
+    "arxiv-2609.29661-18",
+    "arxiv-2609.29661-20"
+   ],
+   "answerable": true,
+   "explanation": "Chunk 14 answers both parts. Other chunks independently supply parts: 11 and 18 give 64 rows; 12 gives six questions per seed across five seeds; 02, 17, and 20 provide seed/trial information. Chunk 15's three-question × five-seed layout belongs to the separate heavier-model spot check, and its 128 rows belong to the cost sweep. Its overlapping 6/6 result adds no independent answer."
+  },
+  {
+   "id": "g075",
+   "set": "v1",
+   "kind": "confusable",
+   "gold": [
+    "wiki-garbage-patch-04"
+   ],
+   "other": "wiki-garbage-patch-05",
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-garbage-patch-04",
+     "supports": true,
+     "note": "Explicitly states that the 2010 gyre expedition lasted 30 days and tested prototype cleanup devices."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 04 answers both parts. Chunk 05 contains only the end of the 2012 voyage account and a section heading; it provides neither requested fact about 2010."
+  },
+  {
+   "id": "g076",
+   "set": "v1",
+   "kind": "confusable",
+   "gold": [
+    "wiki-garbage-patch-05"
+   ],
+   "other": "wiki-garbage-patch-04",
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-garbage-patch-05",
+     "supports": true,
+     "note": "The tsunami-debris survey account is immediately followed by the heading “Sources of the plastic.”"
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 04 describes the voyage but contains no following heading. Chunk 06 repeats the heading without the voyage context, so it does not independently establish the requested relationship."
+  },
+  {
+   "id": "g077",
+   "set": "v1",
+   "kind": "confusable",
+   "gold": [
+    "gutenberg-alice-24"
+   ],
+   "other": "gutenberg-alice-25",
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "gutenberg-alice-24",
+     "supports": true,
+     "note": "After Alice's second snatch, there were two little shrieks; she guessed cucumber-frames were being smashed."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 24 contains both requested facts. Chunk 25 describes Alice kicking Bill up the chimney and contains neither. Chunk 23 describes her first snatch, not her second."
+  },
+  {
+   "id": "g078",
+   "set": "v1",
+   "kind": "confusable",
+   "gold": [
+    "gutenberg-alice-25"
+   ],
+   "other": "gutenberg-alice-24",
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "gutenberg-alice-25",
+     "supports": true,
+     "note": "Contains Alice’s threat, “If you do, I’ll set Dinah at you!” and the Rabbit’s subsequent order, “A barrowful will do, to begin with.”"
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk gutenberg-alice-25 answers both parts. The near-duplicate gutenberg-alice-24 ends before the proposed burning, Alice’s threat, and the Rabbit’s quantity order, so it answers neither part."
+  },
+  {
+   "id": "h001",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "arxiv-2608.16621-02",
+    "arxiv-2608.16621-09"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.16621-02",
+     "supports": true,
+     "note": "Reports incremental updates as 33.7× cheaper per update and 23.8× cheaper cumulatively than full re-SVD."
+    },
+    {
+     "chunk": "arxiv-2608.16621-09",
+     "supports": true,
+     "note": "Provides absolute costs: 8.4 ms incremental versus 283 ms full re-SVD per update at N=9,000."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The gold chunks contain the reported cost comparison. The benchmark measures batch update events versus full re-SVD, rather than individual-document updates versus end-to-end re-ingestion; embedding time is excluded."
+  },
+  {
+   "id": "h002",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "arxiv-2608.16621-02",
+    "arxiv-2608.16621-12"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.16621-02",
+     "supports": true,
+     "note": "Identifies a controlled synthetic corpus grown from 3,000 to 9,000 documents over 50 update events."
+    },
+    {
+     "chunk": "arxiv-2608.16621-12",
+     "supports": true,
+     "note": "Contains the main experiment's final count, N = 9,000. The separate 4,000-document corpus is for model migration."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The main experiment used a synthetic corpus, initially 3,000 documents and ultimately 9,000. Chunk 11 provides further detail but adds no needed answer part absent from the gold chunks."
+  },
+  {
+   "id": "h003",
+   "set": "v2",
+   "kind": "collect",
+   "gold": [
+    "arxiv-2608.16621-02",
+    "arxiv-2608.16621-11",
+    "arxiv-2608.16621-12"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.16621-02",
+     "supports": true,
+     "note": "Reports the synthetic pilot corpus growing from 3,000 to 9,000 documents."
+    },
+    {
+     "chunk": "arxiv-2608.16621-11",
+     "supports": true,
+     "note": "Reports 3,000 initial documents and 50 batches of 120 documents, reaching 9,000."
+    },
+    {
+     "chunk": "arxiv-2608.16621-12",
+     "supports": true,
+     "note": "Reports a separate 4,000-document migration corpus and a fixed evaluation set of 200 random queries."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2608.16621-10"
+   ],
+   "answerable": true,
+   "explanation": "The gold chunks support the goal, but chunk 10 additionally reports migration anchor sets of 50, 100, 200, 400, and 800 pairs. These experimental data sizes are absent from the gold chunks. Wikipedia is proposed future work, and cited benchmarks are not datasets used in this paper."
+  },
+  {
+   "id": "h004",
+   "set": "v2",
+   "kind": "comparison",
+   "gold": [
+    "arxiv-2608.16621-02",
+    "arxiv-2608.16621-09",
+    "arxiv-2608.16621-14"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.16621-02",
+     "supports": true,
+     "note": "Reports 33.7× cheaper per-update maintenance and 23.8× cheaper cumulative maintenance, with cost scaling with change rather than corpus size."
+    },
+    {
+     "chunk": "arxiv-2608.16621-09",
+     "supports": true,
+     "note": "Provides absolute comparisons: 8.4 ms versus 283 ms per update, and 0.42 s versus 10.0 s over 50 events."
+    },
+    {
+     "chunk": "arxiv-2608.16621-14",
+     "supports": true,
+     "note": "Reports that the cumulative cost gap widens as the corpus grows, with a 23.8× cumulative advantage."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "All gold chunks directly support the cost comparison. Together they cover the reported timings, speedups, and scaling behavior; other passages do not add a needed missing part."
+  },
+  {
+   "id": "h005",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "arxiv-2608.20845-03",
+    "arxiv-2608.20845-09"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.20845-03",
+     "supports": true,
+     "note": "Reports roughly 21× fewer query-path tokens at statistically comparable accuracy, and 2.2k versus 16.3k reader tokens against ordinary chunks."
+    },
+    {
+     "chunk": "arxiv-2608.20845-09",
+     "supports": true,
+     "note": "Shows 2.2k versus 47.7k tokens at comparable accuracy, approximately a 21× reduction."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2608.20845-02",
+    "arxiv-2608.20845-08",
+    "arxiv-2608.20845-13",
+    "arxiv-2608.20845-15",
+    "arxiv-2608.20845-16",
+    "arxiv-2608.20845-19",
+    "arxiv-2608.20845-21",
+    "arxiv-2608.20845-22"
+   ],
+   "answerable": true,
+   "explanation": "Both gold chunks support the goal, but omit additional cost results: maintenance is 33.7× cheaper per update and 23.8× cumulatively; facts at a 256-token budget beat chunks at 2,048; and compilation amortizes after roughly 580–600 reads. The document also clarifies that this break-even comparison measures tokens, not dollars. The reported query-path advantage is token reduction, not measured wall-clock speedup."
+  },
+  {
+   "id": "h006",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "arxiv-2608.20845-15"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.20845-15",
+     "supports": true,
+     "note": "Explicitly states that extraction runs Kimi K2.6 turn-wise over each transcript."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The ingest-time compilation model was Kimi K2.6. The gold chunk fully answers the goal; no needed information is missing."
+  },
+  {
+   "id": "h007",
+   "set": "v2",
+   "kind": "collect",
+   "gold": [
+    "arxiv-2608.20845-03",
+    "arxiv-2608.20845-11",
+    "arxiv-2608.20845-12",
+    "arxiv-2608.20845-13"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.20845-03",
+     "supports": true,
+     "note": "Identifies the contextualized-chunk baseline with hybrid retrieval and reranking."
+    },
+    {
+     "chunk": "arxiv-2608.20845-11",
+     "supports": true,
+     "note": "Describes the full contextualized-chunk baseline: dense and full-text retrieval, reciprocal-rank fusion, and a cross-encoder reranker."
+    },
+    {
+     "chunk": "arxiv-2608.20845-12",
+     "supports": true,
+     "note": "Names fixed-width, turn-aware, and semantic chunking baselines, plus the contextualized stack's vector and hybrid arms."
+    },
+    {
+     "chunk": "arxiv-2608.20845-13",
+     "supports": true,
+     "note": "Reports the hybrid arm's comparison against facts and discusses the assembled chunk pipeline."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The gold chunks cover all six experimental baseline configurations. Other sections discuss related approaches or repeat these baselines; they do not identify additional baseline RAG systems evaluated in this paper."
+  },
+  {
+   "id": "h008",
+   "set": "v2",
+   "kind": "collect",
+   "gold": [
+    "arxiv-2608.20845-03",
+    "arxiv-2608.20845-09",
+    "arxiv-2608.20845-13",
+    "arxiv-2608.20845-15",
+    "arxiv-2608.20845-16",
+    "arxiv-2608.20845-19",
+    "arxiv-2608.20845-22"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.20845-03",
+     "supports": true,
+     "note": "Reports approximately 2.2k versus 16.3k reader tokens and a roughly 21× query-token comparison."
+    },
+    {
+     "chunk": "arxiv-2608.20845-09",
+     "supports": true,
+     "note": "Reports 47.7k, 2.2k, and 16.3k tokens per query."
+    },
+    {
+     "chunk": "arxiv-2608.20845-13",
+     "supports": true,
+     "note": "Reports 2,048- and 256-token budgets and approximately 2.2k versus 16.3k reader tokens."
+    },
+    {
+     "chunk": "arxiv-2608.20845-15",
+     "supports": true,
+     "note": "Reports 48.2k prompt and 4.5k completion tokens per document, $0.064 per document, roughly $32 and 26.3M tokens overall, and approximately 45.5k additional tokens per query."
+    },
+    {
+     "chunk": "arxiv-2608.20845-16",
+     "supports": true,
+     "note": "Reports compilation's token-cost equivalence to roughly 580 queries, or about 600 after adjustment."
+    },
+    {
+     "chunk": "arxiv-2608.20845-19",
+     "supports": true,
+     "note": "Explicitly identifies approximately 580 as a token-count cost equivalence."
+    },
+    {
+     "chunk": "arxiv-2608.20845-22",
+     "supports": true,
+     "note": "Reports approximately 45.5k extra query tokens and a token-based break-even of approximately 580 reads."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2608.20845-06",
+    "arxiv-2608.20845-11"
+   ],
+   "answerable": true,
+   "explanation": "All gold chunks support the goal, but two figures are missing: the illustrative 1,000-token transcript payload in chunk 06 and the 16,384-token experimental budget in chunk 11. The latter is distinct from the approximately 16.3k actual reader-token usage reported in gold chunks."
+  },
+  {
+   "id": "h009",
+   "set": "v2",
+   "kind": "comparison",
+   "gold": [
+    "arxiv-2608.20845-03",
+    "arxiv-2608.20845-09",
+    "arxiv-2608.20845-13"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2608.20845-03",
+     "supports": true,
+     "note": "Reports accuracy and token-use comparisons, supporting the accuracy part; tokens are not measured latency."
+    },
+    {
+     "chunk": "arxiv-2608.20845-09",
+     "supports": true,
+     "note": "Plots accuracy against tokens per query for compiled claims and chunk approaches, but provides no latency measurements."
+    },
+    {
+     "chunk": "arxiv-2608.20845-13",
+     "supports": true,
+     "note": "Provides accuracy comparisons across token budgets and against contextualized retrieval components."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2608.20845-10",
+    "arxiv-2608.20845-11",
+    "arxiv-2608.20845-12",
+    "arxiv-2608.20845-17"
+   ],
+   "answerable": false,
+   "explanation": "The document partially answers the goal: it compares accuracy and query-token consumption, but reports no ingest-time versus query-time end-to-end latency comparison. Maintenance timings concern a different comparison. Additional chunks report accuracy degradation with larger context, budget-specific results and statistical tests, and the limitation that the compiled-payload advantage did not automatically survive agent-mediated retrieval."
+  },
+  {
+   "id": "h010",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "arxiv-2609.29661-01",
+    "arxiv-2609.29661-11"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2609.29661-01",
+     "supports": true,
+     "note": "Describes a revised corpus as one changing over time, containing revisions, drafts, revocations, deletions, and sources with differing authority."
+    },
+    {
+     "chunk": "arxiv-2609.29661-11",
+     "supports": true,
+     "note": "Specifies 80 entities with three slots each and three to five revisions per slot, plus adversarial additions."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Both requested parts are covered. The revision count is given per slot (three to five); an exact aggregate count is not reported. No needed region is missing."
+  },
+  {
+   "id": "h011",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "arxiv-2609.29661-02",
+    "arxiv-2609.29661-15"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2609.29661-02",
+     "supports": true,
+     "note": "Reports correct value, source, and revision in all 30 compiled-substrate trials (100%) and exact answers on simpler revision questions."
+    },
+    {
+     "chunk": "arxiv-2609.29661-15",
+     "supports": true,
+     "note": "States that the compiled method was exact in every seed on simple revision questions, including corrected facts and deletion tombstones."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The method achieved 100% accuracy. Both gold chunks support this answer; no needed information is missing."
+  },
+  {
+   "id": "h012",
+   "set": "v2",
+   "kind": "collect",
+   "gold": [
+    "arxiv-2609.29661-02",
+    "arxiv-2609.29661-06",
+    "arxiv-2609.29661-10",
+    "arxiv-2609.29661-12",
+    "arxiv-2609.29661-13",
+    "arxiv-2609.29661-15",
+    "arxiv-2609.29661-16"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2609.29661-02",
+     "supports": true,
+     "note": "Reports exact correctness, mean read cost, token reduction, and source entailment."
+    },
+    {
+     "chunk": "arxiv-2609.29661-06",
+     "supports": true,
+     "note": "Reports token ratios and source-entailed fact rate."
+    },
+    {
+     "chunk": "arxiv-2609.29661-10",
+     "supports": true,
+     "note": "Reports token ratio, entailment, QA fidelity, and malformed-completion count/rate."
+    },
+    {
+     "chunk": "arxiv-2609.29661-12",
+     "supports": true,
+     "note": "Defines exact answer+source+revision accuracy and reports cost, latency, and the three S2 metrics."
+    },
+    {
+     "chunk": "arxiv-2609.29661-13",
+     "supports": true,
+     "note": "Its overlapping opening explicitly contains QA-fidelity pass rate and mean cost/latency reductions."
+    },
+    {
+     "chunk": "arxiv-2609.29661-15",
+     "supports": true,
+     "note": "Reports exact accuracy, mean cost per question, latency, and tokens per question."
+    },
+    {
+     "chunk": "arxiv-2609.29661-16",
+     "supports": true,
+     "note": "Reports accuracy, cost/token premiums, and a diagnostic breakdown of value-recovery versus citation errors."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2609.29661-09",
+    "arxiv-2609.29661-11",
+    "arxiv-2609.29661-20"
+   ],
+   "answerable": true,
+   "explanation": "All gold chunks support the goal, but coverage is incomplete: chunk 09 reports per-fact S2 ingest cost; chunk 11 reports missing-major-claim counts; chunk 20 reports Fisher’s exact-test p-value and identifies the Wilson 95% confidence intervals whose continuation appears in chunk 16."
+  },
+  {
+   "id": "h013",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "arxiv-2609.29661-16"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2609.29661-16",
+     "supports": false,
+     "note": "Contains later limitations, but not the first limitation."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2609.29661-19"
+   ],
+   "answerable": true,
+   "explanation": "The first limitation is that the harness is synthetic: it isolates failure modes and cost mechanics under controlled governance rules and supports no claim of external validity on real corpora. This appears in chunk 19."
+  },
+  {
+   "id": "h014",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "arxiv-2610.18579-01",
+    "arxiv-2610.18579-03",
+    "arxiv-2610.18579-05",
+    "arxiv-2610.18579-08"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2610.18579-01",
+     "supports": true,
+     "note": "Distinguishes choosing a wrong action after misreading the state from choosing wrongly after reading correctly."
+    },
+    {
+     "chunk": "arxiv-2610.18579-03",
+     "supports": true,
+     "note": "Defines the System One choice interface and describes both kinds of wrong-action failure."
+    },
+    {
+     "chunk": "arxiv-2610.18579-05",
+     "supports": true,
+     "note": "Illustrates facts-right/action-wrong failure and explains the paired behavioral measurement."
+    },
+    {
+     "chunk": "arxiv-2610.18579-08",
+     "supports": true,
+     "note": "Defines U1D0 and cautions that attributing failure purely to deciding requires sufficient probes."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2610.18579-06",
+    "arxiv-2610.18579-07"
+   ],
+   "answerable": true,
+   "explanation": "The gold chunks support the goal, but omit the formal action-error criterion. Chunks 06–07 define the admissible actions and gold set G(s), including how gold actions are determined. Chunk 07 explicitly defines correctness as choosing an action in G(s); failure therefore means choosing outside that set."
+  },
+  {
+   "id": "h015",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "arxiv-2610.18579-06",
+    "arxiv-2610.18579-12",
+    "arxiv-2610.18579-16",
+    "arxiv-2610.18579-18"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2610.18579-06",
+     "supports": true,
+     "note": "Reports that 73–85% of errors in the six strongest systems follow correct reading."
+    },
+    {
+     "chunk": "arxiv-2610.18579-12",
+     "supports": true,
+     "note": "Gives error shares after correct reading across systems, including 49–81% for competent fast systems and 85% for GPT-6.1."
+    },
+    {
+     "chunk": "arxiv-2610.18579-16",
+     "supports": true,
+     "note": "Table 2 provides each system's error share with all facts correct and the joint outcome percentages."
+    },
+    {
+     "chunk": "arxiv-2610.18579-18",
+     "supports": true,
+     "note": "Reports error shares after correct reading by model and system type."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2610.18579-19",
+    "arxiv-2610.18579-20"
+   ],
+   "answerable": true,
+   "explanation": "All gold chunks support the goal, but chunks 19–20 add domain-specific error fractions absent from the gold chunks. For the six strongest systems, 73–85% of failures follow correct measured reading, leaving 15–27% with a measured reading error. This is a behavioral split, not proof of exclusive causal attribution."
+  },
+  {
+   "id": "h016",
+   "set": "v2",
+   "kind": "collect",
+   "gold": [
+    "arxiv-2610.18579-02",
+    "arxiv-2610.18579-03",
+    "arxiv-2610.18579-09",
+    "arxiv-2610.18579-10"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2610.18579-02",
+     "supports": true,
+     "note": "Names ALFWorld, BabyAI-Text, TextWorld, and τ²-bench as evaluated sources."
+    },
+    {
+     "chunk": "arxiv-2610.18579-03",
+     "supports": false,
+     "note": "Describes broad task categories but identifies no specific agent benchmark or environment."
+    },
+    {
+     "chunk": "arxiv-2610.18579-09",
+     "supports": true,
+     "note": "Identifies the simulators, τ²-bench airline and retail, AgentRM trees, and additional evaluation cohorts."
+    },
+    {
+     "chunk": "arxiv-2610.18579-10",
+     "supports": false,
+     "note": "Discusses splitting, auditing, protocol, and model costs without identifying an evaluated benchmark or environment."
+    }
+   ],
+   "other_answering_chunks": [
+    "arxiv-2610.18579-19"
+   ],
+   "answerable": true,
+   "explanation": "Chunks 03 and 10 do not identify benchmarks or environments. Chunk 19 additionally identifies an evaluated Workflow cohort in the results table, which the gold chunks do not name."
+  },
+  {
+   "id": "h017",
+   "set": "v2",
+   "kind": "comparison",
+   "gold": [
+    "arxiv-2610.18579-16",
+    "arxiv-2610.18579-18",
+    "arxiv-2610.18579-19"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "arxiv-2610.18579-16",
+     "supports": true,
+     "note": "Table 2 gives the strongest model, GPT-6.1, comprehension U = 0.943 and action-selection D = 0.884."
+    },
+    {
+     "chunk": "arxiv-2610.18579-18",
+     "supports": false,
+     "note": "Discusses weaker systems, not the strongest model's comprehension and action-selection scores."
+    },
+    {
+     "chunk": "arxiv-2610.18579-19",
+     "supports": false,
+     "note": "Discusses other models and domain-specific results; it does not supply the requested strongest-model comparison."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "GPT-6.1 scores 94.3% on comprehension versus 88.4% on action selection, a 5.9-percentage-point gap. Chunk 16 supplies the complete answer."
+  },
+  {
+   "id": "h018",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "cdc-sleep-00",
+    "cdc-sleep-01",
+    "cdc-sleep-02"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "cdc-sleep-00",
+     "supports": true,
+     "note": "Explicitly recommends 7 or more hours of sleep daily for adults aged 18–60."
+    },
+    {
+     "chunk": "cdc-sleep-01",
+     "supports": false,
+     "note": "Discusses sleep benefits, habits, quality, and disorders without the requested hours recommendation."
+    },
+    {
+     "chunk": "cdc-sleep-02",
+     "supports": false,
+     "note": "Contains sleep diary guidance, CDC activities, and references, but no recommended hours for adults aged 18–60."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The complete answer—7 or more hours daily—is in cdc-sleep-00 alone. The other gold chunks do not support the goal."
+  },
+  {
+   "id": "h019",
+   "set": "v2",
+   "kind": "collect",
+   "gold": [
+    "cdc-sleep-00",
+    "cdc-sleep-01",
+    "cdc-sleep-02",
+    "cdc-sleep-03"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "cdc-sleep-00",
+     "supports": true,
+     "note": "Contains all nine age ranges and their recommended daily sleep durations."
+    },
+    {
+     "chunk": "cdc-sleep-01",
+     "supports": false,
+     "note": "Discusses sleep benefits, habits, quality, and disorders; provides no age-specific recommended durations."
+    },
+    {
+     "chunk": "cdc-sleep-02",
+     "supports": false,
+     "note": "Mentions population groups and cites recommendations, but gives no recommended sleep durations."
+    },
+    {
+     "chunk": "cdc-sleep-03",
+     "supports": false,
+     "note": "Contains only footer content, with no age groups or sleep recommendations."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The complete answer is in cdc-sleep-00. The other three gold chunks do not support the goal, and no needed region is missing."
+  },
+  {
+   "id": "h020",
+   "set": "v2",
+   "kind": "collect",
+   "gold": [
+    "cdc-sleep-01"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "cdc-sleep-01",
+     "supports": true,
+     "note": "Contains type 2 diabetes, heart disease, high blood pressure, and stroke, plus sleep disorders that prevent sufficient quality sleep: insomnia, restless legs syndrome, narcolepsy, and sleep apnea."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "cdc-sleep-01 contains all named health conditions linked to insufficient sleep. cdc-sleep-00 repeats the health-benefits passage without adding another condition; the remaining chunks add none."
+  },
+  {
+   "id": "h021",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "gutenberg-alice-05",
+    "gutenberg-alice-06"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "gutenberg-alice-05",
+     "supports": true,
+     "note": "Contains the complete taste description: cherry-tart, custard, pine-apple, roast turkey, toffee, and hot buttered toast; Alice finds it very nice."
+    },
+    {
+     "chunk": "gutenberg-alice-06",
+     "supports": false,
+     "note": "Describes her difficulty reaching the key and discovering the cake, but contains no description of the drink’s taste."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 05 fully answers the goal. Chunk 06 is unnecessary and does not support it; no needed region is missing."
+  },
+  {
+   "id": "h022",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "gutenberg-alice-00"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "gutenberg-alice-00",
+     "supports": false,
+     "note": "Only names the tea-party chapter in the contents; it contains neither the Hatter’s riddle nor whether it is answered."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The supplied text ends during Chapter IV, before the tea party. No provided chunk states the riddle or whether it is answered."
+  },
+  {
+   "id": "h023",
+   "set": "v2",
+   "kind": "collect",
+   "gold": [
+    "gutenberg-alice-05",
+    "gutenberg-alice-06",
+    "gutenberg-alice-07",
+    "gutenberg-alice-08",
+    "gutenberg-alice-11",
+    "gutenberg-alice-22"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "gutenberg-alice-05",
+     "supports": true,
+     "note": "The DRINK ME liquid shrinks Alice to ten inches tall."
+    },
+    {
+     "chunk": "gutenberg-alice-06",
+     "supports": false,
+     "note": "Introduces the EAT ME cake but only speculates about possible growth or shrinking; no actual effect is established."
+    },
+    {
+     "chunk": "gutenberg-alice-07",
+     "supports": true,
+     "note": "Eating the cake makes Alice grow."
+    },
+    {
+     "chunk": "gutenberg-alice-08",
+     "supports": true,
+     "note": "Supplies the resulting height: more than nine feet."
+    },
+    {
+     "chunk": "gutenberg-alice-11",
+     "supports": true,
+     "note": "The opening overlap explicitly attributes her shrinking to the fan."
+    },
+    {
+     "chunk": "gutenberg-alice-22",
+     "supports": true,
+     "note": "The magic bottle makes her grow until she fills the room."
+    }
+   ],
+   "other_answering_chunks": [
+    "gutenberg-alice-10",
+    "gutenberg-alice-21"
+   ],
+   "answerable": true,
+   "explanation": "Chunk 10 adds the fan's measured effect—about two feet tall and still shrinking. Chunk 21 identifies the second drink as an unlabeled bottle near the Rabbit's looking-glass and describes its immediate growth effect. These details exceed the overlap retained in the gold chunks. The supplied document answers the goal within its scope; it ends during chunk 25."
+  },
+  {
+   "id": "h024",
+   "set": "v2",
+   "kind": "collect",
+   "gold": [
+    "gutenberg-alice-14",
+    "gutenberg-alice-15",
+    "gutenberg-alice-16",
+    "gutenberg-alice-17",
+    "gutenberg-alice-19"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "gutenberg-alice-14",
+     "supports": true,
+     "note": "Identifies the Mouse, Duck, Dodo, Lory, and Eaglet in the pool and shore party."
+    },
+    {
+     "chunk": "gutenberg-alice-15",
+     "supports": true,
+     "note": "Shows the Mouse, Lory, and Duck participating in the gathering."
+    },
+    {
+     "chunk": "gutenberg-alice-16",
+     "supports": true,
+     "note": "Identifies the Dodo and Eaglet as present when the Caucus-Race is proposed and run."
+    },
+    {
+     "chunk": "gutenberg-alice-17",
+     "supports": true,
+     "note": "Shows the Dodo and Mouse participating in the race's prize ceremony."
+    },
+    {
+     "chunk": "gutenberg-alice-19",
+     "supports": true,
+     "note": "Adds an old Crab and her daughter, an old Magpie, and a Canary with its children."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "All gold chunks identify animals present, and no additional named participant is missing. Some other creatures remain unnamed in the text. Animals merely mentioned in conversation or stories are not participants."
+  },
+  {
+   "id": "h025",
+   "set": "v2",
+   "kind": "comparison",
+   "gold": [
+    "gutenberg-alice-00"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "gutenberg-alice-00",
+     "supports": false,
+     "note": "Contains a table of contents and the opening scene, neither of which describes Alice meeting the Duchess."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The supplied text ends during Chapter IV, before either encounter with the Duchess. Mentions of her elsewhere do not describe the meetings needed for the comparison."
+  },
+  {
+   "id": "h026",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "gutenberg-timemachine-24",
+    "gutenberg-timemachine-25",
+    "gutenberg-timemachine-27",
+    "gutenberg-timemachine-28"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "gutenberg-timemachine-24",
+     "supports": false,
+     "note": "Describes his arrival in a hailstorm but gives no year or dial reading."
+    },
+    {
+     "chunk": "gutenberg-timemachine-25",
+     "supports": false,
+     "note": "Describes the White Sphinx and his fears, without stating the year."
+    },
+    {
+     "chunk": "gutenberg-timemachine-27",
+     "supports": false,
+     "note": "Describes his first encounter with the inhabitants, without a year or dial reading."
+    },
+    {
+     "chunk": "gutenberg-timemachine-28",
+     "supports": false,
+     "note": "Describes the inhabitants examining him and the machine; no year is given."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "None of the supplied chunks states what year the dials showed when he stopped in the Eloi era."
+  },
+  {
+   "id": "h027",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "gutenberg-timemachine-27",
+    "gutenberg-timemachine-28"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "gutenberg-timemachine-27",
+     "supports": false,
+     "note": "Describes an initial encounter with a male inhabitant; no river rescue or woman's name appears."
+    },
+    {
+     "chunk": "gutenberg-timemachine-28",
+     "supports": false,
+     "note": "Describes inhabitants examining the traveller and his machine; does not identify a rescued woman."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The supplied document text does not name the woman rescued from the river or describe that rescue."
+  },
+  {
+   "id": "h028",
+   "set": "v2",
+   "kind": "collect",
+   "gold": [
+    "gutenberg-timemachine-10",
+    "gutenberg-timemachine-13",
+    "gutenberg-timemachine-14",
+    "gutenberg-timemachine-18"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "gutenberg-timemachine-10",
+     "supports": false,
+     "note": "He carries a lamp around his home before the journey; nothing establishes that he takes it travelling."
+    },
+    {
+     "chunk": "gutenberg-timemachine-13",
+     "supports": true,
+     "note": "His dirty coat on returning identifies clothing worn during the journey."
+    },
+    {
+     "chunk": "gutenberg-timemachine-14",
+     "supports": true,
+     "note": "His tattered, blood-stained socks identify another item worn during the journey."
+    },
+    {
+     "chunk": "gutenberg-timemachine-18",
+     "supports": true,
+     "note": "Identifies the Time Machine and the starting and stopping levers he holds while travelling."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "Chunk 10 incorrectly treats carrying something before departure as journey inventory. Chunk 28 describes removing the same control levers already identified in chunk 18, so it adds no distinct item."
+  },
+  {
+   "id": "h030",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "nist-sp-800-63b-00"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "nist-sp-800-63b-00",
+     "supports": true,
+     "note": "States the withdrawal date as August 1, 2025, and identifies NIST SP 800-63B-4, Digital Identity Guidelines: Authentication and Authenticator Management, as superseding it in its entirety."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The gold chunk explicitly answers both parts of the goal. No needed region is missing."
+  },
+  {
+   "id": "h031",
+   "set": "v2",
+   "kind": "collect",
+   "gold": [
+    "nist-sp-800-63b-25",
+    "nist-sp-800-63b-27"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "nist-sp-800-63b-25",
+     "supports": true,
+     "note": "Contains one actual authenticator-list entry, Multi-Factor Cryptographic Device, but not the complete AAL1 permissions list."
+    },
+    {
+     "chunk": "nist-sp-800-63b-27",
+     "supports": true,
+     "note": "Contains the multi-factor types and the permitted memorized-secret-plus-possession-authenticator combinations."
+    }
+   ],
+   "other_answering_chunks": [
+    "nist-sp-800-63b-24",
+    "nist-sp-800-63b-26"
+   ],
+   "answerable": false,
+   "explanation": "Chunk 24 supplies all nine types and explicitly permits them at AAL1. Chunk 26 supplies the AAL2 permission context missing from 27; its contribution is more than the overlapping list. The supplied document lacks the AAL3 permitted-type list, so a complete mapping across all three AALs cannot be established."
+  },
+  {
+   "id": "h033",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "rfc9110-04"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "rfc9110-04",
+     "supports": false,
+     "note": "“421 Misdirected Request” appears only in the table of contents, which the instructions exclude."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The supplied text contains no substantive passage identifying the status code for Misdirected Request; its only occurrences are excluded table-of-contents entries."
+  },
+  {
+   "id": "h034",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "rfc9110-10"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "rfc9110-10",
+     "supports": true,
+     "note": "Contains the complete section 1.4 list: RFCs 2818, 7230 (partially), 7231, 7232, 7233, 7235, 7538, 7615, and 7694."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "The gold chunk contains the entire list and the qualification about RFC 7230. No needed region is missing."
+  },
+  {
+   "id": "h036",
+   "set": "v2",
+   "kind": "collect",
+   "gold": [
+    "wiki-ada-lovelace-03"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-ada-lovelace-03",
+     "supports": false,
+     "note": "Contains only generic categories of commemorations and childhood biography; identifies no specific honor, award, or commemoration named after Ada Lovelace."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "Chunk 02 mentions commemorations generally, with overlapping text in chunk 03, but the supplied document names no specific commemorative items to collect."
+  },
+  {
+   "id": "h037",
+   "set": "v2",
+   "kind": "single",
+   "gold": [
+    "wiki-garbage-patch-10",
+    "wiki-garbage-patch-15"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-garbage-patch-10",
+     "supports": true,
+     "note": "Gives a patch plastic mass of 79,000 metric tons. The following 2017 study concerns global plastic, not the patch estimate."
+    },
+    {
+     "chunk": "wiki-garbage-patch-15",
+     "supports": true,
+     "note": "Gives an estimated 80,000 metric tons in the patch, but does not identify the study."
+    }
+   ],
+   "other_answering_chunks": [
+    "wiki-garbage-patch-00",
+    "wiki-garbage-patch-14"
+   ],
+   "answerable": true,
+   "explanation": "Chunk 14 supplies the missing attribution: the Ocean Cleanup's March 2018 paper based on its 2015 Mega Expedition and 2016 Aerial Expedition. Chunk 00 additionally gives an estimated range of 45,000–129,000 metric tons attributed to Ocean Cleanup researchers as of 2018. Chunk 09 merely repeats the mass present in gold chunk 10."
+  },
+  {
+   "id": "h038",
+   "set": "v2",
+   "kind": "collect",
+   "gold": [
+    "wiki-garbage-patch-04",
+    "wiki-garbage-patch-05",
+    "wiki-garbage-patch-08",
+    "wiki-garbage-patch-14"
+   ],
+   "verdict": "disagree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-garbage-patch-04",
+     "supports": true,
+     "note": "Ocean Voyages Institute tested prototype cleanup devices during its 2010 expedition."
+    },
+    {
+     "chunk": "wiki-garbage-patch-05",
+     "supports": false,
+     "note": "Only repeats a fragment about surveying tsunami debris; it identifies no cleanup effort or organization."
+    },
+    {
+     "chunk": "wiki-garbage-patch-08",
+     "supports": false,
+     "note": "Reports a plastic-source estimate from Ocean Cleanup, without describing a cleanup attempt."
+    },
+    {
+     "chunk": "wiki-garbage-patch-14",
+     "supports": false,
+     "note": "Describes research surveys measuring debris distribution, size, and mass, rather than cleanup efforts."
+    }
+   ],
+   "other_answering_chunks": [
+    "wiki-garbage-patch-00",
+    "wiki-garbage-patch-03",
+    "wiki-garbage-patch-06"
+   ],
+   "answerable": true,
+   "explanation": "Missing regions describe Ocean Cleanup's actual trash removal (00), Project Kaisei/Ocean Voyages Institute's investigation of commercial collection and recycling feasibility (03), and Coastal Conservancy, Earth Day, Ocean Cleanup, and World Cleanup Day efforts to reduce land-generated debris and marine accumulation (06). Chunk 03 also names the JUNK Raft Project and Algalita's related awareness effort."
+  },
+  {
+   "id": "h040",
+   "set": "v2",
+   "kind": "collect",
+   "gold": [
+    "wiki-kalman-filter-02",
+    "wiki-kalman-filter-03",
+    "wiki-kalman-filter-10"
+   ],
+   "verdict": "agree",
+   "gold_checks": [
+    {
+     "chunk": "wiki-kalman-filter-02",
+     "supports": true,
+     "note": "Names extended, unscented, and distributed or consensus Kalman filtering."
+    },
+    {
+     "chunk": "wiki-kalman-filter-03",
+     "supports": true,
+     "note": "Names Kalman–Bucy filtering and the Stratonovich–Kalman–Bucy filter."
+    },
+    {
+     "chunk": "wiki-kalman-filter-10",
+     "supports": true,
+     "note": "Names simple, Kalman–Bucy, Schmidt's extended, information, and square-root filters, plus the phase-locked loop as a Kalman filter type."
+    }
+   ],
+   "other_answering_chunks": [],
+   "answerable": true,
+   "explanation": "All gold chunks support the goal, and no additional chunk supplies a distinct named variant or extension absent from them."
+  },
+  {
+   "id": "n001",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "Chunks 08–09 state that re-orthogonalization occurs periodically but give no interval in update events. The 50 events describe the experiment’s total duration, not the re-orthogonalization frequency."
+  },
+  {
+   "id": "n002",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The document reports 0.95 mean cosine similarity for Procrustes-migrated vectors versus truly re-embedded vectors, but no recall@10 for that comparison. The reported recall@10 of 1.0 concerns incremental SVD versus full re-SVD."
+  },
+  {
+   "id": "n003",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "Chunk arxiv-2608.20845-11 states that the contextualized-chunk stack uses a cross-encoder reranker, but no chunk identifies its model. Kimi K2.6 is named only for extraction and grading."
+  },
+  {
+   "id": "n004",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "Chunk arxiv-2608.20845-12 states that facts and chunks used identical embedding models but does not identify the model. Kimi K2.6 is named only for extraction and grading, not embedding. No chunk supplies the requested embedding model."
+  },
+  {
+   "id": "n005",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "Chunk 10 states that a hosted LLM automatically judged source entailment and QA-fidelity but does not identify it. Chunk 12 names DeepSeek V4 Flash only as the rephrasing model, not the judge. The judge’s identity is absent."
+  },
+  {
+   "id": "n006",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The document identifies DeepSeek V4 Flash and mentions saved run configurations, but provides no sampling temperature or decoding settings. Corpus seeds and the description of near-deterministic lookup do not specify model decoding parameters."
+  },
+  {
+   "id": "n007",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The document describes the 65,228-record benchmark, its composition, and evaluation protocol, but does not state its release license."
+  },
+  {
+   "id": "n008",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The document identifies Eikos-27B as a Qwen3.8-27B fine-tune but provides neither its fine-tuning learning rate nor its number of training epochs."
+  },
+  {
+   "id": "n009",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The document gives recommended sleep durations and mentions CDC monitoring of insufficient sleep, but provides no percentage of U.S. adults reporting insufficient sleep."
+  },
+  {
+   "id": "n010",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "Chunk cdc-sleep-01 recommends keeping the bedroom at a cool temperature, but no chunk specifies a temperature in degrees."
+  },
+  {
+   "id": "n011",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The supplied text ends in chunk gutenberg-alice-25 before the pebbles are thrown or their transformation is described. No chunk states what they turn into."
+  },
+  {
+   "id": "n012",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The provided text ends during Chapter IV, before the mad tea-party. Chapter VII appears only in the table of contents; no chunk contains the Hatter’s riddle."
+  },
+  {
+   "id": "n013",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "Chunks 23–24 describe the machine stopping in the far future, but no year is given. The remaining text also does not identify the arrival year."
+  },
+  {
+   "id": "n014",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The provided chunks describe the Time Traveller’s arrival and first encounter with the future people, but contain neither the drowning rescue nor the woman’s name."
+  },
+  {
+   "id": "n015",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The provided chunks mention memorized secrets and reference Section 5.1.1, but do not include a minimum length requirement for subscriber-chosen memorized secrets."
+  },
+  {
+   "id": "n016",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The provided chunks contain AAL2 authenticator requirements but no AAL2 reauthentication interval or inactivity timeout. AAL2 reauthentication appears only in the table of contents; the timing requirement in chunk 25 applies to AAL1."
+  },
+  {
+   "id": "n017",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The provided chunks mention the https URI scheme only in the table of contents. They do not state its default TCP port when none is specified."
+  },
+  {
+   "id": "n018",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The supplied chunks mention Date/Time Formats and Date only in the table of contents. They provide neither the preferred format nor an example timestamp."
+  },
+  {
+   "id": "n019",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The document mentions that Lovelace's explanatory notes described computing Bernoulli numbers, but never identifies which lettered note contained the algorithm."
+  },
+  {
+   "id": "n020",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "Chunks 02–03 mention a programming language named in her honor, but no chunk gives the year or the organization responsible for naming it."
+  },
+  {
+   "id": "n021",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The document mentions The Ocean Cleanup’s research and cleanup efforts but identifies neither its founder nor its founding year."
+  },
+  {
+   "id": "n022",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The document identifies neither persistent toxic chemicals absorbed by the plastics from seawater nor their concentrations. Its concentration measurements describe plastic debris itself."
+  },
+  {
+   "id": "n023",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "The document describes the Kalman gain qualitatively and discusses covariance-based weighting, but never gives an explicit formula relating the optimal gain to predicted covariance, the observation matrix, and measurement noise covariance."
+  },
+  {
+   "id": "n024",
+   "set": "nearmiss",
+   "kind": "nearmiss",
+   "verdict": "agree",
+   "gold_checks": [],
+   "other_answering_chunks": [],
+   "answerable": false,
+   "explanation": "Chunk 02 mentions that the unscented Kalman filter handles nonlinear systems, but no chunk explains how it selects or weights sigma points. The weighting discussions concern ordinary Kalman state estimates and measurements."
+  }
+ ],
+ "method": "Per goal: the goal, its whole document in catalog chunks (all documents for distractors), and the label; a structured verdict. The auditor never saw skimmer's scores."
+}

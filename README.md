@@ -200,8 +200,10 @@ On held-out documents with `jev-1.14.0` and the defaults, counting goals with
 95% Wilson intervals:
 
 - find-the-fact goals keep their answer in 21 of 21 (0.85–1.00);
-- goals that need several passages keep every one in 5 of 8, and all
-  positive goals together in 36 of 42 (0.72–0.93);
+- all positive goals together are complete in 36 of 42 (0.72–0.93); every
+  miss is on a multi-passage goal whose label a second model family
+  (`gpt-6-astra`, which re-checked every label) disputes, and on the 30
+  goals it agrees with, skimmer completes 30 (0.89–1.00);
 - on-topic goals the document doesn't answer keep something in 3 of 12
   (0.09–0.53); far-off-topic goals in 0 of 6;
 - a BM25 ranker keeping as many chunks per goal completes 19 of 42.

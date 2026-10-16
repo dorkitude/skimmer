@@ -45,7 +45,12 @@ Layout:
 - `nearmiss` (`nearmiss.json`) — on the document's subject, asking for a
   fact it does not contain (absence checked by grep of answer terms).
 
-Language models wrote every goal and checked every label; no person has
+Language models wrote every goal. Every label was then re-checked by
+`gpt-6-astra`, a different model family, via `codex exec`
+(`go run ./evals/cmd/labelaudit`, results in `gold/audit_astra.json`): it
+agrees with all v1 gold, distractor and near-miss labels, 13 of 14
+confusables, and only 12 of 36 v2 labels. `evalreport -agreed
+gold/audit_astra.json` scores only the agreed goals. No person has
 checked a label.
 
 ## Scoring

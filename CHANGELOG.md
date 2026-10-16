@@ -34,6 +34,11 @@ In answer to the review in [#3](https://github.com/dorkitude/skimmer/issues/3).
   live runner (`evalskim`) and an offline report (`evalreport`: Wilson
   intervals, exact McNemar, a BM25 baseline, cross-draw flips, injection).
   Results in `evals/skimmer/0.1.103/results.md`.
+- A label audit by a second model family (`gpt-6-astra` via `codex exec`,
+  `evals/cmd/labelaudit`): it agrees with all v1 gold, distractor and
+  near-miss labels and 13 of 14 confusables, but only 12 of 36 v2 labels,
+  and every skimmer miss falls on a disputed v2 label. `evalreport -agreed`
+  re-scores on agreed goals only; no decision changes.
 
 ### Fixed
 

@@ -165,6 +165,36 @@ func (r Rule) keep(c Chunk) bool {
 type Env struct {
 	Goals map[string]kit.Goal
 	Cat   kit.Catalog
+	// Keep, when set, limits scoring to these goals (e.g. the ones whose
+	// labels a second model agreed with).
+	Keep map[string]bool
+}
+
+// restrict keeps only goals an audit file marks "agree".
+func (e *Env) restrict(auditPath string) error {
+	if auditPath == "" {
+		return nil
+	}
+	b, err := os.ReadFile(auditPath)
+	if err != nil {
+		return err
+	}
+	var a struct {
+		Entries []struct {
+			ID      string `json:"id"`
+			Verdict string `json:"verdict"`
+		} `json:"entries"`
+	}
+	if err := json.Unmarshal(b, &a); err != nil {
+		return err
+	}
+	e.Keep = map[string]bool{}
+	for _, x := range a.Entries {
+		if x.Verdict == "agree" {
+			e.Keep[x.ID] = true
+		}
+	}
+	return nil
 }
 
 func loadEnv() (*Env, error) {
@@ -280,7 +310,7 @@ func (e *Env) collect(run *Run, rule Rule, half string) map[string]*goalOutcomes
 			continue
 		}
 		g, ok := e.Goals[rec.Goal]
-		if !ok {
+		if !ok || (e.Keep != nil && !e.Keep[rec.Goal]) {
 			continue
 		}
 		gol := out[rec.Goal]

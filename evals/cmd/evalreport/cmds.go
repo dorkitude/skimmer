@@ -91,11 +91,15 @@ func cmdSummary(args []string) error {
 	check := f.Bool("check", false, "drop chunks the injection check flags")
 	half := f.String("half", "all", "dev, holdout, or all")
 	noBaseline := f.Bool("no-baseline", false, "skip the BM25 table")
+	agreed := f.String("agreed", "", "score only goals this audit file marks agree")
 	if err := f.Parse(args); err != nil {
 		return err
 	}
 	env, err := loadEnv()
 	if err != nil {
+		return err
+	}
+	if err := env.restrict(*agreed); err != nil {
 		return err
 	}
 	run, err := loadRun(*path)
@@ -385,11 +389,15 @@ func cmdSweep(args []string) error {
 	score := f.String("score", "p", "p, weighted:W, or gate:G")
 	half := f.String("half", "dev", "dev, holdout, or all")
 	check := f.Bool("check", false, "drop chunks the injection check flags")
+	agreed := f.String("agreed", "", "score only goals this audit file marks agree")
 	if err := f.Parse(args); err != nil {
 		return err
 	}
 	env, err := loadEnv()
 	if err != nil {
+		return err
+	}
+	if err := env.restrict(*agreed); err != nil {
 		return err
 	}
 	run, err := loadRun(*path)
@@ -447,11 +455,15 @@ func cmdCompare(args []string) error {
 	ta := f.Float64("t-a", 0.5, "threshold for A")
 	tb := f.Float64("t-b", 0.5, "threshold for B")
 	half := f.String("half", "all", "dev, holdout, or all")
+	agreed := f.String("agreed", "", "score only goals this audit file marks agree")
 	if err := f.Parse(args); err != nil {
 		return err
 	}
 	env, err := loadEnv()
 	if err != nil {
+		return err
+	}
+	if err := env.restrict(*agreed); err != nil {
 		return err
 	}
 	ra, err := loadRun(*pa)

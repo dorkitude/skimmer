@@ -32,14 +32,25 @@ Dev reads the same way: v1 gold 31/31, confusable 10/10 (near-duplicate
 also kept 4/10), v2 12/19, near-miss leak 2/12, distractor 0/6; all
 positive 53/60 (0.78–0.94).
 
+A second model family re-checked every label after the runs (see
+[Label audit](#label-audit)): it agrees with all v1, near-miss and
+distractor labels but only 12 of 36 v2 labels, and **every miss in this
+table falls on a v2 goal whose label it disputes.** On the goals it agrees
+with, skimmer is complete on 30 of 30 holdout goals (0.89–1.00) and 47 of
+47 dev goals (0.92–1.00).
+
 What this says, plainly:
 
 - **Find-the-fact goals hold** (v1 gold 52/52 across both halves), but
   "recall 1.000" means 52 of 52 goals written while looking at their
   answer chunk; the interval reaches down to 0.93.
-- **Goals that need several regions are the weak spot.** A v2 goal is
-  complete only when *every* gold region is kept: 12 of 18 collect and
-  comparison goals over both halves, against 52 of 52 v1 gold goals.
+- **Multi-region goals look weak, but mostly because of their labels.** A
+  v2 goal is complete only when *every* gold region is kept: 12 of 18
+  collect and comparison goals over both halves. The audit finds 6 v2
+  goals the extracts cannot answer and many gold chunks that don't hold
+  the answer; on the 12 v2 goals whose labels it accepts, skimmer is
+  complete on all 12. Whether skimmer also misses real regions is not
+  settled by 12 goals.
 - **On-topic goals the document doesn't answer leak** in 5 of 24 near-miss
   goals (both halves). The leaking chunks are the closest neighbors of the
   missing fact (n002: the Procrustes migration result, reported as cosine,
@@ -204,6 +215,52 @@ chunk of NIST's table of contents): the planted line sits in the same
 request state. The check costs about 25%
 more input tokens. It catches most planted lines, misses some, and is a
 filter, not a security boundary.
+
+## Label audit
+
+Run after every result above, at the maintainer's request in place of a
+person checking labels: `gpt-6-astra` (OpenAI, a different model family
+from the labelers) re-checked every label through `codex exec`
+(`go run ./evals/cmd/labelaudit`, reasoning effort high). For each goal it
+saw the goal, its whole document in the catalog's chunks (the whole
+corpus, for distractors), and the label, never skimmer's scores, and gave
+a structured verdict: does each gold chunk hold the answer, does any other
+chunk, can the document answer the goal at all. Per-goal verdicts and
+reasons: [`../../gold/audit_astra.json`](../../gold/audit_astra.json).
+
+| goal set | auditor agrees |
+|---|---|
+| v1 gold | 52/52 (0.93–1.00) |
+| v1 confusable | 13/14 (g065: it finds the answer in chunks 22–23, not gold chunk 09) |
+| v1 distractor | 12/12 |
+| near-miss | 24/24 (0.86–1.00) |
+| v2 single / collect / comparison | 7/18, 4/14, 1/4: **12/36 (0.20–0.50)** |
+
+The v2 disputes are of three kinds: goals the extract cannot answer (6:
+h022 and h025 ask about Alice past where the extract ends, h026 and h027
+about the Time Machine, h033 finds only a table-of-contents entry, h036
+has nothing to collect); gold chunks that do not hold the answer (e.g.
+h017–h019, h021, h028), which all-modes scoring still requires; and, for
+collect goals, regions the label missed.
+
+The labels stay frozen, as pre-registered, so the tables above score all
+of them. Re-scored on only the goals the auditor agrees with
+(`evalreport ... -agreed evals/gold/audit_astra.json`), no decision
+changes:
+
+| | all goals | agreed goals only |
+|---|---|---|
+| holdout complete, shipped at 0.5 | 36/42 | 30/30 (0.89–1.00) |
+| dev complete, shipped at 0.5 | 53/60 | 47/47 (0.92–1.00) |
+| holdout: nosource at 0.4 vs shipped | 36 vs 36 | 30 vs 30 |
+| dev: split (0.5/0.5) vs shipped, leak | 8 vs 2 of 18 (p 0.03) | the same (negatives all agreed) |
+| holdout: 4000 vs 2000 chars | 34 vs 36 | 28 vs 30 |
+| holdout complete at 0.6 / 0.7 | 31 / 28 of 42 | 27 / 26 of 30 |
+| holdout: BM25, same budget | 19/42 | 15/30 |
+
+A model checking a model is not a person checking labels: the auditor can
+be wrong too (it is strict about "every region"), and no person has
+checked either set of judgments.
 
 ## Language (S11)
 
