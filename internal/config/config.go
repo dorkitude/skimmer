@@ -20,12 +20,14 @@ import (
 
 	"github.com/spf13/viper"
 	"go.yaml.in/yaml/v3"
+
+	"github.com/dorkitude/skimmer/internal/jev"
 )
 
 // Defaults.
 const (
 	DefaultBaseURL     = "https://api.typesafe.ai"
-	DefaultModel       = "jev-latest"
+	DefaultModel       = jev.DefaultModel
 	DefaultThreshold   = 0.5
 	DefaultChunkChars  = 2000
 	DefaultOverlap     = 0.10

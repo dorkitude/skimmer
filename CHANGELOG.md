@@ -5,6 +5,51 @@ Versions are semver with large patch numbers (`0.1.100`, `0.1.101`, ...).
 
 ## [Unreleased]
 
+In answer to the review in [#3](https://github.com/dorkitude/skimmer/issues/3).
+
+### Changed
+
+- The default model is pinned to `jev-1.14.0`, the model the evals measured,
+  instead of the `jev-latest` alias (which points at `jev-1.13.0`). `--model`,
+  `SKIMMER_MODEL` and a prompt's `model:` still choose another.
+- The stderr summary and `skim --json` (`"model"`) name the model that
+  answered. The summary also counts unjudged chunks.
+- The batch planner charges a chunk's text once, or twice only when a prompt
+  pastes it with `{{.Text}}`, and measures the prompt itself without
+  subtracting text it no longer contains. Batches with large `--chunk-chars`
+  now hold up to about twice as many chunks.
+
+### Added
+
+- `--injection-check` for `skim` and `filter`: a second yes/no question per
+  chunk or item, in the same requests, drops ones that try to steer the
+  reader (listed as `flagged` in `--json`). Measured: planted lines kept
+  1–6% of the time instead of 18–20%, 0 flags in 5,439 clean judgments,
+  about 25% more input tokens. A filter, not a security boundary.
+  The prompt is `injection_check/DEFAULT.md`.
+- Prompt frontmatter takes `criteria` (`true` and `false` text), sent as the
+  Noul's criteria.
+- Evals: a frozen dev/holdout split, a pre-registration, near-miss negative
+  goals, span-based scoring that holds across chunk sizes and shifts, one
+  live runner (`evalskim`) and an offline report (`evalreport`: Wilson
+  intervals, exact McNemar, a BM25 baseline, cross-draw flips, injection).
+  Results in `evals/skimmer/0.1.103/results.md`.
+- A label audit by a second model family (`gpt-6-astra` via `codex exec`,
+  `evals/cmd/labelaudit`): it agrees with all v1 gold, distractor and
+  near-miss labels and 13 of 14 confusables, but only 12 of 36 v2 labels,
+  and every skimmer miss falls on a disputed v2 label. `evalreport -agreed`
+  re-scores on agreed goals only; no decision changes.
+
+### Fixed
+
+- The chunk-size sweep scored near-duplicate goals by chunk id, which names
+  different text at other sizes. Re-scored by span, smaller chunks do not
+  lose discrimination; the 0.1.101 claim is withdrawn.
+- Eval claims corrected in place: headline counts now carry n and intervals;
+  the 0.7 threshold advice is withdrawn (it loses 8 of 42 held-out goals);
+  the 0.1.102 prompt change measured 14.5% fewer tokens with no measurable
+  recall difference, not "19% fewer, equal-or-better at every rank".
+
 ## [0.1.102] - 2026-10-15
 
 ### Changed

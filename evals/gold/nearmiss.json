@@ -1,0 +1,468 @@
+[
+  {
+    "id": "n001",
+    "kind": "nearmiss",
+    "goal": "How many update events does the incremental maintainer process between its periodic re-orthogonalizations of the substrate basis?",
+    "doc": "arxiv-2608.16621",
+    "answer_terms": [
+      "interval",
+      "re-orthogonalize every",
+      "re-orthogonalization frequency",
+      "events between"
+    ],
+    "grep_hits": {
+      "interval": 0,
+      "re-orthogonalize every": 0,
+      "re-orthogonalization frequency": 0,
+      "events between": 0
+    },
+    "rationale": "Section III-C says the maintainer periodically re-orthogonalizes to bound departure from V_k^T V_k = I_k, and the setup gives 50 events of m = 120 documents, but no re-orthogonalization interval or frequency is ever stated."
+  },
+  {
+    "id": "n002",
+    "kind": "nearmiss",
+    "goal": "What recall@10 did the Procrustes-migrated vectors achieve against nearest neighbors computed from the truly re-embedded corpus?",
+    "doc": "arxiv-2608.16621",
+    "answer_terms": [
+      "recall@10",
+      "migrat",
+      "re-embedded"
+    ],
+    "grep_hits": {
+      "recall@10": 6,
+      "migrat": 6,
+      "re-embedded": 4
+    },
+    "rationale": "recall@10 = 1.0 is reported only for the incremental-SVD vs. full re-SVD comparison; the Procrustes migration result is reported solely as 0.95 mean cosine with ~10% anchors, so no retrieval recall exists for migrated vectors. All recall@10 hits refer to subspace tracking, not migration."
+  },
+  {
+    "id": "n003",
+    "kind": "nearmiss",
+    "goal": "Which cross-encoder reranker model was used in the contextualized-chunk retrieval stack?",
+    "doc": "arxiv-2608.20845",
+    "answer_terms": [
+      "bge-reranker",
+      "ms-marco",
+      "cohere",
+      "rerank-",
+      "mxbai",
+      "jina"
+    ],
+    "grep_hits": {
+      "bge-reranker": 0,
+      "ms-marco": 0,
+      "cohere": 0,
+      "rerank-": 0,
+      "mxbai": 0,
+      "jina": 0
+    },
+    "rationale": "The paper describes the strongest baseline as LLM-contextualized chunks with hybrid retrieval, reciprocal-rank fusion and 'a cross-encoder reranker', and mentions reranker pricing, but never names the reranker model."
+  },
+  {
+    "id": "n004",
+    "kind": "nearmiss",
+    "goal": "Which embedding model produced the vectors for both compiled facts and chunks in the broadcast-interview QA study?",
+    "doc": "arxiv-2608.20845",
+    "answer_terms": [
+      "text-embedding",
+      "bge",
+      "e5-",
+      "voyage",
+      "embedding model"
+    ],
+    "grep_hits": {
+      "text-embedding": 0,
+      "bge": 0,
+      "e5-": 0,
+      "voyage": 0,
+      "embedding model": 2
+    },
+    "rationale": "The study says chunk policies were compared 'under identical embedding, retrieval, and answer models' and names Kimi K2.6 only as extractor and grader; the two 'embedding model' hits are generic statements about the geometric layer and migration contract, not the study's model."
+  },
+  {
+    "id": "n005",
+    "kind": "nearmiss",
+    "goal": "Which hosted LLM served as the automatic judge for source entailment and QA-fidelity in the rephrasing evaluation?",
+    "doc": "arxiv-2609.29661",
+    "answer_terms": [
+      "judge model",
+      "gpt",
+      "claude",
+      "gemini",
+      "judge"
+    ],
+    "grep_hits": {
+      "judge model": 0,
+      "gpt": 2,
+      "claude": 1,
+      "gemini": 0,
+      "judge": 3
+    },
+    "rationale": "Entailment and QA-fidelity are said to be 'judged automatically by a hosted LLM judge' without naming it; DeepSeek V4 Flash is named only as the rephrasing model. 'judge' hits are that unnamed reference and the verb 'judged'; 'claude' is the acknowledgment's language-editing assistant; 'gpt' matches GPTCache and GPT-2 in references."
+  },
+  {
+    "id": "n006",
+    "kind": "nearmiss",
+    "goal": "What sampling temperature and decoding settings were used when calling DeepSeek V4 Flash?",
+    "doc": "arxiv-2609.29661",
+    "answer_terms": [
+      "temperature",
+      "top_p",
+      "top-p",
+      "decoding"
+    ],
+    "grep_hits": {
+      "temperature": 0,
+      "top_p": 0,
+      "top-p": 0,
+      "decoding": 0
+    },
+    "rationale": "The setup describes pinned model identifiers, JSON run configurations, frozen snapshots and per-million-token prices (Table I), but no temperature, top-p or other decoding parameters."
+  },
+  {
+    "id": "n007",
+    "kind": "nearmiss",
+    "goal": "Under what license is the 65,228-record agent decision benchmark released?",
+    "doc": "arxiv-2610.18579",
+    "answer_terms": [
+      "mit license",
+      "apache",
+      "cc by",
+      "license",
+      "released under"
+    ],
+    "grep_hits": {
+      "mit license": 0,
+      "apache": 0,
+      "cc by": 0,
+      "license": 1,
+      "released under": 0
+    },
+    "rationale": "The extract describes the frozen, hash-sealed benchmark (65,228 records, 19,663 paired test states) and a project website, but gives no license; the single 'license' hit is the verb 'licenses' in 'Each licenses less than it may seem'."
+  },
+  {
+    "id": "n008",
+    "kind": "nearmiss",
+    "goal": "What learning rate and number of training epochs were used to fine-tune Eikos-27B?",
+    "doc": "arxiv-2610.18579",
+    "answer_terms": [
+      "learning rate",
+      "epoch",
+      "batch size"
+    ],
+    "grep_hits": {
+      "learning rate": 0,
+      "epoch": 0,
+      "batch size": 0
+    },
+    "rationale": "Eikos-27B appears in Table 1 as a 'Qwen3.8-27B fine-tune, FP8' with its accuracy, latency and cost, but it is a third-party model evaluated as released; no training hyperparameters are given."
+  },
+  {
+    "id": "n009",
+    "kind": "nearmiss",
+    "goal": "What percentage of U.S. adults report not getting enough sleep?",
+    "doc": "cdc-sleep",
+    "answer_terms": [
+      "%",
+      "percent",
+      "one in three",
+      "third"
+    ],
+    "grep_hits": {
+      "%": 0,
+      "percent": 0,
+      "one in three": 0,
+      "third": 0
+    },
+    "rationale": "The page says CDC monitors trends on not getting enough sleep among children, high school students and adults and that PLACES has local estimates, but it states no prevalence figure."
+  },
+  {
+    "id": "n010",
+    "kind": "nearmiss",
+    "goal": "What bedroom temperature, in degrees, is recommended for good sleep?",
+    "doc": "cdc-sleep",
+    "answer_terms": [
+      "degrees",
+      "°f",
+      "fahrenheit",
+      "celsius"
+    ],
+    "grep_hits": {
+      "degrees": 0,
+      "°f": 0,
+      "fahrenheit": 0,
+      "celsius": 0
+    },
+    "rationale": "The habits list says to keep the bedroom 'quiet, relaxing, and at a cool temperature' but gives no numeric temperature."
+  },
+  {
+    "id": "n011",
+    "kind": "nearmiss",
+    "goal": "What do the pebbles thrown through the window of the White Rabbit's house turn into?",
+    "doc": "gutenberg-alice",
+    "answer_terms": [
+      "pebble",
+      "little cakes",
+      "shower"
+    ],
+    "grep_hits": {
+      "pebble": 0,
+      "little cakes": 0,
+      "shower": 0
+    },
+    "rationale": "The extract ends mid-word in Chapter IV ('the next moment a sh') right after the Rabbit says 'A barrowful will do'; the pebbles and their turning into cakes come after the cut."
+  },
+  {
+    "id": "n012",
+    "kind": "nearmiss",
+    "goal": "What riddle does the Hatter ask Alice at the mad tea-party?",
+    "doc": "gutenberg-alice",
+    "answer_terms": [
+      "hatter",
+      "raven",
+      "writing-desk",
+      "riddle"
+    ],
+    "grep_hits": {
+      "hatter": 0,
+      "raven": 0,
+      "writing-desk": 0,
+      "riddle": 0
+    },
+    "rationale": "'A Mad Tea-Party' appears only as a Chapter VII title in the contents; the extract covers Chapters I to IV (partial), so the Hatter and his riddle never appear."
+  },
+  {
+    "id": "n013",
+    "kind": "nearmiss",
+    "goal": "In what year does the Time Traveller's machine come to a stop in the far future?",
+    "doc": "gutenberg-timemachine",
+    "answer_terms": [
+      "802",
+      "701",
+      "eight hundred",
+      "thousand"
+    ],
+    "grep_hits": {
+      "802": 0,
+      "701": 0,
+      "eight hundred": 0,
+      "thousand": 0
+    },
+    "rationale": "Chapter IV narrates the journey, the dials, 'over a year a minute' and the landing by the White Sphinx, but the arrival year is never stated in the extract."
+  },
+  {
+    "id": "n014",
+    "kind": "nearmiss",
+    "goal": "What is the name of the small woman of the future people whom the Time Traveller saves from drowning?",
+    "doc": "gutenberg-timemachine",
+    "answer_terms": [
+      "weena",
+      "eloi",
+      "drown"
+    ],
+    "grep_hits": {
+      "weena": 0,
+      "eloi": 0,
+      "drown": 0
+    },
+    "rationale": "The extract ends early in Chapter V, with the first meeting of the frail, four-foot future people; they are never named and no rescue or named companion appears."
+  },
+  {
+    "id": "n015",
+    "kind": "nearmiss",
+    "goal": "What is the minimum length required for a subscriber-chosen memorized secret?",
+    "doc": "nist-sp-800-63b",
+    "answer_terms": [
+      "8 characters",
+      "eight characters",
+      "at least 8",
+      "characters",
+      "minimum length"
+    ],
+    "grep_hits": {
+      "8 characters": 0,
+      "eight characters": 0,
+      "at least 8": 0,
+      "characters": 0,
+      "minimum length": 0
+    },
+    "rationale": "Memorized Secrets are listed as an AAL1/AAL2 authenticator type and Section 5.1.1 / Appendix A.2 'Length' appear in the table of contents, but the extract stops at 4.2.2 before any length requirement."
+  },
+  {
+    "id": "n016",
+    "kind": "nearmiss",
+    "goal": "How often must a subscriber be reauthenticated at AAL2, including the inactivity timeout?",
+    "doc": "nist-sp-800-63b",
+    "answer_terms": [
+      "12 hours",
+      "30 minutes",
+      "inactivity",
+      "minutes",
+      "hours"
+    ],
+    "grep_hits": {
+      "12 hours": 0,
+      "30 minutes": 0,
+      "inactivity": 0,
+      "minutes": 0,
+      "hours": 0
+    },
+    "rationale": "The extract gives the AAL1 rule (reauthenticate at least once per 30 days) and lists '4.2.3 Reauthentication' in the contents, but ends at 4.2.2, before any AAL2 time limit."
+  },
+  {
+    "id": "n017",
+    "kind": "nearmiss",
+    "goal": "What default TCP port does the https URI scheme use when none is given?",
+    "doc": "rfc9110",
+    "answer_terms": [
+      "443",
+      "default port",
+      "port 443"
+    ],
+    "grep_hits": {
+      "443": 0,
+      "default port": 0,
+      "port 443": 0
+    },
+    "rationale": "The contents list '4.2.2 https URI Scheme' and '18.9 Port Registration', but the extract ends in Section 3.2 and never states a port number."
+  },
+  {
+    "id": "n018",
+    "kind": "nearmiss",
+    "goal": "What is the preferred date/time format for HTTP fields such as Date, with an example timestamp?",
+    "doc": "rfc9110",
+    "answer_terms": [
+      "imf-fixdate",
+      "gmt",
+      "1994",
+      "rfc1123",
+      "rfc 1123"
+    ],
+    "grep_hits": {
+      "imf-fixdate": 0,
+      "gmt": 0,
+      "1994": 0,
+      "rfc1123": 0,
+      "rfc 1123": 0
+    },
+    "rationale": "'5.6.7 Date/Time Formats' and '6.6.1 Date' appear only as contents entries; the extract (Sections 1 to 3.2) defines no date syntax or example."
+  },
+  {
+    "id": "n019",
+    "kind": "nearmiss",
+    "goal": "Which lettered note in Lovelace's translation contained the algorithm for computing Bernoulli numbers?",
+    "doc": "wiki-ada-lovelace",
+    "answer_terms": [
+      "note g",
+      "note a",
+      "scientific memoirs"
+    ],
+    "grep_hits": {
+      "note g": 0,
+      "note a": 0,
+      "scientific memoirs": 0
+    },
+    "rationale": "The lead says she added seven long explanatory notes describing a Bernoulli-number method, and the Education section mentions the 'numbers of Bernoulli', but no note is identified by letter."
+  },
+  {
+    "id": "n020",
+    "kind": "nearmiss",
+    "goal": "In what year was the Ada programming language named after her, and by which organization?",
+    "doc": "wiki-ada-lovelace",
+    "answer_terms": [
+      "department of defense",
+      "1980",
+      "mil-std",
+      "dod"
+    ],
+    "grep_hits": {
+      "department of defense": 0,
+      "1980": 0,
+      "mil-std": 0,
+      "dod": 0
+    },
+    "rationale": "The lead says she is commemorated 'in the names of a programming language' (the one 'programming language' hit), but neither the language's naming year nor the sponsoring organization is given."
+  },
+  {
+    "id": "n021",
+    "kind": "nearmiss",
+    "goal": "Who founded The Ocean Cleanup, and in what year?",
+    "doc": "wiki-garbage-patch",
+    "answer_terms": [
+      "boyan slat",
+      "slat",
+      "founded",
+      "founder",
+      "2013"
+    ],
+    "grep_hits": {
+      "boyan slat": 0,
+      "slat": 0,
+      "founded": 0,
+      "founder": 0,
+      "2013": 0
+    },
+    "rationale": "The Ocean Cleanup is cited repeatedly (size estimates, 2015 Mega Expedition, 2016 aerial survey, removing over one million pounds by 2024), but its founder and founding year are never mentioned."
+  },
+  {
+    "id": "n022",
+    "kind": "nearmiss",
+    "goal": "Which persistent toxic chemicals do the patch's plastics absorb from seawater, and at what concentrations?",
+    "doc": "wiki-garbage-patch",
+    "answer_terms": [
+      "pcb",
+      "ddt",
+      "toxic",
+      "persistent organic",
+      "absorb",
+      "adsorb"
+    ],
+    "grep_hits": {
+      "pcb": 0,
+      "ddt": 0,
+      "toxic": 0,
+      "persistent organic": 0,
+      "absorb": 0,
+      "adsorb": 0
+    },
+    "rationale": "The article covers plastic sources, composition, animals and size estimates, but not chemical contamination; the only near term, 'pollutants', is about the lack of a standard boundary between 'normal' and 'elevated' debris levels."
+  },
+  {
+    "id": "n023",
+    "kind": "nearmiss",
+    "goal": "What is the explicit formula for the optimal Kalman gain in terms of the predicted covariance, observation matrix and measurement noise covariance?",
+    "doc": "wiki-kalman-filter",
+    "answer_terms": [
+      "innovation",
+      "\\mathbf {K}",
+      "\\mathbf {H}",
+      "\\mathbf {R}",
+      "^{-1}"
+    ],
+    "grep_hits": {
+      "innovation": 0,
+      "\\mathbf {K}": 0,
+      "\\mathbf {H}": 0,
+      "\\mathbf {R}": 0,
+      "^{-1}": 0
+    },
+    "rationale": "The overview explains the Kalman gain only qualitatively (high vs. low gain, weighting by covariance), and the extract ends after introducing F_k, the state-transition model, before any gain equation."
+  },
+  {
+    "id": "n024",
+    "kind": "nearmiss",
+    "goal": "How does the unscented Kalman filter choose and weight its sigma points?",
+    "doc": "wiki-kalman-filter",
+    "answer_terms": [
+      "sigma point",
+      "unscented transform",
+      "2n+1"
+    ],
+    "grep_hits": {
+      "sigma point": 0,
+      "unscented transform": 0,
+      "2n+1": 0
+    },
+    "rationale": "The unscented Kalman filter is mentioned once, as an extension that works on nonlinear systems (the single 'unscented' hit), with no description of its mechanism."
+  }
+]

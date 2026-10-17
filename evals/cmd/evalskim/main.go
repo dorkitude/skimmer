@@ -1,8 +1,12 @@
-// evalskim runs the skimmer eval: for each goal in evals/gold/goals.json,
-// it runs the REAL skimmer pipeline (internal/skim) over the eval corpus
-// documents against the pinned Jev model, archives every outcome to the
-// versioned runs.jsonl, and prints per-draw metrics. Explicitly invoked;
-// nothing here runs in CI or go test.
+// evalskim runs skimmer's live eval. For each goal and draw it runs the real
+// skim pipeline (internal/skim: chunking, batching, the prompt, the source
+// as context) over the goal's document at threshold 0, and archives every
+// chunk's span and probability, one JSON line per goal and draw. Nothing is
+// scored here: evalreport scores the archive offline, so thresholds,
+// combinations and baselines can be compared on identical data.
+//
+// Explicitly invoked only; nothing here runs in CI or go test. See
+// evals/README.md for the commands behind each results table.
 package main
 
 import (
@@ -13,70 +17,71 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/dorkitude/skimmer/evals/internal/kit"
 	"github.com/dorkitude/skimmer/internal/config"
 	"github.com/dorkitude/skimmer/internal/jev"
 	"github.com/dorkitude/skimmer/internal/prompts"
 	"github.com/dorkitude/skimmer/internal/skim"
 )
 
-// Goal is one frozen eval goal. Gold is a catalog chunk id, or a list for
-// multi-gold (the decisive fact spans adjacent chunks).
-type Goal struct {
-	ID           string `json:"id"`
-	Kind         string `json:"kind"`
-	Goal         string `json:"goal"`
-	Doc          string `json:"doc,omitempty"`
-	GoldRaw      any    `json:"gold,omitempty"`
-	DecisiveFact string `json:"decisive_fact,omitempty"`
-	Multi        bool   `json:"multi,omitempty"`
-	Other        string `json:"other,omitempty"` // confusable near-duplicate chunk
+// Chunk is one judged chunk in the archive.
+type Chunk struct {
+	Doc  string             `json:"doc"`
+	I    int                `json:"i"`
+	Span *kit.Span          `json:"span,omitempty"` // in the unshifted document; nil if not found
+	P    *float64           `json:"p"`
+	X    map[string]float64 `json:"x,omitempty"` // extra questions' P(yes)
+	Text string             `json:"text,omitempty"`
 }
 
-// CatalogChunk mirrors evals/gold/catalog.json.
-type CatalogChunk struct {
-	ID        string `json:"id"`
-	Doc       string `json:"doc"`
-	Text      string `json:"text"`
-	StartLine int    `json:"start_line"`
-	EndLine   int    `json:"end_line"`
+// Record is one goal and draw.
+type Record struct {
+	Schema       string  `json:"schema"`
+	Run          string  `json:"run"`
+	Goal         string  `json:"goal"`
+	Set          string  `json:"set"`
+	Kind         string  `json:"kind"`
+	Half         string  `json:"half"`
+	Draw         int     `json:"draw"`
+	Model        string  `json:"model"`
+	Docs         int     `json:"docs"`
+	InputTokens  int     `json:"input_tokens"`
+	OutputTokens int     `json:"output_tokens"`
+	Unjudged     int     `json:"unjudged"`
+	Error        string  `json:"error,omitempty"`
+	Chunks       []Chunk `json:"chunks"`
 }
 
-type gres struct {
-	goal      Goal
-	draw      int
-	keptIDs   []string
-	keptP     map[string]float64
-	keptTexts []string
-	tokens    int
-	nJudged   int // chunks judged (all chunks of the goal's source set)
-	err       string
+// Header describes the run; it is the first line of the archive.
+type Header struct {
+	Schema         string   `json:"schema"`
+	Type           string   `json:"type"`
+	Run            string   `json:"run"`
+	Model          string   `json:"model"`
+	Draws          int      `json:"draws"`
+	Sets           []string `json:"sets"`
+	Half           string   `json:"half"`
+	Prompt         string   `json:"prompt"`
+	Extra          []string `json:"extra,omitempty"`
+	ChunkChars     int      `json:"chunk_chars"`
+	Overlap        float64  `json:"overlap"`
+	Shift          int      `json:"shift"`
+	Corpus         string   `json:"corpus"`
+	SkimmerVersion string   `json:"skimmer_version"`
+	Commit         string   `json:"commit"`
+	Fingerprint    string   `json:"fingerprint"`
+	Started        string   `json:"started"`
 }
 
-func goldIDs(g Goal) []string {
-	switch v := g.GoldRaw.(type) {
-	case string:
-		return []string{v}
-	case []string:
-		return v
-	case []any:
-		var out []string
-		for _, x := range v {
-			if s, ok := x.(string); ok {
-				out = append(out, s)
-			}
-		}
-		return out
-	}
-	return nil
-}
+const schema = "skimmer-eval/v2"
 
 func main() {
 	if err := run(os.Args[1:]); err != nil {
@@ -87,422 +92,294 @@ func main() {
 
 func run(args []string) error {
 	f := flag.NewFlagSet("evalskim", flag.ContinueOnError)
-	model := f.String("model", "", "pinned Jev model ID (e.g. jev-1.14.0); required")
+	model := f.String("model", "", "pinned Jev model ID, e.g. jev-1.14.0 (required; aliases are refused)")
 	draws := f.Int("draws", 2, "independent draws")
-	goalsPath := f.String("goals", "evals/gold/goals.json", "frozen goals JSON")
-	catalogPath := f.String("catalog", "evals/gold/catalog.json", "chunk catalog JSON")
-	corpusDir := f.String("corpus", "evals/corpus/raw", "raw corpus dir")
-	skV := f.String("skimmer-version", "0.1.101", "skimmer design version label for the history folder")
-	threshold := f.Float64("threshold", 0.5, "keep threshold")
-	singleDoc := f.Bool("single-doc", true, "judge each goal over only its own document (skimmer's primary single-source mode)")
-	factMatch := f.Bool("fact-match", false, "score gold goals by decisive-fact content match in kept chunks (required when chunk size differs from the catalog)")
-	ranked := f.Bool("ranked", false, "v2 goal set: rank-based metrics, recall@k and all-modes coverage")
-	chunkChars := f.Int("chunk-chars", 0, "chunk size override (0 = skimmer default)")
-	overlap := f.Float64("overlap", -1, "chunk overlap fraction override (-1 = skimmer default)")
+	sets := f.String("sets", "v1,v2,nearmiss", "goal sets: v1, v2, nearmiss")
+	half := f.String("half", "dev", "dev, holdout, or all (evals/gold/split.json)")
+	kinds := f.String("kinds", "", "only these goal kinds, comma separated (default all)")
+	promptPath := f.String("prompt", "", "skim prompt file (default: the built-in skim_document/DEFAULT)")
+	extra := f.String("extra", "", "extra questions per chunk, name=prompt.md,... (injection = the built-in check)")
+	chunkChars := f.Int("chunk-chars", config.DefaultChunkChars, "chunk size")
+	overlap := f.Float64("overlap", config.DefaultOverlap, "chunk overlap fraction")
+	shift := f.Int("shift", 0, "drop this many runes from the head of every document, moving every chunk boundary")
+	corpus := f.String("corpus", kit.CorpusDir, "corpus directory")
+	keepText := f.Bool("keep-text", false, "archive chunk text too")
+	out := f.String("out", "", "archive path, e.g. evals/skimmer/0.1.103/runs/dev-shipped.jsonl (required)")
+	label := f.String("label", "", "run label (default: the archive's file name)")
+	version := f.String("skimmer-version", "0.1.103", "skimmer version under test")
+	conc := f.Int("concurrency", 6, "parallel Jev requests")
 	if err := f.Parse(args); err != nil {
 		return err
 	}
-	if *model == "" || strings.Contains(*model, "latest") {
+	if *model == "" || strings.Contains(*model, "latest") || strings.Contains(*model, "preview") {
 		return fmt.Errorf("-model must be a pinned versioned ID, e.g. jev-1.14.0")
 	}
+	if *out == "" {
+		return fmt.Errorf("-out is required")
+	}
+	if *label == "" {
+		*label = strings.TrimSuffix(filepath.Base(*out), ".jsonl")
+	}
 
-	goalBytes, err := os.ReadFile(*goalsPath)
+	split, err := kit.LoadSplit()
 	if err != nil {
 		return err
 	}
-	var goals []Goal
-	if err := json.Unmarshal(goalBytes, &goals); err != nil {
-		return err
-	}
-	catBytes, err := os.ReadFile(*catalogPath)
+	goals, err := kit.LoadGoals(strings.Split(*sets, ","))
 	if err != nil {
 		return err
 	}
-	var catalog []CatalogChunk
-	if err := json.Unmarshal(catBytes, &catalog); err != nil {
-		return err
-	}
-
-	// Fingerprint over goals + catalog + corpus bytes.
-	h := sha256.New()
-	h.Write(goalBytes)
-	h.Write(catBytes)
-	files, _ := os.ReadDir(*corpusDir)
-	var names []string
-	for _, e := range files {
-		if strings.HasSuffix(e.Name(), ".txt") {
-			names = append(names, e.Name())
+	var keep []kit.Goal
+	for _, g := range goals {
+		if (*half == "all" || split.Of(g) == *half) && (*kinds == "" || inList(*kinds, g.Kind)) {
+			keep = append(keep, g)
 		}
 	}
-	sort.Strings(names)
-	for _, n := range names {
-		b, _ := os.ReadFile(filepath.Join(*corpusDir, n))
-		fmt.Fprintf(h, "%d:%s:%d\n", len(n), n, len(b))
-		h.Write(b)
+	goals = keep
+	if len(goals) == 0 {
+		return fmt.Errorf("no goals selected")
 	}
-	fingerprint := hex.EncodeToString(h.Sum(nil))[:32]
 
-	outDir := filepath.Join("evals/skimmer", *skV)
-	if err := os.MkdirAll(outDir, 0o755); err != nil {
-		return err
-	}
-	runsF, err := os.OpenFile(filepath.Join(outDir, "runs.jsonl"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	prompt, err := loadPrompt(prompts.SkimDocument, *promptPath)
 	if err != nil {
 		return err
 	}
-	defer runsF.Close()
-	runID := time.Now().UTC().Format("20060102T150405.000000000Z")
+	var extras []skim.Question
+	var extraNames []string
+	if *extra != "" {
+		for _, e := range strings.Split(*extra, ",") {
+			name, path, _ := strings.Cut(e, "=")
+			kind := prompts.SkimDocument
+			if name == "injection" {
+				kind = prompts.InjectionCheck
+			}
+			p, err := loadPrompt(kind, path)
+			if err != nil {
+				return err
+			}
+			extras = append(extras, skim.Question{Name: name, Prompt: p})
+			extraNames = append(extraNames, e)
+		}
+	}
+
+	// Documents: the text skimmer sees (shifted, or with planted lines) and
+	// the original text chunks are located in, so spans are comparable
+	// across runs.
+	docs := map[string]string{}
+	locText := map[string]string{}
+	for _, d := range split.Docs("all") {
+		text, err := kit.LoadDoc(*corpus, d)
+		if err != nil {
+			return err
+		}
+		docs[d] = kit.Shift(text, *shift)
+		if locText[d], err = kit.LoadDoc(kit.CorpusDir, d); err != nil {
+			return err
+		}
+	}
+
+	header := Header{
+		Schema: schema, Type: "header", Run: *label, Model: *model, Draws: *draws,
+		Sets: strings.Split(*sets, ","), Half: *half, Prompt: promptName(*promptPath), Extra: extraNames,
+		ChunkChars: *chunkChars, Overlap: *overlap, Shift: *shift, Corpus: *corpus,
+		SkimmerVersion: *version, Commit: commit(),
+		Fingerprint: fingerprint(*corpus, split.Docs("all"), *sets, *promptPath, extras),
+		Started:     time.Now().UTC().Format(time.RFC3339),
+	}
+
+	client := jev.NewClient(apiKey())
+	client.BaseURL = os.Getenv("SKIMMER_BASE_URL")
+	client.Model = *model
+	client.SetConcurrency(*conc)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 
-	baseURL := os.Getenv("SKIMMER_BASE_URL")
-	if baseURL == "" {
-		baseURL = config.DefaultBaseURL
-	}
-	client := jev.NewClient(os.Getenv("SKIMMER_API_KEY"))
-	client.BaseURL = baseURL
-	client.Model = *model
-	client.SetConcurrency(6)
-
-	prompt, err := prompts.Load(prompts.SkimDocument, "", "")
-	if err != nil {
-		return err
-	}
-
-	sourcesByName := map[string]skim.Source{}
-	for _, n := range names {
-		sourcesByName[n] = skim.Source{Kind: skim.KindFile, Ref: filepath.Join(*corpusDir, n)}
-	}
-
-	var allSources []skim.Source
-	for _, n := range names {
-		allSources = append(allSources, sourcesByName[n])
-	}
-
 	var (
-		mu  sync.Mutex
-		grs []gres
-		wg  sync.WaitGroup
-		sem = make(chan struct{}, 3)
+		mu      sync.Mutex
+		records []Record
+		wg      sync.WaitGroup
+		sem     = make(chan struct{}, 4)
+		done    int
 	)
+	total := len(goals) * *draws
 	for draw := 1; draw <= *draws; draw++ {
 		for _, g := range goals {
 			wg.Add(1)
-			go func(g Goal, draw int) {
+			go func(g kit.Goal, draw int) {
 				defer wg.Done()
 				sem <- struct{}{}
 				defer func() { <-sem }()
-				goalSources := allSources
-				if *singleDoc && g.Doc != "" {
-					// single-source mode: one goal over its own document.
-					// Distractor goals (no doc) run over every document:
-					// "nothing here helps with the goal" is the claim under test.
-					goalSources = []skim.Source{sourcesByName[g.Doc+".txt"]}
-				}
-				cc, ov := *chunkChars, *overlap
-				if cc <= 0 {
-					cc = config.DefaultChunkChars
-				}
-				if ov < 0 {
-					ov = config.DefaultOverlap
-				}
-				s := &skim.Skimmer{
-					Client: client, Prompt: prompt,
-					Goal: g.Goal, Threshold: *threshold,
-					ChunkChars: cc, Overlap: ov,
-					MaxChars: 0, Parallel: len(goalSources),
-				}
-				res, usage := s.Run(ctx, goalSources)
-				gr := gres{goal: g, draw: draw, keptP: map[string]float64{}, tokens: usage.InputTokens}
-				for _, r := range res {
-					if r.Error != "" {
-						gr.err = r.Error
-					}
-					gr.nJudged += r.Chunks
-					doc := strings.TrimSuffix(filepath.Base(r.Source), ".txt")
-					for _, k := range r.Kept {
-						id := fmt.Sprintf("%s-%02d", doc, k.Index)
-						gr.keptIDs = append(gr.keptIDs, id)
-						gr.keptTexts = append(gr.keptTexts, k.Text)
-						if k.P != nil {
-							gr.keptP[id] = *k.P
-						}
+				var names []string
+				if g.Doc != "" {
+					names = []string{g.Doc}
+				} else {
+					names = split.Docs(split.Of(g)) // a distractor: every document of its half
+					if *half == "all" {
+						names = split.Docs("all")
 					}
 				}
+				rec := skimGoal(ctx, client, prompt, extras, g, names, docs, locText, *corpus, *chunkChars, *overlap, *keepText)
+				rec.Schema, rec.Run, rec.Draw, rec.Half = schema, *label, draw, split.Of(g)
 				mu.Lock()
-				grs = append(grs, gr)
+				records = append(records, rec)
+				done++
+				if done%25 == 0 || done == total {
+					fmt.Fprintf(os.Stderr, "evalskim: %s %d/%d\n", *label, done, total)
+				}
 				mu.Unlock()
 			}(g, draw)
 		}
 	}
 	wg.Wait()
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
 
-	// Archive.
-	enc := json.NewEncoder(runsF)
-	write := func(v any) error { return enc.Encode(v) }
-	if err := write(map[string]any{"schema": "skimmer-eval/v1", "type": "header", "run_id": runID, "model": *model, "skimmer_version": *skV, "draws": *draws, "threshold": *threshold, "fingerprint": fingerprint, "ts": time.Now().UTC().Format(time.RFC3339)}); err != nil {
+	sort.Slice(records, func(a, b int) bool {
+		if records[a].Draw != records[b].Draw {
+			return records[a].Draw < records[b].Draw
+		}
+		return records[a].Goal < records[b].Goal
+	})
+	if err := os.MkdirAll(filepath.Dir(*out), 0o755); err != nil {
 		return err
 	}
-	sort.Slice(grs, func(a, b int) bool {
-		if grs[a].draw != grs[b].draw {
-			return grs[a].draw < grs[b].draw
+	file, err := os.Create(*out)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	enc := json.NewEncoder(file)
+	if err := enc.Encode(header); err != nil {
+		return err
+	}
+	var tokens, unjudged, failed int
+	for _, r := range records {
+		tokens += r.InputTokens
+		unjudged += r.Unjudged
+		if r.Error != "" {
+			failed++
 		}
-		return grs[a].goal.ID < grs[b].goal.ID
-	})
-	for _, gr := range grs {
-		kept := map[string]float64{}
-		for id, p := range gr.keptP {
-			kept[id] = p
-		}
-		rec := map[string]any{
-			"schema": "skimmer-eval/v1", "run_id": runID, "goal": gr.goal.ID,
-			"draw": gr.draw, "kind": gr.goal.Kind, "model": *model,
-			"skimmer_version": *skV, "threshold": *threshold,
-			"kept": kept, "kept_texts": gr.keptTexts, "input_tokens": gr.tokens, "ts": time.Now().UTC().Format(time.RFC3339),
-		}
-		if gr.err != "" {
-			rec["error"] = gr.err
-		}
-		if err := write(rec); err != nil {
+		if err := enc.Encode(r); err != nil {
 			return err
 		}
 	}
-
-	// Metrics.
-	report := compute(grs, goals, fingerprint, *model, *skV, *threshold, runID, names, catalog, *factMatch)
-	if *ranked {
-		report["ranked"] = rankedMetrics(grs)
-	}
-	out, _ := json.MarshalIndent(report, "", " ")
-	fmt.Println(string(out))
+	fmt.Fprintf(os.Stderr, "evalskim: wrote %s: %d goal-draws, %d input tokens, %d unjudged chunks, %d failed\n",
+		*out, len(records), tokens, unjudged, failed)
 	return nil
 }
 
-func normalize(s string) string {
-	var b strings.Builder
-	for _, r := range strings.ToLower(s) {
-		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') {
-			b.WriteRune(r)
+func skimGoal(ctx context.Context, client *jev.Client, prompt *prompts.Prompt, extras []skim.Question, g kit.Goal,
+	names []string, docs, locText map[string]string, corpus string, chunkChars int, overlap float64, keepText bool) Record {
+	rec := Record{Goal: g.ID, Set: g.Set, Kind: g.Kind, Docs: len(names), Chunks: []Chunk{}}
+	sources := make([]skim.Source, len(names))
+	for i, n := range names {
+		sources[i] = skim.Source{Kind: skim.KindFile, Ref: filepath.Join(corpus, n+".txt"), Text: docs[n]}
+	}
+	s := &skim.Skimmer{
+		Client: client, Prompt: prompt, Extra: extras, Goal: g.Goal,
+		Threshold: 0, ChunkChars: chunkChars, Overlap: overlap, Parallel: len(sources),
+	}
+	results, usage := s.Run(ctx, sources)
+	rec.Model, rec.InputTokens, rec.OutputTokens = usage.Model, usage.InputTokens, usage.OutputTokens
+	for i, r := range results {
+		if r.Error != "" {
+			rec.Error = r.Error
+		}
+		rec.Unjudged += r.Unjudged
+		loc := kit.NewLocator(locText[names[i]])
+		for _, k := range r.Kept {
+			c := Chunk{Doc: names[i], I: k.Index, P: k.P}
+			if sp, ok := loc.Locate(k.Text); ok {
+				c.Span = &sp
+			}
+			for name, p := range k.Extra {
+				if p != nil {
+					if c.X == nil {
+						c.X = map[string]float64{}
+					}
+					c.X[name] = *p
+				}
+			}
+			if keepText {
+				c.Text = k.Text
+			}
+			rec.Chunks = append(rec.Chunks, c)
 		}
 	}
-	return b.String()
+	return rec
 }
 
-func factHit(g Goal, kept string) bool {
-	f := normalize(g.DecisiveFact)
-	if len(f) < 16 {
-		return false
+func loadPrompt(kind, path string) (*prompts.Prompt, error) {
+	if path == "" {
+		return prompts.Load(kind, "", "")
 	}
-	t := normalize(kept)
-	if strings.Contains(t, f) {
-		return true
+	return prompts.Load(kind, path, "")
+}
+
+func promptName(path string) string {
+	if path == "" {
+		return "built-in skim_document/DEFAULT"
 	}
-	for k := 0; k+16 <= len(f); k++ {
-		if strings.Contains(t, f[k:k+16]) {
+	return path
+}
+
+func inList(list, x string) bool {
+	for _, y := range strings.Split(list, ",") {
+		if y == x {
 			return true
 		}
 	}
 	return false
 }
 
-func compute(grs []gres, goals []Goal, fingerprint, model, skV string, threshold float64, runID string, names []string, catalog []CatalogChunk, factMatch bool) map[string]any {
-	byID := map[string]Goal{}
-	for _, g := range goals {
-		byID[g.ID] = g
-	}
-	type drawStat struct {
-		Draw                int     `json:"draw"`
-		Gold                int     `json:"gold_goals"`
-		GoldKept            int     `json:"gold_kept"` // gold goal with any gold chunk kept
-		Confusables         int     `json:"confusable_goals"`
-		ConfusableKeptGold  int     `json:"confusable_kept_gold"`  // gold chunk kept
-		ConfusableKeptOther int     `json:"confusable_kept_other"` // near-duplicate other chunk kept
-		DistractorGoals     int     `json:"distractor_goals"`
-		DistractorKeptAny   int     `json:"distractor_kept_any"` // distractor goal keeping any chunk
-		KeptMean            float64 `json:"kept_mean_chunks_per_goal"`
-		TokensPerGoal       float64 `json:"input_tokens_per_goal"`
-		Chunks              float64 `json:"chunks_judged_mean"` // mean chunks judged per goal
-	}
-	stats := map[int]*drawStat{}
-	for _, gr := range grs {
-		st := stats[gr.draw]
-		if st == nil {
-			st = &drawStat{Draw: gr.draw}
-			stats[gr.draw] = st
-		}
-		st.TokensPerGoal += float64(gr.tokens)
-		st.Chunks += float64(gr.nJudged)
-		st.KeptMean += float64(len(gr.keptIDs))
-		if gr.goal.Kind == "distractor" {
-			st.DistractorGoals++
-			if len(gr.keptIDs) > 0 {
-				st.DistractorKeptAny++
-			}
-			continue
-		}
-		gold := map[string]bool{}
-		for _, id := range goldIDs(gr.goal) {
-			gold[id] = true
-		}
-		if gr.goal.Kind == "confusable" {
-			st.Confusables++
-			for _, id := range gr.keptIDs {
-				if gold[id] {
-					st.ConfusableKeptGold++
-				}
-				if gr.goal.Other != "" && id == gr.goal.Other {
-					st.ConfusableKeptOther++
-				}
-			}
-			continue
-		}
-		st.Gold++
-		if factMatch {
-			for _, kt := range gr.keptTexts {
-				if factHit(gr.goal, kt) {
-					st.GoldKept++
-					break
-				}
-			}
-			continue
-		}
-		for _, id := range gr.keptIDs {
-			if gold[id] {
-				st.GoldKept++
-				break
-			}
+// apiKey reads the key from the environment only, like the CLI.
+func apiKey() string {
+	for _, name := range []string{"SKIMMER_API_KEY", "JEV_API_KEY", "TYPESAFE_API_KEY"} {
+		if v := os.Getenv(name); v != "" {
+			return v
 		}
 	}
-	var draws []drawStat
-	for d := 1; d <= 10; d++ {
-		if st, ok := stats[d]; ok {
-			n := st.Gold + st.DistractorGoals + st.Confusables
-			if n > 0 {
-				st.KeptMean /= float64(n)
-				st.TokensPerGoal /= float64(n)
-				st.Chunks /= float64(n)
-			}
-			draws = append(draws, *st)
-		}
-	}
-	return map[string]any{
-		"run_id": runID, "fingerprint": fingerprint, "model": model,
-		"skimmer_version": skV, "threshold": threshold,
-		"sources": len(names), "catalog_chunks": len(catalog),
-		"draws": draws,
-	}
+	return ""
 }
 
-var _ = strconv.Itoa
+func commit() string {
+	out, err := exec.Command("git", "rev-parse", "--short", "HEAD").Output()
+	if err != nil {
+		return ""
+	}
+	c := strings.TrimSpace(string(out))
+	if st, _ := exec.Command("git", "status", "--porcelain").Output(); len(st) > 0 {
+		c += "-dirty"
+	}
+	return c
+}
 
-// rankedMetrics computes recall@k and all-modes coverage from the archived
-// per-chunk probabilities. For each goal, chunks of its own document are
-// ranked by kept probability (ties broken by chunk id); recall@k is the share
-// of gold chunks within the top k; coverage is the fraction of goals whose
-// top-10 contains every gold chunk (mode drop: any gold region missing).
-func rankedMetrics(grs []gres) map[string]any {
-	type rk struct {
-		Draw    int     `json:"draw"`
-		Goals   int     `json:"goals"`
-		RAt1    float64 `json:"recall_at_1"`
-		RAt3    float64 `json:"recall_at_3"`
-		RAt5    float64 `json:"recall_at_5"`
-		RAt10   float64 `json:"recall_at_10"`
-		Cover10 float64 `json:"all_modes_in_top10"`
-		MRR     float64 `json:"mrr"`
+// fingerprint hashes everything that defines the inputs: goal files, the
+// split, the catalog, the corpus, and the prompts.
+func fingerprint(corpus string, docs []string, sets, prompt string, extras []skim.Question) string {
+	h := sha256.New()
+	add := func(path string) {
+		b, _ := os.ReadFile(path)
+		fmt.Fprintf(h, "%s:%d\n", path, len(b))
+		h.Write(b)
 	}
-	stats := map[int]*rk{}
-	for _, gr := range grs {
-		gold := map[string]bool{}
-		switch v := gr.goal.GoldRaw.(type) {
-		case string:
-			gold[v] = true
-		case []string:
-			for _, x := range v {
-				gold[x] = true
-			}
-		case []any:
-			for _, x := range v {
-				if s, ok := x.(string); ok {
-					gold[s] = true
-				}
-			}
-		}
-		if len(gold) == 0 {
-			continue
-		}
-		st := stats[gr.draw]
-		if st == nil {
-			st = &rk{Draw: gr.draw}
-			stats[gr.draw] = st
-		}
-		type pc struct {
-			id string
-			p  float64
-		}
-		var ps []pc
-		for id, p := range gr.keptP {
-			ps = append(ps, pc{id, p})
-		}
-		sort.Slice(ps, func(a, b int) bool {
-			if ps[a].p != ps[b].p {
-				return ps[a].p > ps[b].p
-			}
-			return ps[a].id < ps[b].id
-		})
-		var ranks []int
-		for k, c := range ps {
-			if gold[c.id] {
-				ranks = append(ranks, k+1)
-			}
-		}
-		st.Goals++
-		in := func(k int) bool {
-			for _, r := range ranks {
-				if r <= k {
-					return true
-				}
-			}
-			return false
-		}
-		if in(1) {
-			st.RAt1++
-		}
-		if in(3) {
-			st.RAt3++
-		}
-		if in(5) {
-			st.RAt5++
-		}
-		if in(10) {
-			st.RAt10++
-		}
-		if r := ranks[0]; r > 0 {
-			st.MRR += 1 / float64(r)
-		}
-		all := true
-		for _, r := range ranks {
-			if r > 10 {
-				all = false
-			}
-		}
-		if all {
-			st.Cover10++
-		}
+	for _, s := range strings.Split(sets, ",") {
+		add(kit.GoalSets[s])
 	}
-	var out []rk
-	for d := 1; d <= 10; d++ {
-		if st, ok := stats[d]; ok && st.Goals > 0 {
-			n := float64(st.Goals)
-			st.RAt1 /= n
-			st.RAt3 /= n
-			st.RAt5 /= n
-			st.RAt10 /= n
-			st.Cover10 /= n
-			st.MRR /= n
-			out = append(out, *st)
-		}
+	add("evals/gold/split.json")
+	add("evals/gold/catalog.json")
+	for _, d := range docs {
+		add(filepath.Join(corpus, d+".txt"))
 	}
-	return map[string]any{"draws": out}
+	if prompt != "" {
+		add(prompt)
+	} else {
+		add("prompts/skim_document/DEFAULT.md")
+	}
+	for _, e := range extras {
+		fmt.Fprintf(h, "extra:%s:%s\n", e.Name, e.Prompt.Body)
+	}
+	return hex.EncodeToString(h.Sum(nil))[:32]
 }

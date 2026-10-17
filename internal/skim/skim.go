@@ -35,7 +35,8 @@ type Source struct {
 	Kind Kind
 	// Ref is the URL or file path; "-" for stdin.
 	Ref string
-	// Text is the content for KindStdin.
+	// Text is the content for KindStdin. When set for another kind, it is
+	// used instead of fetching or reading Ref.
 	Text string
 }
 
@@ -45,7 +46,21 @@ type Kept struct {
 	StartLine int      `json:"start_line"`
 	EndLine   int      `json:"end_line"`
 	P         *float64 `json:"p"` // nil: Jev never ruled on it, kept to be safe
-	Text      string   `json:"text"`
+	// PInjection is the injection check's P(yes), with --injection-check.
+	PInjection *float64 `json:"p_injection,omitempty"`
+	// Extra holds the answers to Skimmer.Extra questions, by name.
+	Extra map[string]*float64 `json:"extra,omitempty"`
+	Text  string              `json:"text"`
+}
+
+// Flagged is a chunk the injection check dropped. Its text is left out on
+// purpose: it is the part of the page that tried to steer the reader.
+type Flagged struct {
+	Index      int      `json:"index"`
+	StartLine  int      `json:"start_line"`
+	EndLine    int      `json:"end_line"`
+	P          *float64 `json:"p"`
+	PInjection float64  `json:"p_injection"`
 }
 
 // Lines renders the kept chunk's line range.
@@ -63,7 +78,19 @@ type Result struct {
 	KeptChars int    `json:"kept_chars"`
 	Truncated bool   `json:"truncated,omitempty"`
 	Unjudged  int    `json:"unjudged,omitempty"`
-	Kept      []Kept `json:"kept"`
+	// Flagged lists chunks dropped by the injection check.
+	Flagged []Flagged `json:"flagged,omitempty"`
+	Kept    []Kept    `json:"kept"`
+}
+
+// InjectionThreshold is the injection check's P(yes) at or above which a
+// chunk is dropped.
+const InjectionThreshold = 0.5
+
+// Question is an extra question asked of every chunk.
+type Question struct {
+	Name   string
+	Prompt *prompts.Prompt
 }
 
 // Skimmer holds the shared settings for a run.
@@ -83,6 +110,12 @@ type Skimmer struct {
 	MaxKept int
 	// Parallel bounds how many sources are loaded and chunked at once.
 	Parallel int
+	// InjectionCheck, when set, is asked of every chunk in the same requests,
+	// and chunks it flags are dropped. A chunk it could not judge is kept.
+	InjectionCheck *prompts.Prompt
+	// Extra are more questions asked of every chunk; their answers land in
+	// Kept.Extra. The evals use them to compare question designs.
+	Extra []Question
 }
 
 // Run skims every source and returns results aligned with sources, plus the
@@ -142,30 +175,53 @@ func (s *Skimmer) one(ctx context.Context, src Source) (Result, jev.Usage) {
 	if src.Kind == KindStdin {
 		label = ""
 	}
-	ps, usage, err := s.Client.Judge(ctx, jev.Judgement{
-		Goal:    s.Goal,
-		Context: label,
-		Texts:   texts,
-		Instructions: func(i int) (string, error) {
-			return s.Prompt.Render(prompts.Data{
-				Goal: s.Goal, ID: jev.ItemKey(i), Index: i, Text: texts[i],
-				Source: label, Lines: chunks[i].Lines(),
-			})
-		},
-	})
+	data := func(i int) prompts.Data {
+		return prompts.Data{
+			Goal: s.Goal, ID: jev.ItemKey(i), Index: i, Text: texts[i],
+			Source: label, Lines: chunks[i].Lines(),
+		}
+	}
+	ask := s.Prompt.Ask("", data)
+	j := jev.Judgement{
+		Goal:         s.Goal,
+		Context:      label,
+		Texts:        texts,
+		Instructions: ask.Instructions,
+		Criteria:     ask.Criteria,
+	}
+	for _, q := range s.Extra {
+		j.Extra = append(j.Extra, q.Prompt.Ask(q.Name, data))
+	}
+	if s.InjectionCheck != nil {
+		j.Extra = append(j.Extra, s.InjectionCheck.Ask(injectionKey, data))
+	}
+	v, err := s.Client.JudgeAll(ctx, j)
+	usage, ps := v.Usage, v.P
 	var partial *jev.PartialError
 	if err != nil && !errors.As(err, &partial) {
 		r.Error = err.Error()
 		return r, usage
 	}
+	flagged := func(i int) bool {
+		if s.InjectionCheck == nil {
+			return false
+		}
+		pi := v.Extra[injectionKey]
+		return pi[i] != nil && *pi[i] >= InjectionThreshold
+	}
 
 	// Pick the chunks to keep: P ≥ threshold, or unjudged.
 	var keep []int
 	for i, p := range ps {
-		if p == nil {
+		switch {
+		case p == nil:
 			r.Unjudged++
 			keep = append(keep, i)
-		} else if *p >= s.Threshold {
+		case *p < s.Threshold:
+		case flagged(i):
+			c := chunks[i]
+			r.Flagged = append(r.Flagged, Flagged{Index: i, StartLine: c.StartLine, EndLine: c.EndLine, P: p, PInjection: *v.Extra[injectionKey][i]})
+		default:
 			keep = append(keep, i)
 		}
 	}
@@ -176,11 +232,26 @@ func (s *Skimmer) one(ctx context.Context, src Source) (Result, jev.Usage) {
 	}
 	for _, i := range keep {
 		c := chunks[i]
-		r.Kept = append(r.Kept, Kept{Index: i, StartLine: c.StartLine, EndLine: c.EndLine, P: ps[i], Text: c.Text})
+		k := Kept{Index: i, StartLine: c.StartLine, EndLine: c.EndLine, P: ps[i], Text: c.Text}
+		if s.InjectionCheck != nil {
+			k.PInjection = v.Extra[injectionKey][i]
+		}
+		for _, q := range s.Extra {
+			if k.Extra == nil {
+				k.Extra = map[string]*float64{}
+			}
+			k.Extra[q.Name] = v.Extra[q.Name][i]
+		}
+		r.Kept = append(r.Kept, k)
 		r.KeptChars += utf8.RuneCountInString(c.Text)
 	}
 	return r, usage
 }
+
+// injectionKey names the injection check among a judgement's questions.
+// Only InjectionCheck drops chunks; an Extra question of any name, even one
+// asking the same thing, is only recorded.
+const injectionKey = "injection_check"
 
 // score orders chunks for MaxKept; unjudged chunks rank last.
 func score(p *float64) float64 {
@@ -191,6 +262,9 @@ func score(p *float64) float64 {
 }
 
 func (s *Skimmer) load(ctx context.Context, src Source) (string, error) {
+	if src.Text != "" && src.Kind != KindStdin {
+		return src.Text, nil
+	}
 	switch src.Kind {
 	case KindURL:
 		return s.Fetcher.Fetch(ctx, src.Ref)

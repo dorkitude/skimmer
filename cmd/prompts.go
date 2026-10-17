@@ -16,12 +16,14 @@ var promptsCmd = &cobra.Command{
 	Short: "List, show, or customize the Jev prompts",
 	Long: `skimmer asks Jev one yes/no question per chunk (skim) or item (filter),
 rendered from a prompt template. The built-in defaults are
-skim_document/DEFAULT and filter_results/DEFAULT.
+skim_document/DEFAULT and filter_results/DEFAULT; --injection-check adds
+injection_check/DEFAULT.
 
 Add your own as ~/.config/skimmer/prompts/<kind>/<NAME>.md and pick them with
 --prompt NAME (a file named DEFAULT.md replaces the built-in default), or pass
 --prompt path/to/file.md. A prompt is optional YAML frontmatter (name,
-description, model) and a Go text/template body with these fields:
+description, model, and criteria: true/false text saying what yes and no
+mean) and a Go text/template body with these fields:
 
   {{.Goal}}    what the caller is trying to accomplish
   {{.Text}}    the chunk or item text
@@ -54,7 +56,7 @@ var promptsListCmd = &cobra.Command{
 }
 
 var promptsShowCmd = &cobra.Command{
-	Use:   "show <skim_document|filter_results> [NAME]",
+	Use:   "show <skim_document|filter_results|injection_check> [NAME]",
 	Short: "Print a prompt's source",
 	Args:  cobra.RangeArgs(1, 2),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -77,7 +79,7 @@ var promptsShowCmd = &cobra.Command{
 }
 
 var promptsInitCmd = &cobra.Command{
-	Use:   "init <skim_document|filter_results> NAME",
+	Use:   "init <skim_document|filter_results|injection_check> NAME",
 	Short: "Copy the default prompt to ~/.config/skimmer/prompts to customize it",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {

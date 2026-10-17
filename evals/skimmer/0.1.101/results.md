@@ -1,5 +1,27 @@
 # Skimmer 0.1.101 — measured
 
+> **Corrections (2026-10-16, [issue #3](https://github.com/dorkitude/skimmer/issues/3)).**
+> These figures are kept as history; [`../0.1.103/results.md`](../0.1.103/results.md)
+> supersedes them.
+>
+> - **The chunk-size sweep's confusable columns were not measured.** The
+>   harness scored confusables by chunk id (`doc-NN`), and at sizes other
+>   than 2000 the same id names different text. Re-scored by document span,
+>   smaller chunks do *not* lose discrimination (0.1.103 results). "Do not
+>   shrink chunks to save tokens — it costs quality" is withdrawn.
+> - **Headline counts are small.** "Recall 1.000" is 52 of 52 goals (95%
+>   Wilson 0.93–1.00); "distractor leak 0.000" is 0 of 12 far-off-topic
+>   goals (0.00–0.24); confusable gold kept is 14 of 14 (0.78–1.00).
+> - **The threshold advice (0.7) was picked on the goals that report it.**
+>   It does not hold for the 0.1.102 prompt on held-out documents.
+> - **Token figures:** 53,786 is the mean over all 78 goals in `runs.jsonl`,
+>   including 12 distractors judged over all 236 chunks (239,200 tokens
+>   each); gold goals average 19,577 and confusables 21,923. The 16,986
+>   in the baseline table matches no goal kind in the archived run and
+>   could not be reproduced.
+> - **Cross-draw delta** came from 2 draws with no committed script; in
+>   `runs.jsonl` 15 chunks in 13 goals land on opposite sides of 0.5.
+
 Pinned model `jev-1.14.0`, 2 draws, 78 goals (52 gold, 14 confusable,
 12 distractor) over 12 documents / 236 chunks at the default design
 (2000-char chunks, 0.10 overlap, `prompts/skim_document/DEFAULT.md`,

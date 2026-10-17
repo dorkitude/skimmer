@@ -28,6 +28,7 @@ var skimOpts struct {
 	pathsStdin bool
 	textStdin  bool
 	quiet      bool
+	injection  bool
 }
 
 var skimCmd = &cobra.Command{
@@ -68,6 +69,7 @@ func init() {
 	f.BoolVar(&skimOpts.pathsStdin, "paths", false, "treat stdin as a list of file paths")
 	f.BoolVar(&skimOpts.textStdin, "text", false, "treat stdin as the document")
 	f.BoolVarP(&skimOpts.quiet, "quiet", "q", false, "no summary on stderr")
+	f.BoolVar(&skimOpts.injection, "injection-check", false, "also ask whether each chunk tries to steer the reader, and drop the ones that do (a filter, not a security boundary)")
 	_ = skimCmd.MarkFlagRequired("goal")
 	rootCmd.AddCommand(skimCmd)
 }
@@ -119,6 +121,11 @@ func runSkim(cmd *cobra.Command, args []string) error {
 		MaxChars:   cfg.MaxChars,
 		MaxKept:    skimOpts.maxKept,
 	}
+	if skimOpts.injection {
+		if s.InjectionCheck, err = prompts.Load(prompts.InjectionCheck, "", promptDir(cfg)); err != nil {
+			return err
+		}
+	}
 	results, usage := s.Run(cmd.Context(), sources)
 
 	out := cmd.OutOrStdout()
@@ -129,9 +136,10 @@ func runSkim(cmd *cobra.Command, args []string) error {
 		enc.SetEscapeHTML(false)
 		if err := enc.Encode(struct {
 			Goal    string        `json:"goal"`
+			Model   string        `json:"model,omitempty"`
 			Results []skim.Result `json:"results"`
 			Usage   jev.Usage     `json:"jev_usage"`
-		}{skimOpts.goal, results, usage}); err != nil {
+		}{skimOpts.goal, usage.Model, results, usage}); err != nil {
 			return err
 		}
 	case skimOpts.raw:
@@ -303,6 +311,9 @@ func printSkim(w io.Writer, results []skim.Result) {
 		if r.Unjudged > 0 {
 			note += fmt.Sprintf(", %d unjudged kept", r.Unjudged)
 		}
+		if len(r.Flagged) > 0 {
+			note += fmt.Sprintf(", %d dropped by --injection-check", len(r.Flagged))
+		}
 		fmt.Fprintf(w, "## %s: kept %d of %d chunks (%s of %s chars%s)\n",
 			label(r), len(r.Kept), r.Chunks, human(r.KeptChars), human(r.Chars), note)
 		for _, k := range r.Kept {
@@ -367,12 +378,14 @@ func human(n int) string {
 }
 
 func printSkimSummary(results []skim.Result, usage jev.Usage) {
-	var chunks, kept, chars, keptChars, failed int
+	var chunks, kept, chars, keptChars, failed, unjudged, flagged int
 	for _, r := range results {
 		if r.Error != "" {
 			failed++
 			continue
 		}
+		unjudged += r.Unjudged
+		flagged += len(r.Flagged)
 		chunks += r.Chunks
 		kept += len(r.Kept)
 		chars += r.Chars
@@ -387,8 +400,24 @@ func printSkimSummary(results []skim.Result, usage jev.Usage) {
 	if failed > 0 {
 		msg += fmt.Sprintf(", %d failed", failed)
 	}
-	if usage.InputTokens > 0 {
-		msg += fmt.Sprintf(" · jev %s tokens", human(usage.InputTokens+usage.OutputTokens))
+	if unjudged > 0 {
+		msg += fmt.Sprintf(", %d unjudged kept", unjudged)
 	}
+	if flagged > 0 {
+		msg += fmt.Sprintf(", %d dropped by --injection-check", flagged)
+	}
+	msg += usageNote(usage)
 	fmt.Fprintln(os.Stderr, msg)
+}
+
+// usageNote renders Jev's token use and the model that answered.
+func usageNote(u jev.Usage) string {
+	if u.InputTokens == 0 {
+		return ""
+	}
+	msg := fmt.Sprintf(" · jev %s tokens", human(u.InputTokens+u.OutputTokens))
+	if u.Model != "" {
+		msg += " (" + u.Model + ")"
+	}
+	return msg
 }
