@@ -5,6 +5,8 @@ Versions are semver with large patch numbers (`0.1.100`, `0.1.101`, ...).
 
 ## [Unreleased]
 
+## [0.1.103] - 2026-10-16
+
 In answer to the review in [#3](https://github.com/dorkitude/skimmer/issues/3).
 
 ### Changed
