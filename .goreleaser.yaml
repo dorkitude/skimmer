@@ -17,6 +17,13 @@ builds:
     goos: [darwin, linux, windows]
     goarch: [amd64, arm64]
 
+# One macOS binary for Apple Silicon and Intel (skimmer_X_darwin_all.tar.gz),
+# which the Homebrew cask installs. The per-arch darwin archives stay too.
+universal_binaries:
+  - id: skimmer
+    ids: [skimmer]
+    replace: false
+
 archives:
   - id: default
     ids: [skimmer]

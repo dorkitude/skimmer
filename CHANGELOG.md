@@ -5,6 +5,25 @@ Versions are semver with large patch numbers (`0.1.100`, `0.1.101`, ...).
 
 ## [Unreleased]
 
+## [0.1.104] - 2026-10-16
+
+### Changed
+
+- Homebrew installs skimmer as a cask holding the release's prebuilt binary,
+  not a formula built from source. On macOS Tahoe Homebrew refuses any
+  source build without the Xcode Command Line Tools, so
+  `brew install dorkitude/tap/skimmer` failed on Macs without them. The cask
+  needs neither Go nor the Command Line Tools, and it clears macOS's
+  quarantine flag so the unnotarized binary runs without a warning. If you
+  installed the formula, switch once:
+  `brew uninstall skimmer && brew install dorkitude/tap/skimmer`.
+
+### Added
+
+- A universal macOS binary in every release (`skimmer_X_darwin_all.tar.gz`,
+  Apple Silicon and Intel in one file), which the cask installs. The
+  per-architecture macOS, Linux and Windows builds are unchanged.
+
 ## [0.1.103] - 2026-10-16
 
 In answer to the review in [#3](https://github.com/dorkitude/skimmer/issues/3).

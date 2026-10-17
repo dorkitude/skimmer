@@ -55,8 +55,9 @@ and then a real `skimmer skim ... -g ...`.
   Bump the patch for each release and the minor for big shifts. Never zero-pad
   (`0.1.001` is not valid semver: Go and GoReleaser reject it).
 - The tag is the version with a `v`: `0.1.100` → `v0.1.100`.
-- The binary learns its version from the tag. GoReleaser and the Homebrew
-  formula set `-X github.com/dorkitude/skimmer/cmd.Version=X.Y.Z`, and
+- The binary learns its version from the tag. GoReleaser sets
+  `-X github.com/dorkitude/skimmer/cmd.Version=X.Y.Z` (every channel but
+  `go install` ships its binaries), and
   `go install ...@vX.Y.Z` builds read it from the module info. There is no
   version constant to bump.
 
@@ -66,7 +67,7 @@ and then a real `skimmer skim ... -g ...`.
 |---|---|---|
 | GitHub release (macOS/Linux tarballs, Windows zips, .deb, .rpm, checksums) | `.goreleaser.yaml` | `release` workflow, on tag push |
 | apt (`dorkitude.github.io/skimmer-apt`, signed) | `scripts/publish-apt.sh` | `release` workflow, on tag push |
-| Homebrew (`dorkitude/homebrew-tap`, `Formula/skimmer.rb`, built from source) | `scripts/publish-packages.sh` | maintainer, after the release exists |
+| Homebrew (`dorkitude/homebrew-tap`, `Casks/skimmer.rb`: the universal macOS binary, or the Linux one per arch; no build, so no Xcode Command Line Tools needed) | `scripts/publish-packages.sh` | maintainer, after the release exists |
 | Scoop (`dorkitude/scoop-bucket`, `skimmer.json`) | `scripts/publish-packages.sh` | maintainer, after the release exists |
 | `go install github.com/dorkitude/skimmer@latest` | the tag | automatic |
 
