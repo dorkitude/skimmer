@@ -175,6 +175,59 @@ skimmer skim ./src -g "..." --prompt ./my-prompt.md
 
 A prompt is optional YAML frontmatter (`name`, `description`, `model`, and `criteria` with `true` and `false` text saying what yes and no mean) followed by a Go `text/template` body. The body can use `{{.Goal}}`, `{{.Text}}`, `{{.ID}}`, `{{.Index}}`, and, for skim, `{{.Source}}` and `{{.Lines}}`. A user prompt named `DEFAULT.md` replaces the built-in default. The built-in defaults send each chunk once in the request state and point the question at it (`{{.ID}}`) rather than pasting the text into the question, which measured 14.5% fewer input tokens with no measurable difference in recall (see the [corrections](evals/variants/README.md)).
 
+## Best practices
+
+These come from hands-on runs (below) and from [the evals](evals/skimmer/0.1.103/results.md).
+
+| | without skimmer | with skimmer | answer kept? |
+|---|---|---|---|
+| Code search: "where do we retry or back off on 429s, and how long do we wait?" over 24 files | 179k chars | 65k at defaults; 17 chunks with `-t 0.8 -n 2` | yes, both ways |
+| A Wikipedia article: Bloom filter false-positive formula and best number of hashes | 71k chars | 13k (82% less) | yes |
+| The Go spec: closing nil or closed channels | 225k chars | 16k (93% less) | yes |
+| 40 GitHub search results: "a production-quality Go Bloom filter library" | 40 items | 20 items | yes; close calls near p 0.5 were uneven |
+| A goal the page can't answer | 71k chars | nothing kept | correctly empty |
+
+**Write the goal as the question you need answered.** Name the specifics
+("how long do we wait between attempts?", "the formula for the false-positive
+rate"), not a topic ("retries", "bloom filters"). A topic matches every chunk
+that mentions it. If the answer has several parts, put them all in one goal.
+
+**Code search: narrow with `rg`, then skim the files.** `rg` is free; let it
+pick the files, and let skimmer read them.
+
+```bash
+rg -l -i "retry|backoff|429" --type go . | skimmer skim -g "where do we retry on 429s, and how long do we wait?"
+rg -l "TODO" -g '!*_test.go' . | skimmer skim -g "TODOs about auth or security"   # leave tests out
+```
+
+A broad question over many files keeps a lot at the defaults (43 chunks in
+the run above). Tighten it with `-n 2` (at most two chunks per file, best
+first), and add `-t 0.8` when you need to find *where* something is rather
+than every place it is. Kept chunks are cited as `path:start-end`: open the file
+there for more context.
+
+**Web pages and long documents: skim the URL or file directly.** The defaults
+work; expect 80–95% less to read. Skimmer fetches HTML, PDFs, and Reddit
+threads itself.
+
+**Lists and search results: `filter`, showing Jev only what matters.** Use
+`--fields title,description` to hide noise, `--scores` to see each item's
+probability, and `-n N` to keep the best N. Items scoring near 0.5 are judgment
+calls; if precision matters, look at `--scores` and pick a cut yourself.
+
+**Thresholds.** Keep the default 0.5. Raising it to 0.7 lost 8 of 42
+held-out goals in the evals, mostly ones that need several passages. If a
+goal needs *every* instance of something ("list every dataset"), try `-t 0.3`.
+
+**When nothing comes back,** the answer is probably not there: goals the
+material couldn't answer kept nothing. Rephrase once, or lower `-t`, before
+reading raw. The reverse doesn't hold: when the material is on the right
+subject but lacks the answer, skimmer kept something about 1 time in 5, so
+check that what comes back actually answers the question.
+
+**Untrusted pages:** add `--injection-check`. It costs about 25% more Jev
+tokens, and it can drop a real answer that sits next to a planted line.
+
 ## For agents
 
 Paste this into your `CLAUDE.md` / `AGENTS.md`:
@@ -184,10 +237,12 @@ Paste this into your `CLAUDE.md` / `AGENTS.md`:
 Before reading a long web page, a big file, many grep hits, or a long list of results,
 run it through `skimmer` with a specific goal, and read only what comes back:
 - `skimmer skim <url|file|dir>... -g "<what you need>"`
-- `rg -n "<pattern>" . | skimmer skim -g "<what you need>"`  (reads the matching files)
-- `<command emitting JSON/lines> | skimmer filter -g "<what you need>"`
+- `rg -l "<pattern>" . | skimmer skim -g "<what you need>" -n 2`  (reads the matching files)
+- `<command emitting JSON/lines> | skimmer filter -g "<what you need>" --fields title,description`
+Write the goal as the specific question you need answered, not a topic.
 Kept file chunks are cited as path:start-end; open the file there if you need more context.
 If skimmer reports nothing relevant, rephrase the goal or lower `-t` before reading raw.
+`skimmer --help` has a short guide to each kind of search.
 ```
 
 ## Evals

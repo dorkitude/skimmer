@@ -45,7 +45,8 @@ With no arguments, stdin is read: if every line names a file (as from
 itself is the document. --paths and --text force either reading.
 
 File chunks are labeled path:start-end so you can jump straight to them.
-A summary of what was saved goes to stderr (silence it with -q).`,
+A summary of what was saved goes to stderr (silence it with -q).
+` + "`skimmer --help`" + ` has best practices for code, pages, and lists.`,
 	Example: `  skimmer skim https://en.wikipedia.org/wiki/Bloom_filter -g "false positive rate formula"
   skimmer skim ./docs README.md -g "how do I configure retries?"
   rg -l "context.WithTimeout" | skimmer skim -g "which calls lack a timeout on the HTTP client?"

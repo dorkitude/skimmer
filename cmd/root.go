@@ -53,6 +53,24 @@ less distracted model.
   grep -rl "retry" ./internal | skimmer skim -g "where do we back off on 429s?"
   cat results.json | skimmer filter -g "papers from 2025 about sparse autoencoders"
 
+Best practices (details and measurements in the README):
+  Goal      Ask the specific question you need answered, not a topic.
+            Put every part of a multi-part question in one goal.
+  Code      Narrow with rg, then skim the files it lists. For broad
+            questions over many files, add -n 2 (best two chunks per
+            file); add -t 0.8 when you need where something is, not every
+            place it is. Exclude tests with rg -g '!*_test.go'.
+              rg -l -i "retry|429" --type go . | skimmer skim -g "..." -n 2
+  Pages     Skim URLs and long files directly; the defaults keep 5-20%.
+  Lists     skimmer filter --fields title,description (hide noise),
+            --scores (see each item's p), -n N (keep the best N).
+  Threshold Keep 0.5. Raising it drops multi-part answers; for "list
+            every X" goals, try -t 0.3.
+  Empty     Nothing kept usually means the answer isn't there: rephrase
+            once or lower -t. When something IS kept, check it answers
+            the question; on-topic material can lack the answer.
+  Untrusted Add --injection-check (about 25% more Jev tokens).
+
 Run ` + "`skimmer auth`" + ` once to store your Jev key.`,
 	SilenceUsage:  true,
 	SilenceErrors: true,

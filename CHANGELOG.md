@@ -5,6 +5,15 @@ Versions are semver with large patch numbers (`0.1.100`, `0.1.101`, ...).
 
 ## [Unreleased]
 
+## [0.1.105] - 2026-10-16
+
+### Added
+
+- Best practices, from hands-on runs and the evals: a README section (with
+  measurements for code search, web pages, long docs, search results and
+  unanswerable goals) and a short guide in `skimmer --help`, so agents pick
+  the right flags for each kind of search. The "For agents" snippet uses them.
+
 ## [0.1.104] - 2026-10-16
 
 ### Changed
