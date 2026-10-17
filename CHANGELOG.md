@@ -25,7 +25,8 @@ In answer to the review in [#3](https://github.com/dorkitude/skimmer/issues/3).
   chunk or item, in the same requests, drops ones that try to steer the
   reader (listed as `flagged` in `--json`). Measured: planted lines kept
   1–6% of the time instead of 18–20%, 0 flags in 5,439 clean judgments,
-  about 25% more input tokens. A filter, not a security boundary.
+  about 25% more input tokens; in documents with a planted line it cost 3–4
+  of 66 goals, by dropping answers next to the line. A filter, not a security boundary.
   The prompt is `injection_check/DEFAULT.md`.
 - Prompt frontmatter takes `criteria` (`true` and `false` text), sent as the
   Noul's criteria.
@@ -42,6 +43,11 @@ In answer to the review in [#3](https://github.com/dorkitude/skimmer/issues/3).
 
 ### Fixed
 
+- Injection eval chunks now map through the planted insertion to their
+  original-document spans, including chunks containing only part of the line.
+  Repaired the saved spans offline without changing model probabilities:
+  the check loses 3–4 complete goals of 66 per planted-line run, previously
+  hidden by missing spans. Updated the results and README.
 - The chunk-size sweep scored near-duplicate goals by chunk id, which names
   different text at other sizes. Re-scored by span, smaller chunks do not
   lose discrimination; the 0.1.101 claim is withdrawn.

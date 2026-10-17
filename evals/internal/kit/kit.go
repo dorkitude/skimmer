@@ -178,12 +178,40 @@ func (s Span) Len() int { return max(0, s.B-s.A) }
 
 // Locator finds chunks in one document.
 type Locator struct {
-	doc string
-	pos int // where the previous chunk started; chunks come in order
+	doc    string
+	pos    int  // where the previous chunk started; chunks come in order
+	insert Span // inserted bytes in doc, excluded from original-document coordinates
 }
 
 // NewLocator indexes a document's text.
 func NewLocator(text string) *Locator { return &Locator{doc: Squeeze(text)} }
+
+// NewMappedLocator locates chunks of modified in original-document coordinates.
+// modified must be original with at most one contiguous insertion (as made by
+// evalinject). Chunks may contain any part of the insertion; only their original
+// content contributes to the returned span. A wholly inserted chunk has length 0.
+func NewMappedLocator(original, modified string) (*Locator, error) {
+	orig, mod := Squeeze(original), Squeeze(modified)
+	if len(mod) < len(orig) {
+		return nil, fmt.Errorf("modified document is not the original plus an insertion")
+	}
+	a := 0
+	for a < len(orig) && orig[a] == mod[a] {
+		a++
+	}
+	b := a + len(mod) - len(orig)
+	if orig[a:] != mod[b:] {
+		return nil, fmt.Errorf("modified document is not the original plus an insertion")
+	}
+	return &Locator{doc: mod, insert: Span{a, b}}, nil
+}
+
+func (l *Locator) originalSpan(a, b int) Span {
+	mapOffset := func(p int) int {
+		return p - min(max(p-l.insert.A, 0), l.insert.Len())
+	}
+	return Span{mapOffset(a), mapOffset(b)}
+}
 
 // Locate returns the span of a chunk of this document. Chunks are found in
 // document order, so each search starts where the previous chunk began.
@@ -194,10 +222,10 @@ func (l *Locator) Locate(chunk string) (Span, bool) {
 	}
 	if i := strings.Index(l.doc[l.pos:], c); i >= 0 {
 		l.pos += i
-		return Span{l.pos, l.pos + len(c)}, true
+		return l.originalSpan(l.pos, l.pos+len(c)), true
 	}
 	if i := strings.Index(l.doc, c); i >= 0 {
-		return Span{i, i + len(c)}, true
+		return l.originalSpan(i, i+len(c)), true
 	}
 	return Span{}, false
 }

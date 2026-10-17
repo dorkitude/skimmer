@@ -94,6 +94,11 @@ go run ./evals/cmd/evalreport injection evals/skimmer/0.1.103/runs/inject-*.json
 ```
 
 The model must be a versioned ID (`jev-1.14.0`); aliases are refused.
+For planted corpora, `evalskim` maps chunks through the inserted line back to
+the original document's coordinates. A mixed chunk's useful text still counts
+toward goal completion; only inserted text has zero span length. The supplied
+corpus must match the original apart from one contiguous insertion per document
+(whitespace is ignored). Unsupported edits are rejected before live requests.
 `evalskim` and `evalreport` replace 0.1.101's `evalshift` and
 `evalvariants` (in git history), which scored by chunk id and, for
 variants, bypassed the real pipeline.

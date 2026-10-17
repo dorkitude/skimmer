@@ -162,9 +162,9 @@ func run(args []string) error {
 		}
 	}
 
-	// Documents: the text skimmer sees (shifted, or with planted lines) and
-	// the original text chunks are located in, so spans are comparable
-	// across runs.
+	// Keep the unshifted input (possibly with planted text) and the original
+	// document for mapping spans. Apply the shift only when building sources,
+	// so an insertion remains mappable even when combined with a shift.
 	docs := map[string]string{}
 	locText := map[string]string{}
 	for _, d := range split.Docs("all") {
@@ -172,9 +172,12 @@ func run(args []string) error {
 		if err != nil {
 			return err
 		}
-		docs[d] = kit.Shift(text, *shift)
+		docs[d] = text
 		if locText[d], err = kit.LoadDoc(kit.CorpusDir, d); err != nil {
 			return err
+		}
+		if _, err := kit.NewMappedLocator(locText[d], docs[d]); err != nil {
+			return fmt.Errorf("map document %s: %w", d, err)
 		}
 	}
 
@@ -219,7 +222,7 @@ func run(args []string) error {
 						names = split.Docs("all")
 					}
 				}
-				rec := skimGoal(ctx, client, prompt, extras, g, names, docs, locText, *corpus, *chunkChars, *overlap, *keepText)
+				rec := skimGoal(ctx, client, prompt, extras, g, names, docs, locText, *corpus, *chunkChars, *overlap, *shift, *keepText)
 				rec.Schema, rec.Run, rec.Draw, rec.Half = schema, *label, draw, split.Of(g)
 				mu.Lock()
 				records = append(records, rec)
@@ -271,11 +274,11 @@ func run(args []string) error {
 }
 
 func skimGoal(ctx context.Context, client *jev.Client, prompt *prompts.Prompt, extras []skim.Question, g kit.Goal,
-	names []string, docs, locText map[string]string, corpus string, chunkChars int, overlap float64, keepText bool) Record {
+	names []string, docs, locText map[string]string, corpus string, chunkChars int, overlap float64, shift int, keepText bool) Record {
 	rec := Record{Goal: g.ID, Set: g.Set, Kind: g.Kind, Docs: len(names), Chunks: []Chunk{}}
 	sources := make([]skim.Source, len(names))
 	for i, n := range names {
-		sources[i] = skim.Source{Kind: skim.KindFile, Ref: filepath.Join(corpus, n+".txt"), Text: docs[n]}
+		sources[i] = skim.Source{Kind: skim.KindFile, Ref: filepath.Join(corpus, n+".txt"), Text: kit.Shift(docs[n], shift)}
 	}
 	s := &skim.Skimmer{
 		Client: client, Prompt: prompt, Extra: extras, Goal: g.Goal,
@@ -288,11 +291,17 @@ func skimGoal(ctx context.Context, client *jev.Client, prompt *prompts.Prompt, e
 			rec.Error = r.Error
 		}
 		rec.Unjudged += r.Unjudged
-		loc := kit.NewLocator(locText[names[i]])
+		loc, err := kit.NewMappedLocator(locText[names[i]], docs[names[i]])
+		if err != nil {
+			rec.Error = fmt.Sprintf("map document %s: %v", names[i], err)
+			continue
+		}
 		for _, k := range r.Kept {
 			c := Chunk{Doc: names[i], I: k.Index, P: k.P}
 			if sp, ok := loc.Locate(k.Text); ok {
 				c.Span = &sp
+			} else {
+				rec.Error = fmt.Sprintf("chunk %s#%d not found in its document", names[i], k.Index)
 			}
 			for name, p := range k.Extra {
 				if p != nil {
