@@ -82,6 +82,13 @@ from the maintainer's machine with their own `gh` login, not from CI.
   re-import `key.gpg`.
 - `APT_DEPLOY_KEY`: SSH key for a write deploy key on `dorkitude/skimmer-apt`
   only.
+- `MACOS_SIGN_P12`, `MACOS_SIGN_PASSWORD`: the Developer ID Application
+  certificate (base64 .p12, that identity only) and its password.
+- `MACOS_NOTARY_KEY`, `MACOS_NOTARY_KEY_ID`, `MACOS_NOTARY_ISSUER_ID`: an App
+  Store Connect API key ("goreleaser notarization", Developer role; base64
+  .p8). GoReleaser signs and notarizes every macOS binary with these; without
+  them it skips signing. The same five secrets are set on cfctl, dhctl, tsctl,
+  deadlore and EnronQA-cli.
 
 ### Cutting a release
 

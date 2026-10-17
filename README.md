@@ -45,7 +45,7 @@ When Jev can't judge a chunk (a failed batch, say), skimmer keeps it rather than
 brew install dorkitude/tap/skimmer
 ```
 
-This installs the release's prebuilt binary (one universal binary on macOS), so it needs neither Go nor the Xcode Command Line Tools. If you installed skimmer from the tap before 0.1.104, when it was a formula built from source, switch once: `brew uninstall skimmer && brew install dorkitude/tap/skimmer`.
+This installs the release's prebuilt, signed and notarized binary (one universal binary on macOS), so it needs neither Go nor the Xcode Command Line Tools. If you installed skimmer from the tap before 0.1.104, when it was a formula built from source, switch once: `brew uninstall skimmer && brew install dorkitude/tap/skimmer`.
 
 ### apt (Debian and Ubuntu)
 

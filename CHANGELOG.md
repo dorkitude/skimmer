@@ -5,6 +5,14 @@ Versions are semver with large patch numbers (`0.1.100`, `0.1.101`, ...).
 
 ## [Unreleased]
 
+## [0.1.106] - 2026-10-16
+
+### Changed
+
+- macOS binaries (universal and per-architecture) are signed with a
+  Developer ID certificate and notarized by Apple, so they run without a
+  Gatekeeper warning however they're downloaded, not only through Homebrew.
+
 ## [0.1.105] - 2026-10-16
 
 ### Added
